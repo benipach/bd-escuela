@@ -1,0 +1,9943 @@
+USE bd_etn;
+
+-- 1
+
+-- Directivos cuyo cargo contengan la palabra "regente"
+
+/*Esta consulta se utiliza para identificar a los directivos cuyo cargo incluye la palabra “regente”, 
+ya sea regente o vicerregente. El uso de LIKE '%regente%' permite buscar esa palabra dentro del texto del cargo, 
+sin importar si aparece al comienzo, en el medio o al final.
+Esto resulta útil para poder distinguir rápidamente a los directivos que cumplen funciones específicas de regencia, 
+organizar reuniones, planificar tareas o generar listados según roles dentro de la institución.*/
+
+SELECT Nombre, Apellido 
+FROM Directivos
+WHERE Cargo LIKE '%regente%';
+
+-- +----------+------------+
+-- | Nombre   | Apellido   |
+-- +----------+------------+
+-- | Laura   | Martínez   |
+-- | Gustavo | Fernández  |
+-- | Jorge   | Suárez     |
+-- | Silvia  | Ramírez    |
+-- | Andrés | López      |
+-- | Patricia | Torres     |
+-- +----------+------------+
+
+
+-- Docentes cuyo cargo contiene la palabra "Suplente"
+
+/*Esta consulta se utiliza para identificar a los docentes que trabajan como suplentes. 
+El uso de LIKE '%Suplente%' permite buscar esa palabra dentro del texto del cargo, sin importar si está al inicio,
+al final o en el medio del nombre del puesto.
+Esto es útil para conocer rápidamente qué profesores se encuentran cubriendo suplencias,
+gestionar horarios, organizar reemplazos o elaborar reportes administrativos relacionados con su situación laboral.*/
+
+SELECT Nombre, Apellido 
+FROM Docentes
+WHERE Cargo LIKE '%Suplente%';
+
+-- +----------+----------+
+-- | Nombre   | Apellido |
+-- +----------+----------+
+-- | Martina  | López   |
+-- | Bianca   | Navarro  |
+-- | Agustina | Cabrera  |
+-- +----------+----------+
+
+
+-- Alumnos que no tienen dirección registrada
+
+/* Esta consulta se usa porque permite en una única ejecución, revisar si hay alumnos que todavía no tienen una dirección cargada. 
+Si existen, los muestra con nombre y apellido para poder identificarlos fácilmente y completar sus datos.
+Además, gracias al UNION con la subconsulta, la misma consulta también cubre el caso contrario. 
+Si todos los alumnos tienen dirección registrada, muestra un mensaje indicándolo, 
+en lugar de devolver una tabla vacía que no diría nada útil. */
+
+SELECT Nombre, Apellido 
+FROM Alumnos
+WHERE Direccion IS NULL
+
+UNION
+
+SELECT 'Todos los alumnos', 'tienen direccion registrada'
+WHERE NOT EXISTS (
+    SELECT 1 FROM Alumnos WHERE Direccion IS NULL
+);
+
+-- +-------------------+-----------------------------+
+-- | Nombre            | Apellido                    |
+-- +-------------------+-----------------------------+
+-- | Todos los alumnos | tienen direccion registrada |
+-- +-------------------+-----------------------------+
+
+
+-- Docentes sin correo cargado
+
+/*Sirve para verificar si hay docentes que todavía no tienen su correo electrónico registrado en la base de datos. 
+Si encuentra algún docente sin correo, los muestra directamente por nombre y apellido, 
+lo que facilita identificar a quiénes les falta completar esa información.
+Además, como incluye una subconsulta con NOT EXISTS unida mediante UNION, 
+también resuelve el caso en el que todos los correos estén cargados. 
+En lugar de que la consulta no devuelva nada, muestra un mensaje indicando que la información está completa.*/
+
+SELECT Nombre, Apellido
+FROM Docentes
+WHERE Email IS NULL
+
+UNION
+
+SELECT 'Todos los docentes', 'tienen correo cargado'
+WHERE NOT EXISTS (
+    SELECT 1 FROM Docentes WHERE Email IS NULL
+);
+
+-- +--------------------+----------------------+
+-- | Nombre             | Apellido             |
+-- +--------------------+----------------------+
+-- | Todos los docentes | tienen mail asignado |
+-- +--------------------+----------------------+
+
+-- Alumnos en cursos de automotor
+
+/*Esta subconsulta se utiliza para obtener únicamente a los alumnos que están cursando la especialidad de Automotor. Para realizarlo, 
+compara el año y división de los alumnos con los que pertenecen a cursos cuya especialidad es Automotor, 
+utilizando una subconsulta dentro de IN.
+Gracias a esa subconsulta, no es necesario conocer manualmente qué alumnos pertenecen a la especialidad ni escribirlos uno por uno. 
+La base de datos se encarga de buscar primero los cursos de Automotor y luego devolver a los estudiantes que forman parte de ellos.*/
+
+SELECT Nombre, Apellido 
+FROM Alumnos
+WHERE Anio_Division IN (
+    SELECT Anio_Division FROM Cursos WHERE Especialidad = 'Automotor'
+);
+
+-- +-------------+---------------+
+-- | Nombre      | Apellido      |
+-- +-------------+---------------+
+-- | Alan        | Ojeda         |
+-- | Sol         | Alfaro        |
+-- | Pablo       | Téllez        |
+-- | Magdalena   | Cardozo       |
+-- | Elías       | Villagra      |
+-- | Lola        | Peña          |
+-- | Matheo      | Ferreyra      |
+-- | Candelaria  | Maldonado     |
+-- | Axel        | Reina         |
+-- | Alma        | Vera          |
+-- | Thiago      | Aguirre       |
+-- | Marina      | Barrios       |
+-- | Lucas       | Navarro       |
+-- | Emilia      | Ocampo        |
+-- | Matías      | Silva         |
+-- | Lucía       | Morán         |
+-- | Gonzalo     | Salcedo       |
+-- | Sofía       | Durán         |
+-- | Martín      | Calvo         |
+-- | Josefina    | Villavicencio |
+-- | Sebastián   | Acosta        |
+-- | Isabel      | Ríos          |
+-- | Felipe      | Montes        |
+-- | Micaela     | Romero        |
+-- | Mauricio    | Carranza      |
+-- | Milena      | Araya         |
+-- | Gustavo     | Villaflor     |
+-- | Zoe         | Peñaloza      |
+-- | Ramón       | Quiñones      |
+-- | Miranda     | Godoy         |
+-- | Damián      | Valdés        |
+-- | Verónica    | Mejía         |
+-- | Renzo       | Barcena       |
+-- | Margarita   | Estévez       |
+-- | Elian       | Silvestre     |
+-- | Ainhoa      | Santana       |
+-- | Jonás       | Correa        |
+-- | Mónica      | Ferrari       |
+-- | Mauricio    | Godoy         |
+-- | Bárbara     | Salvatierra   |
+-- | Pablo       | Sierra        |
+-- | Tamara      | Bustos        |
+-- | Federico    | Vallejos      |
+-- | Mariela     | Santoro       |
+-- | Iván        | Báez          |
+-- | Antonella   | Coronel       |
+-- | Rodrigo     | Aguilar       |
+-- | Carla       | Duré          |
+-- | Tomás       | Serrano       |
+-- | Fiorella    | Bustamante    |
+-- | Mateo       | Cardozo       |
+-- | Camila      | Figueroa      |
+-- | Benjamín    | Espinoza      |
+-- | Marina      | Galarza       |
+-- | Franco      | Palacios      |
+-- | Agustina    | Ortigoza      |
+-- | Lucas       | Quintana      |
+-- | Florencia   | Sánchez       |
+-- | Alejandro   | Bravo         |
+-- | Tamara      | Caballero     |
+-- | Mauricio    | Ahumada       |
+-- | Verónica    | Aragón        |
+-- | Iván        | Barroso       |
+-- | Camila      | Cardenas      |
+-- | Emanuel     | Zárate        |
+-- | Andrea      | Gudiño        |
+-- | Oscar       | Mena          |
+-- | Rocío       | Olivera       |
+-- | Pedro       | Villarreal    |
+-- | Valentina   | Ravelo        |
+-- | Gonzalo     | Medina        |
+-- | Melisa      | Torres        |
+-- | Julián      | Bustos        |
+-- | Daniela     | Rojas         |
+-- | Maximiliano | Zárate        |
+-- | Ailén       | Domínguez     |
+-- | Hernán      | Moya          |
+-- | Verónica    | Pizarro       |
+-- | Rodrigo     | Cáceres       |
+-- | Patricia    | Vidal         |
+-- | Sergio      | Coronel       |
+-- | Vanesa      | Silva         |
+-- | Martín      | Agüero        |
+-- | Florencia   | Lagos         |
+-- | Felipe      | Lemus         |
+-- | Micaela     | Godoy         |
+-- | Sergio      | Moreno        |
+-- | Bianca      | Acosta        |
+-- | Cristian    | Delgado       |
+-- | Valeria     | Aguirre       |
+-- | Ariel       | Gómez         |
+-- | Lorena      | Paz           |
+-- | Gastón      | Caballero     |
+-- | Mariela     | Funes         |
+-- | Jorge       | Ramos         |
+-- | Alejandra   | Salas         |
+-- | Cristian    | Cáceres       |
+-- | Laura       | Morales       |
+-- | Agustín     | Zúñiga        |
+-- | Sofía       | Aguilar       |
+-- | Brian       | Ledesma       |
+-- | Luciana     | Funes         |
+-- | Héctor      | Márquez       |
+-- | Rocío       | Montes        |
+-- | Emanuel     | Villanueva    |
+-- | Brenda      | Arce          |
+-- | Fernando    | Ojeda         |
+-- | Jimena      | Britez        |
+-- | Franco      | Silvestre     |
+-- | Micaela     | Durán         |
+-- | Jorge       | Pintos        |
+-- | Patricia    | Almada        |
+-- | Oscar       | Figueroa      |
+-- | Adriana     | Salas         |
+-- | Damián      | Ferreyra      |
+-- | Florencia   | Palacios      |
+-- | Emanuel     | Ojeda         |
+-- | Karina      | Benítez       |
+-- | Luis        | Miranda       |
+-- | Gloria      | Chávez        |
+-- | Alejandro   | Falcón        |
+-- | Mónica      | Corvalán      |
+-- | Cristian    | Santillán     |
+-- | Viviana     | Pereira       |
+-- | Pablo       | Cáceres       |
+-- | Gabriela    | Márquez       |
+-- | Hugo        | Bustos        |
+-- | Teresa      | Roldán        |
+-- | Martín      | Saavedra      |
+-- | Graciela    | Valverde      |
+-- | Claudio     | Ocampo        |
+-- | Nadia       | Ramírez       |
+-- | Héctor      | Vega          |
+-- | Luciana     | Peñaloza      |
+-- | Nicolás     | Moyano        |
+-- | Beatriz     | Riquelme      |
+-- | Andrés      | Barrios       |
+-- | Liliana     | Giménez       |
+-- | Esteban     | Toledo        |
+-- | Ruth        | Calderón      |
+-- | Germán      | Roldán        |
+-- | Adriana     | Silva         |
+-- | Cristian    | Montenegro    |
+-- | Griselda    | Aguirre       |
+-- +-------------+---------------+
+
+-- Alumnos que están en computación
+
+
+/*Esta subconsulta se utiliza para obtener únicamente a los alumnos que están cursando la especialidad de computación. Para realizarlo, 
+compara el año y división de los alumnos con los que pertenecen a cursos cuya especialidad es Computacíón, 
+utilizando una subconsulta dentro de IN.
+Gracias a esa subconsulta, no es necesario conocer manualmente qué alumnos pertenecen a la especialidad ni escribirlos uno por uno. 
+La base de datos se encarga de buscar primero los cursos de computación y luego devolver a los estudiantes que forman parte de ellos.*/
+
+SELECT Nombre, Apellido 
+FROM Alumnos
+WHERE Anio_Division IN (
+    SELECT Anio_Division FROM Cursos WHERE Especialidad = 'Computacion'
+);
+
+-- +-------------+--------------+
+-- | Nombre      | Apellido     |
+-- +-------------+--------------+
+-- | Lautaro     | Benítez     |
+-- | Abril       | Coronel      |
+-- | Santino     | Montenegro   |
+-- | Juana       | Perdomo      |
+-- | Bautista    | Almada       |
+-- | Victoria    | Quiroga      |
+-- | Franco      | Figueroa     |
+-- | Clara       | Medrano      |
+-- | Tomás      | Bermúdez    |
+-- | Renata      | Chávez      |
+-- | Iván       | Olmedo       |
+-- | Bianca      | Correa       |
+-- | Ignacio     | Galván      |
+-- | Valentina   | Arévalo     |
+-- | Dante       | Vivas        |
+-- | Milagros    | Sánchez     |
+-- | Emilio      | Carrizo      |
+-- | Paula       | Tejada       |
+-- | Simón      | Cabral       |
+-- | Camila      | Villafañe   |
+-- | Mauricio    | Riveros      |
+-- | Aitana      | Fonseca      |
+-- | Esteban     | Lagos        |
+-- | Martina     | Esquivel     |
+-- | Agustín    | Toha         |
+-- | Tamara      | Frías       |
+-- | Maximiliano | Saiz         |
+-- | Candela     | Lucero       |
+-- | Nicolás    | Patiño      |
+-- | Rocío      | Alonso       |
+-- | Fabián     | Vega         |
+-- | Mariela     | Bravo        |
+-- | Oscar       | Tello        |
+-- | Adriana     | Castillo     |
+-- | Benjamín   | Oliva        |
+-- | Daniela     | Campos       |
+-- | Ezequiel    | Corvalán    |
+-- | Pamela      | Ferreyra     |
+-- | Agustina    | Ojeda        |
+-- | Leandro     | Funes        |
+-- | Cintia      | Vázquez     |
+-- | Joaquín    | Domínguez   |
+-- | Nerea       | Camposano    |
+-- | Franco      | Yáñez       |
+-- | Bianca      | Ortega       |
+-- | Axel        | Ibarra       |
+-- | Tobías     | Quiroga      |
+-- | Camila      | Barrios      |
+-- | Enzo        | Recalde      |
+-- | Gabriela    | Morales      |
+-- | Luciano     | Pizarro      |
+-- | Mariela     | Tello        |
+-- | Facundo     | Herrera      |
+-- | Romina      | Fariña      |
+-- | Gustavo     | Santana      |
+-- | Daniela     | Morel        |
+-- | Kevin       | Aguirre      |
+-- | Magalí     | Navarro      |
+-- | Nicolás    | Santibáñez  |
+-- | Lara        | Cabrera      |
+-- | Sebastian   | Signorello   |
+-- | Eliana      | Cedeño      |
+-- | Marcos      | Fiorini      |
+-- | Daniela     | Montes       |
+-- | Lucio       | Salmerón    |
+-- | Micaela     | Ojeda        |
+-- | Diego       | Paz          |
+-- | Paula       | Tobares      |
+-- | Alan        | Serra        |
+-- | Valeria     | Andrada      |
+-- | Cristian    | Melgarejo    |
+-- | Julieta     | Cornejo      |
+-- | Damián     | Rosales      |
+-- | Gisela      | Ferraresi    |
+-- | Marcos      | Cordero      |
+-- | Rocío      | Acosta       |
+-- | Santiago    | Bermúdez    |
+-- | Miriam      | Garrido      |
+-- | Adrián     | Villalba     |
+-- | Sabrina     | Espinoza     |
+-- | Kevin       | Mercado      |
+-- | Natalia     | Bravo        |
+-- | Ariel       | Paz          |
+-- | Mariela     | Sepúlveda   |
+-- | Franco      | Quinteros    |
+-- | Carolina    | Paredes      |
+-- | Leandro     | Salvatierra  |
+-- | Noelia      | Montenegro   |
+-- | Mauricio    | Olivera      |
+-- | Romina      | Villarreal   |
+-- | Federico    | Cruz         |
+-- | Julieta     | Ponce        |
+-- | Iván       | Alcaraz      |
+-- | Gabriela    | Medina       |
+-- | Pablo       | Serrano      |
+-- | Daiana      | Torres       |
+-- | Fabián     | Rosendo      |
+-- | Eliana      | Prieto       |
+-- | Mariano     | Ojeda        |
+-- | Natalia     | Sarmiento    |
+-- | Iván       | Benítez     |
+-- | Patricia    | Guerrero     |
+-- | Alejandro   | Fleitas      |
+-- | Vanina      | Ayala        |
+-- | Javier      | Galarza      |
+-- | Sabrina     | Meza         |
+-- | Nahuel      | Espínola    |
+-- | Florencia   | Barrios      |
+-- | Ignacio     | Maldini      |
+-- | Valeria     | Ortega       |
+-- | Mauricio    | Santoro      |
+-- | Pamela      | Téllez      |
+-- | Leandro     | Fiorito      |
+-- | Romina      | Mancini      |
+-- | Facundo     | Alarcón     |
+-- | Tamara      | Quintana     |
+-- | Esteban     | Toledo       |
+-- | Laura       | Pellegrini   |
+-- | Pablo       | Centurión   |
+-- | Silvina     | Marelli      |
+-- | Hernán     | Villalba     |
+-- | Carolina    | Marino       |
+-- | Rodrigo     | Arancibia    |
+-- | Sandra      | Escobar      |
+-- | Iván       | Varela       |
+-- | Rocío      | Toja         |
+-- | Gonzalo     | Lozano       |
+-- | Julieta     | Páez        |
+-- | Ezequiel    | Vallejos     |
+-- | Marcela     | Pizarro      |
+-- | Sebastián  | Bravo        |
+-- | Adela       | Zapata       |
+-- | Ignacio     | Quiroga      |
+-- | Mariela     | Téllez      |
+-- | Oscar       | Carrizo      |
+-- | Patricia    | Valdez       |
+-- | Adrián     | Serrano      |
+-- | Rosa        | Meza         |
+-- | Federico    | Olivera      |
+-- | Cecilia     | Prieto       |
+-- | Matías     | Barrera      |
+-- | Daniela     | Lagos        |
+-- | Tomás      | Zárate      |
+-- | Elena       | Ojeda        |
+-- +-------------+--------------+
+
+
+-- Alumnos nacidos entre 2005 y 2007
+
+/*Esta consulta se usa para obtener una lista de alumnos que nacieron entre los años 2005 y 2007. 
+Utiliza la condición BETWEEN para filtrar las fechas dentro de ese rango, lo que facilita seleccionar únicamente a 
+los estudiantes que cumplen con el criterio de edad o que se necesita analizar.
+La ventaja es que no hace falta comparar año por año ni aplicar funciones adicionales sobre la fecha,
+ sino que con un filtro claro y directo se obtienen los resultados precisos.*/
+
+SELECT Nombre, Apellido, Fecha_Nacimiento 
+FROM Alumnos
+WHERE Fecha_Nacimiento BETWEEN '2005-01-01' AND '2007-12-31';
+
+-- +-------------+-------------+------------------+
+-- | Nombre      | Apellido    | Fecha_Nacimiento |
+-- +-------------+-------------+------------------+
+-- | Damián      | Rosales     | 2007-01-14       |
+-- | Gisela      | Ferraresi   | 2007-03-26       |
+-- | Marcos      | Cordero     | 2007-05-08       |
+-- | Rocío       | Acosta      | 2007-07-20       |
+-- | Santiago    | Bermúdez    | 2007-09-11       |
+-- | Miriam      | Garrido     | 2007-11-23       |
+-- | Adrián      | Villalba    | 2007-02-15       |
+-- | Sabrina     | Espinoza    | 2007-04-28       |
+-- | Kevin       | Mercado     | 2007-06-04       |
+-- | Natalia     | Bravo       | 2007-08-17       |
+-- | Ariel       | Paz         | 2007-10-29       |
+-- | Mariela     | Sepúlveda   | 2007-12-11       |
+-- | Julián      | Bustos      | 2007-06-30       |
+-- | Daniela     | Rojas       | 2007-08-12       |
+-- | Maximiliano | Zárate      | 2007-10-24       |
+-- | Ailén       | Domínguez   | 2007-12-05       |
+-- | Hernán      | Moya        | 2007-01-18       |
+-- | Verónica    | Pizarro     | 2007-03-01       |
+-- | Rodrigo     | Cáceres     | 2007-05-13       |
+-- | Patricia    | Vidal       | 2007-07-25       |
+-- | Sergio      | Coronel     | 2007-09-06       |
+-- | Vanesa      | Silva       | 2007-11-18       |
+-- | Martín      | Agüero      | 2007-01-31       |
+-- | Florencia   | Lagos       | 2007-04-14       |
+-- | Franco      | Quinteros   | 2007-01-13       |
+-- | Carolina    | Paredes     | 2007-03-25       |
+-- | Leandro     | Salvatierra | 2007-05-07       |
+-- | Noelia      | Montenegro  | 2007-07-19       |
+-- | Mauricio    | Olivera     | 2007-09-30       |
+-- | Romina      | Villarreal  | 2007-12-12       |
+-- | Federico    | Cruz        | 2007-02-14       |
+-- | Julieta     | Ponce       | 2007-04-27       |
+-- | Iván        | Alcaraz     | 2007-06-09       |
+-- | Gabriela    | Medina      | 2007-08-21       |
+-- | Pablo       | Serrano     | 2007-10-03       |
+-- | Daiana      | Torres      | 2007-12-15       |
+-- | Felipe      | Lemus       | 2007-06-04       |
+-- | Micaela     | Godoy       | 2007-08-16       |
+-- | Sergio      | Moreno      | 2007-10-28       |
+-- | Bianca      | Acosta      | 2007-12-09       |
+-- | Cristian    | Delgado     | 2007-01-21       |
+-- | Valeria     | Aguirre     | 2007-03-05       |
+-- | Ariel       | Gómez       | 2007-05-17       |
+-- | Lorena      | Paz         | 2007-07-29       |
+-- | Gastón      | Caballero   | 2007-09-10       |
+-- | Mariela     | Funes       | 2007-11-22       |
+-- | Jorge       | Ramos       | 2007-02-03       |
+-- | Alejandra   | Salas       | 2007-04-15       |
+-- | Fabián      | Rosendo     | 2007-01-30       |
+-- | Eliana      | Prieto      | 2007-03-14       |
+-- | Mariano     | Ojeda       | 2007-05-26       |
+-- | Natalia     | Sarmiento   | 2007-07-08       |
+-- | Iván        | Benítez     | 2007-09-20       |
+-- | Patricia    | Guerrero    | 2007-11-01       |
+-- | Alejandro   | Fleitas     | 2007-02-12       |
+-- | Vanina      | Ayala       | 2007-04-24       |
+-- | Javier      | Galarza     | 2007-06-06       |
+-- | Sabrina     | Meza        | 2007-08-18       |
+-- | Nahuel      | Espínola    | 2007-10-30       |
+-- | Florencia   | Barrios     | 2007-12-11       |
+-- | Cristian    | Cáceres     | 2007-06-30       |
+-- | Laura       | Morales     | 2007-08-12       |
+-- | Agustín     | Zúñiga      | 2007-10-24       |
+-- | Sofía       | Aguilar     | 2007-12-05       |
+-- | Brian       | Ledesma     | 2007-01-18       |
+-- | Luciana     | Funes       | 2007-03-01       |
+-- | Héctor      | Márquez     | 2007-05-13       |
+-- | Rocío       | Montes      | 2007-07-25       |
+-- | Emanuel     | Villanueva  | 2007-09-06       |
+-- | Brenda      | Arce        | 2007-11-18       |
+-- | Fernando    | Ojeda       | 2007-01-31       |
+-- | Jimena      | Britez      | 2007-04-14       |
+-- | Ignacio     | Maldini     | 2006-01-05       |
+-- | Valeria     | Ortega      | 2006-03-17       |
+-- | Mauricio    | Santoro     | 2006-05-29       |
+-- | Pamela      | Téllez      | 2006-08-10       |
+-- | Leandro     | Fiorito     | 2006-10-22       |
+-- | Romina      | Mancini     | 2006-12-03       |
+-- | Facundo     | Alarcón     | 2006-02-14       |
+-- | Tamara      | Quintana    | 2006-04-26       |
+-- | Esteban     | Toledo      | 2006-06-07       |
+-- | Laura       | Pellegrini  | 2006-08-19       |
+-- | Pablo       | Centurión   | 2006-10-31       |
+-- | Silvina     | Marelli     | 2006-01-12       |
+-- | Franco      | Silvestre   | 2006-08-25       |
+-- | Micaela     | Durán       | 2006-11-06       |
+-- | Jorge       | Pintos      | 2006-01-18       |
+-- | Patricia    | Almada      | 2006-03-02       |
+-- | Oscar       | Figueroa    | 2006-05-14       |
+-- | Adriana     | Salas       | 2006-07-26       |
+-- | Damián      | Ferreyra    | 2006-09-07       |
+-- | Florencia   | Palacios    | 2006-11-19       |
+-- | Emanuel     | Ojeda       | 2006-01-31       |
+-- | Karina      | Benítez     | 2006-04-13       |
+-- | Luis        | Miranda     | 2006-06-25       |
+-- | Gloria      | Chávez      | 2006-09-06       |
+-- | Hernán      | Villalba    | 2006-07-25       |
+-- | Carolina    | Marino      | 2006-09-06       |
+-- | Rodrigo     | Arancibia   | 2006-11-18       |
+-- | Sandra      | Escobar     | 2006-01-30       |
+-- | Iván        | Varela      | 2006-04-12       |
+-- | Rocío       | Toja        | 2006-06-24       |
+-- | Gonzalo     | Lozano      | 2006-09-05       |
+-- | Julieta     | Páez        | 2006-11-17       |
+-- | Ezequiel    | Vallejos    | 2006-02-27       |
+-- | Marcela     | Pizarro     | 2006-05-11       |
+-- | Sebastián   | Bravo       | 2006-07-23       |
+-- | Adela       | Zapata      | 2006-10-04       |
+-- | Alejandro   | Falcón      | 2006-08-19       |
+-- | Mónica      | Corvalán    | 2006-10-31       |
+-- | Cristian    | Santillán   | 2006-01-12       |
+-- | Viviana     | Pereira     | 2006-03-24       |
+-- | Pablo       | Cáceres     | 2006-05-05       |
+-- | Gabriela    | Márquez     | 2006-07-17       |
+-- | Hugo        | Bustos      | 2006-09-28       |
+-- | Teresa      | Roldán      | 2006-12-09       |
+-- | Martín      | Saavedra    | 2006-02-20       |
+-- | Graciela    | Valverde    | 2006-04-02       |
+-- | Claudio     | Ocampo      | 2006-06-13       |
+-- | Nadia       | Ramírez     | 2006-08-25       |
+-- | Ignacio     | Quiroga     | 2006-02-13       |
+-- | Mariela     | Téllez      | 2006-04-25       |
+-- | Oscar       | Carrizo     | 2006-07-07       |
+-- | Patricia    | Valdez      | 2006-09-18       |
+-- | Adrián      | Serrano     | 2006-11-30       |
+-- | Rosa        | Meza        | 2006-01-11       |
+-- | Federico    | Olivera     | 2006-03-23       |
+-- | Cecilia     | Prieto      | 2006-06-04       |
+-- | Matías      | Barrera     | 2006-08-16       |
+-- | Daniela     | Lagos       | 2006-10-28       |
+-- | Tomás       | Zárate      | 2006-01-09       |
+-- | Elena       | Ojeda       | 2006-03-21       |
+-- | Héctor      | Vega        | 2006-11-04       |
+-- | Luciana     | Peñaloza    | 2006-01-16       |
+-- | Nicolás     | Moyano      | 2006-03-28       |
+-- | Beatriz     | Riquelme    | 2006-06-09       |
+-- | Andrés      | Barrios     | 2006-08-21       |
+-- | Liliana     | Giménez     | 2006-10-02       |
+-- | Esteban     | Toledo      | 2006-12-14       |
+-- | Ruth        | Calderón    | 2006-02-25       |
+-- | Germán      | Roldán      | 2006-05-09       |
+-- | Adriana     | Silva       | 2006-07-20       |
+-- | Cristian    | Montenegro  | 2006-09-01       |
+-- | Griselda    | Aguirre     | 2006-11-13       |
+-- +-------------+-------------+------------------+
+
+-- Calificaciones con notas entre 6 y 8
+/*Esta consulta se utiliza para ver únicamente las calificaciones que se encuentran dentro del rango de notas considerado 
+suficiente, en este caso entre 6 a 8. A través del uso de BETWEEN, 
+se filtran directamente las notas que cumplen con ese criterio, sin necesidad de múltiples comparaciones.
+De esta manera, se puede identificar con rapidez a los alumnos que aprobaron con una nota promedio, 
+lo cual resulta útil para análisis de desempeño académico, seguimiento de estudiantes o generación de reportes del bimestre.*/
+
+SELECT DNI_A, ID_Materia, Nota 
+FROM Calificaciones
+WHERE Nota BETWEEN 6 AND 8;
+-- +----------+------------+------+
+-- | DNI_A    | ID_Materia | Nota |
+-- +----------+------------+------+
+-- | 28000001 |          1 |    6 |
+-- | 28000001 |          1 |    7 |
+-- | 28000001 |          2 |    7 |
+-- | 28000001 |          2 |    8 |
+-- | 28000001 |          7 |    6 |
+-- | 28000001 |          9 |    8 |
+-- | 28000001 |         10 |    8 |
+-- | 28000001 |         11 |    6 |
+-- | 28000001 |         11 |    7 |
+-- | 28000001 |         12 |    6 |
+-- | 28000001 |         14 |    7 |
+-- | 28000001 |         14 |    8 |
+-- | 28000001 |         37 |    6 |
+-- | 28000001 |         37 |    7 |
+-- | 28000002 |          1 |    7 |
+-- | 28000002 |          1 |    8 |
+-- | 28000002 |          2 |    8 |
+-- | 28000002 |          2 |    7 |
+-- | 28000002 |          7 |    6 |
+-- | 28000002 |          9 |    6 |
+-- | 28000002 |         10 |    7 |
+-- | 28000002 |         10 |    8 |
+-- | 28000002 |         11 |    6 |
+-- | 28000002 |         12 |    7 |
+-- | 28000002 |         14 |    8 |
+-- | 28000002 |         14 |    6 |
+-- | 28000002 |         16 |    7 |
+-- | 28000002 |         25 |    8 |
+-- | 28000002 |         37 |    6 |
+-- | 28000003 |          1 |    8 |
+-- | 28000003 |          1 |    6 |
+-- | 28000003 |          2 |    8 |
+-- | 28000003 |          2 |    6 |
+-- | 28000003 |          7 |    7 |
+-- | 28000003 |          9 |    7 |
+-- | 28000003 |         10 |    6 |
+-- | 28000003 |         11 |    7 |
+-- | 28000003 |         11 |    8 |
+-- | 28000003 |         12 |    7 |
+-- | 28000003 |         14 |    6 |
+-- | 28000003 |         14 |    8 |
+-- | 28000003 |         37 |    6 |
+-- | 28000003 |         37 |    7 |
+-- | 28000004 |          1 |    7 |
+-- | 28000004 |          2 |    8 |
+-- | 28000004 |          2 |    6 |
+-- | 28000004 |          7 |    7 |
+-- | 28000004 |          9 |    6 |
+-- | 28000004 |          9 |    8 |
+-- | 28000004 |         10 |    6 |
+-- | 28000004 |         11 |    7 |
+-- | 28000004 |         11 |    8 |
+-- | 28000004 |         12 |    6 |
+-- | 28000004 |         14 |    7 |
+-- | 28000004 |         14 |    8 |
+-- | 28000004 |         25 |    6 |
+-- | 28000004 |         37 |    6 |
+-- | 28000004 |         37 |    7 |
+-- | 28000005 |          1 |    6 |
+-- | 28000005 |          1 |    7 |
+-- | 28000005 |          2 |    7 |
+-- | 28000005 |          2 |    8 |
+-- | 28000005 |          7 |    6 |
+-- | 28000005 |          9 |    8 |
+-- | 28000005 |         10 |    8 |
+-- | 28000005 |         11 |    6 |
+-- | 28000005 |         11 |    7 |
+-- | 28000005 |         12 |    6 |
+-- | 28000005 |         14 |    7 |
+-- | 28000005 |         14 |    8 |
+-- | 28000005 |         37 |    6 |
+-- | 28000005 |         37 |    7 |
+-- | 28000006 |          1 |    7 |
+-- | 28000006 |          1 |    8 |
+-- | 28000006 |          2 |    8 |
+-- | 28000006 |          2 |    7 |
+-- | 28000006 |          7 |    6 |
+-- | 28000006 |          9 |    6 |
+-- | 28000006 |         10 |    7 |
+-- | 28000006 |         10 |    8 |
+-- | 28000006 |         11 |    6 |
+-- | 28000006 |         12 |    7 |
+-- | 28000006 |         14 |    8 |
+-- | 28000006 |         14 |    6 |
+-- | 28000006 |         16 |    7 |
+-- | 28000006 |         25 |    8 |
+-- | 28000006 |         37 |    6 |
+-- | 28000007 |          1 |    8 |
+-- | 28000007 |          1 |    6 |
+-- | 28000007 |          2 |    8 |
+-- | 28000007 |          2 |    6 |
+-- | 28000007 |          7 |    7 |
+-- | 28000007 |          9 |    7 |
+-- | 28000007 |         10 |    6 |
+-- | 28000007 |         11 |    7 |
+-- | 28000007 |         11 |    8 |
+-- | 28000007 |         12 |    7 |
+-- | 28000007 |         14 |    6 |
+-- | 28000007 |         14 |    8 |
+-- | 28000007 |         37 |    6 |
+-- | 28000007 |         37 |    7 |
+-- | 28000008 |          1 |    7 |
+-- | 28000008 |          2 |    8 |
+-- | 28000008 |          2 |    6 |
+-- | 28000008 |          7 |    7 |
+-- | 28000008 |          9 |    6 |
+-- | 28000008 |          9 |    8 |
+-- | 28000008 |         10 |    6 |
+-- | 28000008 |         11 |    7 |
+-- | 28000008 |         11 |    8 |
+-- | 28000008 |         12 |    6 |
+-- | 28000008 |         14 |    7 |
+-- | 28000008 |         14 |    8 |
+-- | 28000008 |         25 |    6 |
+-- | 28000008 |         37 |    6 |
+-- | 28000008 |         37 |    7 |
+-- | 28000009 |          1 |    6 |
+-- | 28000009 |          1 |    7 |
+-- | 28000009 |          2 |    7 |
+-- | 28000009 |          2 |    8 |
+-- | 28000009 |          7 |    6 |
+-- | 28000009 |          9 |    8 |
+-- | 28000009 |         10 |    8 |
+-- | 28000009 |         11 |    6 |
+-- | 28000009 |         11 |    7 |
+-- | 28000009 |         12 |    6 |
+-- | 28000009 |         14 |    7 |
+-- | 28000009 |         14 |    8 |
+-- | 28000009 |         37 |    6 |
+-- | 28000009 |         37 |    7 |
+-- | 28000010 |          1 |    7 |
+-- | 28000010 |          1 |    8 |
+-- | 28000010 |          2 |    8 |
+-- | 28000010 |          2 |    7 |
+-- | 28000010 |          7 |    6 |
+-- | 28000010 |          9 |    6 |
+-- | 28000010 |         10 |    7 |
+-- | 28000010 |         10 |    8 |
+-- | 28000010 |         11 |    6 |
+-- | 28000010 |         12 |    7 |
+-- | 28000010 |         14 |    8 |
+-- | 28000010 |         14 |    6 |
+-- | 28000010 |         16 |    7 |
+-- | 28000010 |         25 |    8 |
+-- | 28000010 |         37 |    6 |
+-- | 28000011 |          1 |    8 |
+-- | 28000011 |          1 |    6 |
+-- | 28000011 |          2 |    8 |
+-- | 28000011 |          2 |    6 |
+-- | 28000011 |          7 |    7 |
+-- | 28000011 |          9 |    7 |
+-- | 28000011 |         10 |    6 |
+-- | 28000011 |         11 |    7 |
+-- | 28000011 |         11 |    8 |
+-- | 28000011 |         12 |    7 |
+-- | 28000011 |         14 |    6 |
+-- | 28000011 |         14 |    8 |
+-- | 28000011 |         37 |    6 |
+-- | 28000011 |         37 |    7 |
+-- | 28000012 |          1 |    7 |
+-- | 28000012 |          2 |    8 |
+-- | 28000012 |          2 |    6 |
+-- | 28000012 |          7 |    7 |
+-- | 28000012 |          9 |    6 |
+-- | 28000012 |          9 |    8 |
+-- | 28000012 |         10 |    6 |
+-- | 28000012 |         11 |    7 |
+-- | 28000012 |         11 |    8 |
+-- | 28000012 |         12 |    6 |
+-- | 28000012 |         14 |    7 |
+-- | 28000012 |         14 |    8 |
+-- | 28000012 |         25 |    6 |
+-- | 28000012 |         37 |    6 |
+-- | 28000012 |         37 |    7 |
+-- | 28000021 |          1 |    6 |
+-- | 28000021 |          1 |    7 |
+-- | 28000021 |          2 |    7 |
+-- | 28000021 |          2 |    8 |
+-- | 28000021 |          7 |    6 |
+-- | 28000021 |          9 |    8 |
+-- | 28000021 |         10 |    8 |
+-- | 28000021 |         11 |    6 |
+-- | 28000021 |         11 |    7 |
+-- | 28000021 |         12 |    6 |
+-- | 28000021 |         14 |    7 |
+-- | 28000021 |         14 |    8 |
+-- | 28000021 |         37 |    6 |
+-- | 28000021 |         37 |    7 |
+-- | 28000022 |          1 |    7 |
+-- | 28000022 |          1 |    8 |
+-- | 28000022 |          2 |    8 |
+-- | 28000022 |          2 |    7 |
+-- | 28000022 |          7 |    6 |
+-- | 28000022 |          9 |    6 |
+-- | 28000022 |         10 |    7 |
+-- | 28000022 |         10 |    8 |
+-- | 28000022 |         11 |    6 |
+-- | 28000022 |         12 |    7 |
+-- | 28000022 |         14 |    8 |
+-- | 28000022 |         14 |    6 |
+-- | 28000022 |         16 |    7 |
+-- | 28000022 |         25 |    8 |
+-- | 28000022 |         37 |    6 |
+-- | 28000023 |          1 |    8 |
+-- | 28000023 |          1 |    6 |
+-- | 28000023 |          2 |    8 |
+-- | 28000023 |          2 |    6 |
+-- | 28000023 |          7 |    7 |
+-- | 28000023 |          9 |    7 |
+-- | 28000023 |         10 |    6 |
+-- | 28000023 |         11 |    7 |
+-- | 28000023 |         11 |    8 |
+-- | 28000023 |         12 |    7 |
+-- | 28000023 |         14 |    6 |
+-- | 28000023 |         14 |    8 |
+-- | 28000023 |         37 |    6 |
+-- | 28000023 |         37 |    7 |
+-- | 28000024 |          1 |    7 |
+-- | 28000024 |          2 |    8 |
+-- | 28000024 |          2 |    6 |
+-- | 28000024 |          7 |    7 |
+-- | 28000024 |          9 |    6 |
+-- | 28000024 |          9 |    8 |
+-- | 28000024 |         10 |    6 |
+-- | 28000024 |         11 |    7 |
+-- | 28000024 |         11 |    8 |
+-- | 28000024 |         12 |    6 |
+-- | 28000024 |         14 |    7 |
+-- | 28000024 |         14 |    8 |
+-- | 28000024 |         25 |    6 |
+-- | 28000024 |         37 |    6 |
+-- | 28000024 |         37 |    7 |
+-- | 28000025 |          1 |    6 |
+-- | 28000025 |          1 |    7 |
+-- | 28000025 |          2 |    7 |
+-- | 28000025 |          2 |    8 |
+-- | 28000025 |          7 |    6 |
+-- | 28000025 |          9 |    8 |
+-- | 28000025 |         10 |    8 |
+-- | 28000025 |         11 |    6 |
+-- | 28000025 |         11 |    7 |
+-- | 28000025 |         12 |    6 |
+-- | 28000025 |         14 |    7 |
+-- | 28000025 |         14 |    8 |
+-- | 28000025 |         37 |    6 |
+-- | 28000025 |         37 |    7 |
+-- | 28000026 |          1 |    7 |
+-- | 28000026 |          1 |    8 |
+-- | 28000026 |          2 |    8 |
+-- | 28000026 |          2 |    7 |
+-- | 28000026 |          7 |    6 |
+-- | 28000026 |          9 |    6 |
+-- | 28000026 |         10 |    7 |
+-- | 28000026 |         10 |    8 |
+-- | 28000026 |         11 |    6 |
+-- | 28000026 |         12 |    7 |
+-- | 28000026 |         14 |    8 |
+-- | 28000026 |         14 |    6 |
+-- | 28000026 |         16 |    7 |
+-- | 28000026 |         25 |    8 |
+-- | 28000026 |         37 |    6 |
+-- | 28000027 |          1 |    8 |
+-- | 28000027 |          1 |    6 |
+-- | 28000027 |          2 |    8 |
+-- | 28000027 |          2 |    6 |
+-- | 28000027 |          7 |    7 |
+-- | 28000027 |          9 |    7 |
+-- | 28000027 |         10 |    6 |
+-- | 28000027 |         11 |    7 |
+-- | 28000027 |         11 |    8 |
+-- | 28000027 |         12 |    7 |
+-- | 28000027 |         14 |    6 |
+-- | 28000027 |         14 |    8 |
+-- | 28000027 |         37 |    6 |
+-- | 28000027 |         37 |    7 |
+-- | 28000028 |          1 |    7 |
+-- | 28000028 |          2 |    8 |
+-- | 28000028 |          2 |    6 |
+-- | 28000028 |          7 |    7 |
+-- | 28000028 |          9 |    6 |
+-- | 28000028 |          9 |    8 |
+-- | 28000028 |         10 |    6 |
+-- | 28000028 |         11 |    7 |
+-- | 28000028 |         11 |    8 |
+-- | 28000028 |         12 |    6 |
+-- | 28000028 |         14 |    7 |
+-- | 28000028 |         14 |    8 |
+-- | 28000028 |         25 |    6 |
+-- | 28000028 |         37 |    6 |
+-- | 28000028 |         37 |    7 |
+-- | 28000029 |          1 |    6 |
+-- | 28000029 |          1 |    7 |
+-- | 28000029 |          2 |    7 |
+-- | 28000029 |          2 |    8 |
+-- | 28000029 |          7 |    6 |
+-- | 28000029 |          9 |    8 |
+-- | 28000029 |         10 |    8 |
+-- | 28000029 |         11 |    6 |
+-- | 28000029 |         11 |    7 |
+-- | 28000029 |         12 |    6 |
+-- | 28000029 |         14 |    7 |
+-- | 28000029 |         14 |    8 |
+-- | 28000029 |         37 |    6 |
+-- | 28000029 |         37 |    7 |
+-- | 28000030 |          1 |    7 |
+-- | 28000030 |          1 |    8 |
+-- | 28000030 |          2 |    8 |
+-- | 28000030 |          2 |    7 |
+-- | 28000030 |          7 |    6 |
+-- | 28000030 |          9 |    6 |
+-- | 28000030 |         10 |    7 |
+-- | 28000030 |         10 |    8 |
+-- | 28000030 |         11 |    6 |
+-- | 28000030 |         12 |    7 |
+-- | 28000030 |         14 |    8 |
+-- | 28000030 |         14 |    6 |
+-- | 28000030 |         16 |    7 |
+-- | 28000030 |         25 |    8 |
+-- | 28000030 |         37 |    6 |
+-- | 28000031 |          1 |    8 |
+-- | 28000031 |          1 |    6 |
+-- | 28000031 |          2 |    8 |
+-- | 28000031 |          2 |    6 |
+-- | 28000031 |          7 |    7 |
+-- | 28000031 |          9 |    7 |
+-- | 28000031 |         10 |    6 |
+-- | 28000031 |         11 |    7 |
+-- | 28000031 |         11 |    8 |
+-- | 28000031 |         12 |    7 |
+-- | 28000031 |         14 |    6 |
+-- | 28000031 |         14 |    8 |
+-- | 28000031 |         37 |    6 |
+-- | 28000031 |         37 |    7 |
+-- | 28000032 |          1 |    7 |
+-- | 28000032 |          2 |    8 |
+-- | 28000032 |          2 |    6 |
+-- | 28000032 |          7 |    7 |
+-- | 28000032 |          9 |    6 |
+-- | 28000032 |          9 |    8 |
+-- | 28000032 |         10 |    6 |
+-- | 28000032 |         11 |    7 |
+-- | 28000032 |         11 |    8 |
+-- | 28000032 |         12 |    6 |
+-- | 28000032 |         14 |    7 |
+-- | 28000032 |         14 |    8 |
+-- | 28000032 |         25 |    6 |
+-- | 28000032 |         37 |    6 |
+-- | 28000032 |         37 |    7 |
+-- | 28000041 |          1 |    6 |
+-- | 28000041 |          1 |    7 |
+-- | 28000041 |          2 |    7 |
+-- | 28000041 |          2 |    8 |
+-- | 28000041 |          7 |    6 |
+-- | 28000041 |          9 |    8 |
+-- | 28000041 |         10 |    8 |
+-- | 28000041 |         11 |    6 |
+-- | 28000041 |         11 |    7 |
+-- | 28000041 |         12 |    6 |
+-- | 28000041 |         14 |    7 |
+-- | 28000041 |         14 |    8 |
+-- | 28000041 |         37 |    6 |
+-- | 28000041 |         37 |    7 |
+-- | 28000042 |          1 |    7 |
+-- | 28000042 |          1 |    8 |
+-- | 28000042 |          2 |    8 |
+-- | 28000042 |          2 |    7 |
+-- | 28000042 |          7 |    6 |
+-- | 28000042 |          9 |    6 |
+-- | 28000042 |         10 |    7 |
+-- | 28000042 |         10 |    8 |
+-- | 28000042 |         11 |    6 |
+-- | 28000042 |         12 |    7 |
+-- | 28000042 |         14 |    8 |
+-- | 28000042 |         14 |    6 |
+-- | 28000042 |         16 |    7 |
+-- | 28000042 |         25 |    8 |
+-- | 28000042 |         37 |    6 |
+-- | 28000043 |          1 |    8 |
+-- | 28000043 |          1 |    6 |
+-- | 28000043 |          2 |    8 |
+-- | 28000043 |          2 |    6 |
+-- | 28000043 |          7 |    7 |
+-- | 28000043 |          9 |    7 |
+-- | 28000043 |         10 |    6 |
+-- | 28000043 |         11 |    7 |
+-- | 28000043 |         11 |    8 |
+-- | 28000043 |         12 |    7 |
+-- | 28000043 |         14 |    6 |
+-- | 28000043 |         14 |    8 |
+-- | 28000043 |         37 |    6 |
+-- | 28000043 |         37 |    7 |
+-- | 28000044 |          1 |    7 |
+-- | 28000044 |          2 |    8 |
+-- | 28000044 |          2 |    6 |
+-- | 28000044 |          7 |    7 |
+-- | 28000044 |          9 |    6 |
+-- | 28000044 |          9 |    8 |
+-- | 28000044 |         10 |    6 |
+-- | 28000044 |         11 |    7 |
+-- | 28000044 |         11 |    8 |
+-- | 28000044 |         12 |    6 |
+-- | 28000044 |         14 |    7 |
+-- | 28000044 |         14 |    8 |
+-- | 28000044 |         25 |    6 |
+-- | 28000044 |         37 |    6 |
+-- | 28000044 |         37 |    7 |
+-- | 28000045 |          1 |    6 |
+-- | 28000045 |          1 |    7 |
+-- | 28000045 |          2 |    7 |
+-- | 28000045 |          2 |    8 |
+-- | 28000045 |          7 |    6 |
+-- | 28000045 |          9 |    8 |
+-- | 28000045 |         10 |    8 |
+-- | 28000045 |         11 |    6 |
+-- | 28000045 |         11 |    7 |
+-- | 28000045 |         12 |    6 |
+-- | 28000045 |         14 |    7 |
+-- | 28000045 |         14 |    8 |
+-- | 28000045 |         37 |    6 |
+-- | 28000045 |         37 |    7 |
+-- | 28000046 |          1 |    7 |
+-- | 28000046 |          1 |    8 |
+-- | 28000046 |          2 |    8 |
+-- | 28000046 |          2 |    7 |
+-- | 28000046 |          7 |    6 |
+-- | 28000046 |          9 |    6 |
+-- | 28000046 |         10 |    7 |
+-- | 28000046 |         10 |    8 |
+-- | 28000046 |         11 |    6 |
+-- | 28000046 |         12 |    7 |
+-- | 28000046 |         14 |    8 |
+-- | 28000046 |         14 |    6 |
+-- | 28000046 |         16 |    7 |
+-- | 28000046 |         25 |    8 |
+-- | 28000046 |         37 |    6 |
+-- | 28000047 |          1 |    8 |
+-- | 28000047 |          1 |    6 |
+-- | 28000047 |          2 |    8 |
+-- | 28000047 |          2 |    6 |
+-- | 28000047 |          7 |    7 |
+-- | 28000047 |          9 |    7 |
+-- | 28000047 |         10 |    6 |
+-- | 28000047 |         11 |    7 |
+-- | 28000047 |         11 |    8 |
+-- | 28000047 |         12 |    7 |
+-- | 28000047 |         14 |    6 |
+-- | 28000047 |         14 |    8 |
+-- | 28000047 |         37 |    6 |
+-- | 28000047 |         37 |    7 |
+-- | 28000048 |          1 |    7 |
+-- | 28000048 |          2 |    8 |
+-- | 28000048 |          2 |    6 |
+-- | 28000048 |          7 |    7 |
+-- | 28000048 |          9 |    6 |
+-- | 28000048 |          9 |    8 |
+-- | 28000048 |         10 |    6 |
+-- | 28000048 |         11 |    7 |
+-- | 28000048 |         11 |    8 |
+-- | 28000048 |         12 |    6 |
+-- | 28000048 |         14 |    7 |
+-- | 28000048 |         14 |    8 |
+-- | 28000048 |         25 |    6 |
+-- | 28000048 |         37 |    6 |
+-- | 28000048 |         37 |    7 |
+-- | 28000049 |          1 |    6 |
+-- | 28000049 |          1 |    7 |
+-- | 28000049 |          2 |    7 |
+-- | 28000049 |          2 |    8 |
+-- | 28000049 |          7 |    6 |
+-- | 28000049 |          9 |    8 |
+-- | 28000049 |         10 |    8 |
+-- | 28000049 |         11 |    6 |
+-- | 28000049 |         11 |    7 |
+-- | 28000049 |         12 |    6 |
+-- | 28000049 |         14 |    7 |
+-- | 28000049 |         14 |    8 |
+-- | 28000049 |         37 |    6 |
+-- | 28000049 |         37 |    7 |
+-- | 28000050 |          1 |    7 |
+-- | 28000050 |          1 |    8 |
+-- | 28000050 |          2 |    8 |
+-- | 28000050 |          2 |    7 |
+-- | 28000050 |          7 |    6 |
+-- | 28000050 |          9 |    6 |
+-- | 28000050 |         10 |    7 |
+-- | 28000050 |         10 |    8 |
+-- | 28000050 |         11 |    6 |
+-- | 28000050 |         12 |    7 |
+-- | 28000050 |         14 |    8 |
+-- | 28000050 |         14 |    6 |
+-- | 28000050 |         16 |    7 |
+-- | 28000050 |         25 |    8 |
+-- | 28000050 |         37 |    6 |
+-- | 28000051 |          1 |    8 |
+-- | 28000051 |          1 |    6 |
+-- | 28000051 |          2 |    8 |
+-- | 28000051 |          2 |    6 |
+-- | 28000051 |          7 |    7 |
+-- | 28000051 |          9 |    7 |
+-- | 28000051 |         10 |    6 |
+-- | 28000051 |         11 |    7 |
+-- | 28000051 |         11 |    8 |
+-- | 28000051 |         12 |    7 |
+-- | 28000051 |         14 |    6 |
+-- | 28000051 |         14 |    8 |
+-- | 28000051 |         37 |    6 |
+-- | 28000051 |         37 |    7 |
+-- | 28000052 |          1 |    7 |
+-- | 28000052 |          2 |    8 |
+-- | 28000052 |          2 |    6 |
+-- | 28000052 |          7 |    7 |
+-- | 28000052 |          9 |    6 |
+-- | 28000052 |          9 |    8 |
+-- | 28000052 |         10 |    6 |
+-- | 28000052 |         11 |    7 |
+-- | 28000052 |         11 |    8 |
+-- | 28000052 |         12 |    6 |
+-- | 28000052 |         14 |    7 |
+-- | 28000052 |         14 |    8 |
+-- | 28000052 |         25 |    6 |
+-- | 28000052 |         37 |    6 |
+-- | 28000052 |         37 |    7 |
+-- | 28000061 |          1 |    6 |
+-- | 28000061 |          1 |    7 |
+-- | 28000061 |          2 |    7 |
+-- | 28000061 |          2 |    8 |
+-- | 28000061 |          7 |    6 |
+-- | 28000061 |          9 |    8 |
+-- | 28000061 |         10 |    8 |
+-- | 28000061 |         11 |    6 |
+-- | 28000061 |         11 |    7 |
+-- | 28000061 |         12 |    6 |
+-- | 28000061 |         14 |    7 |
+-- | 28000061 |         14 |    8 |
+-- | 28000061 |         37 |    6 |
+-- | 28000061 |         37 |    7 |
+-- | 28000062 |          1 |    7 |
+-- | 28000062 |          1 |    8 |
+-- | 28000062 |          2 |    8 |
+-- | 28000062 |          2 |    7 |
+-- | 28000062 |          7 |    6 |
+-- | 28000062 |          9 |    6 |
+-- | 28000062 |         10 |    7 |
+-- | 28000062 |         10 |    8 |
+-- | 28000062 |         11 |    6 |
+-- | 28000062 |         12 |    7 |
+-- | 28000062 |         14 |    8 |
+-- | 28000062 |         14 |    6 |
+-- | 28000062 |         16 |    7 |
+-- | 28000062 |         25 |    8 |
+-- | 28000062 |         37 |    6 |
+-- | 28000063 |          1 |    8 |
+-- | 28000063 |          1 |    6 |
+-- | 28000063 |          2 |    8 |
+-- | 28000063 |          2 |    6 |
+-- | 28000063 |          7 |    7 |
+-- | 28000063 |          9 |    7 |
+-- | 28000063 |         10 |    6 |
+-- | 28000063 |         11 |    7 |
+-- | 28000063 |         11 |    8 |
+-- | 28000063 |         12 |    7 |
+-- | 28000063 |         14 |    6 |
+-- | 28000063 |         14 |    8 |
+-- | 28000063 |         37 |    6 |
+-- | 28000063 |         37 |    7 |
+-- | 28000064 |          1 |    7 |
+-- | 28000064 |          2 |    8 |
+-- | 28000064 |          2 |    6 |
+-- | 28000064 |          7 |    7 |
+-- | 28000064 |          9 |    6 |
+-- | 28000064 |          9 |    8 |
+-- | 28000064 |         10 |    6 |
+-- | 28000064 |         11 |    7 |
+-- | 28000064 |         11 |    8 |
+-- | 28000064 |         12 |    6 |
+-- | 28000064 |         14 |    7 |
+-- | 28000064 |         14 |    8 |
+-- | 28000064 |         25 |    6 |
+-- | 28000064 |         37 |    6 |
+-- | 28000064 |         37 |    7 |
+-- | 28000065 |          1 |    6 |
+-- | 28000065 |          1 |    7 |
+-- | 28000065 |          2 |    7 |
+-- | 28000065 |          2 |    8 |
+-- | 28000065 |          7 |    6 |
+-- | 28000065 |          9 |    8 |
+-- | 28000065 |         10 |    8 |
+-- | 28000065 |         11 |    6 |
+-- | 28000065 |         11 |    7 |
+-- | 28000065 |         12 |    6 |
+-- | 28000065 |         14 |    7 |
+-- | 28000065 |         14 |    8 |
+-- | 28000065 |         37 |    6 |
+-- | 28000065 |         37 |    7 |
+-- | 28000066 |          1 |    7 |
+-- | 28000066 |          1 |    8 |
+-- | 28000066 |          2 |    8 |
+-- | 28000066 |          2 |    7 |
+-- | 28000066 |          7 |    6 |
+-- | 28000066 |          9 |    6 |
+-- | 28000066 |         10 |    7 |
+-- | 28000066 |         10 |    8 |
+-- | 28000066 |         11 |    6 |
+-- | 28000066 |         12 |    7 |
+-- | 28000066 |         14 |    8 |
+-- | 28000066 |         14 |    6 |
+-- | 28000066 |         16 |    7 |
+-- | 28000066 |         25 |    8 |
+-- | 28000066 |         37 |    6 |
+-- | 28000067 |          1 |    8 |
+-- | 28000067 |          1 |    6 |
+-- | 28000067 |          2 |    8 |
+-- | 28000067 |          2 |    6 |
+-- | 28000067 |          7 |    7 |
+-- | 28000067 |          9 |    7 |
+-- | 28000067 |         10 |    6 |
+-- | 28000067 |         11 |    7 |
+-- | 28000067 |         11 |    8 |
+-- | 28000067 |         12 |    7 |
+-- | 28000067 |         14 |    6 |
+-- | 28000067 |         14 |    8 |
+-- | 28000067 |         37 |    6 |
+-- | 28000067 |         37 |    7 |
+-- | 28000068 |          1 |    7 |
+-- | 28000068 |          2 |    8 |
+-- | 28000068 |          2 |    6 |
+-- | 28000068 |          7 |    7 |
+-- | 28000068 |          9 |    6 |
+-- | 28000068 |          9 |    8 |
+-- | 28000068 |         10 |    6 |
+-- | 28000068 |         11 |    7 |
+-- | 28000068 |         11 |    8 |
+-- | 28000068 |         12 |    6 |
+-- | 28000068 |         14 |    7 |
+-- | 28000068 |         14 |    8 |
+-- | 28000068 |         25 |    6 |
+-- | 28000068 |         37 |    6 |
+-- | 28000068 |         37 |    7 |
+-- | 28000069 |          1 |    6 |
+-- | 28000069 |          1 |    7 |
+-- | 28000069 |          2 |    7 |
+-- | 28000069 |          2 |    8 |
+-- | 28000069 |          7 |    6 |
+-- | 28000069 |          9 |    8 |
+-- | 28000069 |         10 |    8 |
+-- | 28000069 |         11 |    6 |
+-- | 28000069 |         11 |    7 |
+-- | 28000069 |         12 |    6 |
+-- | 28000069 |         14 |    7 |
+-- | 28000069 |         14 |    8 |
+-- | 28000069 |         37 |    6 |
+-- | 28000069 |         37 |    7 |
+-- | 28000070 |          1 |    7 |
+-- | 28000070 |          1 |    8 |
+-- | 28000070 |          2 |    8 |
+-- | 28000070 |          2 |    7 |
+-- | 28000070 |          7 |    6 |
+-- | 28000070 |          9 |    6 |
+-- | 28000070 |         10 |    7 |
+-- | 28000070 |         10 |    8 |
+-- | 28000070 |         11 |    6 |
+-- | 28000070 |         12 |    7 |
+-- | 28000070 |         14 |    8 |
+-- | 28000070 |         14 |    6 |
+-- | 28000070 |         16 |    7 |
+-- | 28000070 |         25 |    8 |
+-- | 28000070 |         37 |    6 |
+-- | 28000071 |          1 |    8 |
+-- | 28000071 |          1 |    6 |
+-- | 28000071 |          2 |    8 |
+-- | 28000071 |          2 |    6 |
+-- | 28000071 |          7 |    7 |
+-- | 28000071 |          9 |    7 |
+-- | 28000071 |         10 |    6 |
+-- | 28000071 |         11 |    7 |
+-- | 28000071 |         11 |    8 |
+-- | 28000071 |         12 |    7 |
+-- | 28000071 |         14 |    6 |
+-- | 28000071 |         14 |    8 |
+-- | 28000071 |         37 |    6 |
+-- | 28000071 |         37 |    7 |
+-- | 28000072 |          1 |    7 |
+-- | 28000072 |          2 |    8 |
+-- | 28000072 |          2 |    6 |
+-- | 28000072 |          7 |    7 |
+-- | 28000072 |          9 |    6 |
+-- | 28000072 |          9 |    8 |
+-- | 28000072 |         10 |    6 |
+-- | 28000072 |         11 |    7 |
+-- | 28000072 |         11 |    8 |
+-- | 28000072 |         12 |    6 |
+-- | 28000072 |         14 |    7 |
+-- | 28000072 |         14 |    8 |
+-- | 28000072 |         25 |    6 |
+-- | 28000072 |         37 |    6 |
+-- | 28000072 |         37 |    7 |
+-- | 28000081 |          1 |    6 |
+-- | 28000081 |          1 |    7 |
+-- | 28000081 |          2 |    7 |
+-- | 28000081 |          2 |    8 |
+-- | 28000081 |          7 |    6 |
+-- | 28000081 |          9 |    8 |
+-- | 28000081 |         10 |    8 |
+-- | 28000081 |         11 |    6 |
+-- | 28000081 |         11 |    7 |
+-- | 28000081 |         12 |    6 |
+-- | 28000081 |         14 |    7 |
+-- | 28000081 |         14 |    8 |
+-- | 28000081 |         37 |    6 |
+-- | 28000081 |         37 |    7 |
+-- | 28000082 |          1 |    7 |
+-- | 28000082 |          1 |    8 |
+-- | 28000082 |          2 |    8 |
+-- | 28000082 |          2 |    7 |
+-- | 28000082 |          7 |    6 |
+-- | 28000082 |          9 |    6 |
+-- | 28000082 |         10 |    7 |
+-- | 28000082 |         10 |    8 |
+-- | 28000082 |         11 |    6 |
+-- | 28000082 |         12 |    7 |
+-- | 28000082 |         14 |    8 |
+-- | 28000082 |         14 |    6 |
+-- | 28000082 |         16 |    7 |
+-- | 28000082 |         25 |    8 |
+-- | 28000082 |         37 |    6 |
+-- | 28000083 |          1 |    8 |
+-- | 28000083 |          1 |    6 |
+-- | 28000083 |          2 |    8 |
+-- | 28000083 |          2 |    6 |
+-- | 28000083 |          7 |    7 |
+-- | 28000083 |          9 |    7 |
+-- | 28000083 |         10 |    6 |
+-- | 28000083 |         11 |    7 |
+-- | 28000083 |         11 |    8 |
+-- | 28000083 |         12 |    7 |
+-- | 28000083 |         14 |    6 |
+-- | 28000083 |         14 |    8 |
+-- | 28000083 |         37 |    6 |
+-- | 28000083 |         37 |    7 |
+-- | 28000084 |          1 |    7 |
+-- | 28000084 |          2 |    8 |
+-- | 28000084 |          2 |    6 |
+-- | 28000084 |          7 |    7 |
+-- | 28000084 |          9 |    6 |
+-- | 28000084 |          9 |    8 |
+-- | 28000084 |         10 |    6 |
+-- | 28000084 |         11 |    7 |
+-- | 28000084 |         11 |    8 |
+-- | 28000084 |         12 |    6 |
+-- | 28000084 |         14 |    7 |
+-- | 28000084 |         14 |    8 |
+-- | 28000084 |         25 |    6 |
+-- | 28000084 |         37 |    6 |
+-- | 28000084 |         37 |    7 |
+-- | 28000085 |          1 |    6 |
+-- | 28000085 |          1 |    7 |
+-- | 28000085 |          2 |    7 |
+-- | 28000085 |          2 |    8 |
+-- | 28000085 |          7 |    6 |
+-- | 28000085 |          9 |    8 |
+-- | 28000085 |         10 |    8 |
+-- | 28000085 |         11 |    6 |
+-- | 28000085 |         11 |    7 |
+-- | 28000085 |         12 |    6 |
+-- | 28000085 |         14 |    7 |
+-- | 28000085 |         14 |    8 |
+-- | 28000085 |         37 |    6 |
+-- | 28000085 |         37 |    7 |
+-- | 28000086 |          1 |    7 |
+-- | 28000086 |          1 |    8 |
+-- | 28000086 |          2 |    8 |
+-- | 28000086 |          2 |    7 |
+-- | 28000086 |          7 |    6 |
+-- | 28000086 |          9 |    6 |
+-- | 28000086 |         10 |    7 |
+-- | 28000086 |         10 |    8 |
+-- | 28000086 |         11 |    6 |
+-- | 28000086 |         12 |    7 |
+-- | 28000086 |         14 |    8 |
+-- | 28000086 |         14 |    6 |
+-- | 28000086 |         16 |    7 |
+-- | 28000086 |         25 |    8 |
+-- | 28000086 |         37 |    6 |
+-- | 28000087 |          1 |    8 |
+-- | 28000087 |          1 |    6 |
+-- | 28000087 |          2 |    8 |
+-- | 28000087 |          2 |    6 |
+-- | 28000087 |          7 |    7 |
+-- | 28000087 |          9 |    7 |
+-- | 28000087 |         10 |    6 |
+-- | 28000087 |         11 |    7 |
+-- | 28000087 |         11 |    8 |
+-- | 28000087 |         12 |    7 |
+-- | 28000087 |         14 |    6 |
+-- | 28000087 |         14 |    8 |
+-- | 28000087 |         37 |    6 |
+-- | 28000087 |         37 |    7 |
+-- | 28000088 |          1 |    7 |
+-- | 28000088 |          2 |    8 |
+-- | 28000088 |          2 |    6 |
+-- | 28000088 |          7 |    7 |
+-- | 28000088 |          9 |    6 |
+-- | 28000088 |          9 |    8 |
+-- | 28000088 |         10 |    6 |
+-- | 28000088 |         11 |    7 |
+-- | 28000088 |         11 |    8 |
+-- | 28000088 |         12 |    6 |
+-- | 28000088 |         14 |    7 |
+-- | 28000088 |         14 |    8 |
+-- | 28000088 |         25 |    6 |
+-- | 28000088 |         37 |    6 |
+-- | 28000088 |         37 |    7 |
+-- | 28000089 |          1 |    6 |
+-- | 28000089 |          1 |    7 |
+-- | 28000089 |          2 |    7 |
+-- | 28000089 |          2 |    8 |
+-- | 28000089 |          7 |    6 |
+-- | 28000089 |          9 |    8 |
+-- | 28000089 |         10 |    8 |
+-- | 28000089 |         11 |    6 |
+-- | 28000089 |         11 |    7 |
+-- | 28000089 |         12 |    6 |
+-- | 28000089 |         14 |    7 |
+-- | 28000089 |         14 |    8 |
+-- | 28000089 |         37 |    6 |
+-- | 28000089 |         37 |    7 |
+-- | 28000090 |          1 |    7 |
+-- | 28000090 |          1 |    8 |
+-- | 28000090 |          2 |    8 |
+-- | 28000090 |          2 |    7 |
+-- | 28000090 |          7 |    6 |
+-- | 28000090 |          9 |    6 |
+-- | 28000090 |         10 |    7 |
+-- | 28000090 |         10 |    8 |
+-- | 28000090 |         11 |    6 |
+-- | 28000090 |         12 |    7 |
+-- | 28000090 |         14 |    8 |
+-- | 28000090 |         14 |    6 |
+-- | 28000090 |         16 |    7 |
+-- | 28000090 |         25 |    8 |
+-- | 28000090 |         37 |    6 |
+-- | 28000091 |          1 |    8 |
+-- | 28000091 |          1 |    6 |
+-- | 28000091 |          2 |    8 |
+-- | 28000091 |          2 |    6 |
+-- | 28000091 |          7 |    7 |
+-- | 28000091 |          9 |    7 |
+-- | 28000091 |         10 |    6 |
+-- | 28000091 |         11 |    7 |
+-- | 28000091 |         11 |    8 |
+-- | 28000091 |         12 |    7 |
+-- | 28000091 |         14 |    6 |
+-- | 28000091 |         14 |    8 |
+-- | 28000091 |         37 |    6 |
+-- | 28000091 |         37 |    7 |
+-- | 28000092 |          1 |    7 |
+-- | 28000092 |          2 |    8 |
+-- | 28000092 |          2 |    6 |
+-- | 28000092 |          7 |    7 |
+-- | 28000092 |          9 |    6 |
+-- | 28000092 |          9 |    8 |
+-- | 28000092 |         10 |    6 |
+-- | 28000092 |         11 |    7 |
+-- | 28000092 |         11 |    8 |
+-- | 28000092 |         12 |    6 |
+-- | 28000092 |         14 |    7 |
+-- | 28000092 |         14 |    8 |
+-- | 28000092 |         25 |    6 |
+-- | 28000092 |         37 |    6 |
+-- | 28000092 |         37 |    7 |
+-- | 28000101 |          1 |    6 |
+-- | 28000101 |          1 |    7 |
+-- | 28000101 |          2 |    7 |
+-- | 28000101 |          2 |    8 |
+-- | 28000101 |          7 |    6 |
+-- | 28000101 |          9 |    8 |
+-- | 28000101 |         10 |    8 |
+-- | 28000101 |         11 |    6 |
+-- | 28000101 |         11 |    7 |
+-- | 28000101 |         12 |    6 |
+-- | 28000101 |         14 |    7 |
+-- | 28000101 |         14 |    8 |
+-- | 28000101 |         37 |    6 |
+-- | 28000101 |         37 |    7 |
+-- | 28000102 |          1 |    7 |
+-- | 28000102 |          1 |    8 |
+-- | 28000102 |          2 |    8 |
+-- | 28000102 |          2 |    7 |
+-- | 28000102 |          7 |    6 |
+-- | 28000102 |          9 |    6 |
+-- | 28000102 |         10 |    7 |
+-- | 28000102 |         10 |    8 |
+-- | 28000102 |         11 |    6 |
+-- | 28000102 |         12 |    7 |
+-- | 28000102 |         14 |    8 |
+-- | 28000102 |         14 |    6 |
+-- | 28000102 |         16 |    7 |
+-- | 28000102 |         25 |    8 |
+-- | 28000102 |         37 |    6 |
+-- | 28000103 |          1 |    8 |
+-- | 28000103 |          1 |    6 |
+-- | 28000103 |          2 |    8 |
+-- | 28000103 |          2 |    6 |
+-- | 28000103 |          7 |    7 |
+-- | 28000103 |          9 |    7 |
+-- | 28000103 |         10 |    6 |
+-- | 28000103 |         11 |    7 |
+-- | 28000103 |         11 |    8 |
+-- | 28000103 |         12 |    7 |
+-- | 28000103 |         14 |    6 |
+-- | 28000103 |         14 |    8 |
+-- | 28000103 |         37 |    6 |
+-- | 28000103 |         37 |    7 |
+-- | 28000104 |          1 |    7 |
+-- | 28000104 |          2 |    8 |
+-- | 28000104 |          2 |    6 |
+-- | 28000104 |          7 |    7 |
+-- | 28000104 |          9 |    6 |
+-- | 28000104 |          9 |    8 |
+-- | 28000104 |         10 |    6 |
+-- | 28000104 |         11 |    7 |
+-- | 28000104 |         11 |    8 |
+-- | 28000104 |         12 |    6 |
+-- | 28000104 |         14 |    7 |
+-- | 28000104 |         14 |    8 |
+-- | 28000104 |         25 |    6 |
+-- | 28000104 |         37 |    6 |
+-- | 28000104 |         37 |    7 |
+-- | 28000105 |          1 |    6 |
+-- | 28000105 |          1 |    7 |
+-- | 28000105 |          2 |    7 |
+-- | 28000105 |          2 |    8 |
+-- | 28000105 |          7 |    6 |
+-- | 28000105 |          9 |    8 |
+-- | 28000105 |         10 |    8 |
+-- | 28000105 |         11 |    6 |
+-- | 28000105 |         11 |    7 |
+-- | 28000105 |         12 |    6 |
+-- | 28000105 |         14 |    7 |
+-- | 28000105 |         14 |    8 |
+-- | 28000105 |         37 |    6 |
+-- | 28000105 |         37 |    7 |
+-- | 28000106 |          1 |    7 |
+-- | 28000106 |          1 |    8 |
+-- | 28000106 |          2 |    8 |
+-- | 28000106 |          2 |    7 |
+-- | 28000106 |          7 |    6 |
+-- | 28000106 |          9 |    6 |
+-- | 28000106 |         10 |    7 |
+-- | 28000106 |         10 |    8 |
+-- | 28000106 |         11 |    6 |
+-- | 28000106 |         12 |    7 |
+-- | 28000106 |         14 |    8 |
+-- | 28000106 |         14 |    6 |
+-- | 28000106 |         16 |    7 |
+-- | 28000106 |         25 |    8 |
+-- | 28000106 |         37 |    6 |
+-- | 28000107 |          1 |    8 |
+-- | 28000107 |          1 |    6 |
+-- | 28000107 |          2 |    8 |
+-- | 28000107 |          2 |    6 |
+-- | 28000107 |          7 |    7 |
+-- | 28000107 |          9 |    7 |
+-- | 28000107 |         10 |    6 |
+-- | 28000107 |         11 |    7 |
+-- | 28000107 |         11 |    8 |
+-- | 28000107 |         12 |    7 |
+-- | 28000107 |         14 |    6 |
+-- | 28000107 |         14 |    8 |
+-- | 28000107 |         37 |    6 |
+-- | 28000107 |         37 |    7 |
+-- | 28000108 |          1 |    7 |
+-- | 28000108 |          2 |    8 |
+-- | 28000108 |          2 |    6 |
+-- | 28000108 |          7 |    7 |
+-- | 28000108 |          9 |    6 |
+-- | 28000108 |          9 |    8 |
+-- | 28000108 |         10 |    6 |
+-- | 28000108 |         11 |    7 |
+-- | 28000108 |         11 |    8 |
+-- | 28000108 |         12 |    6 |
+-- | 28000108 |         14 |    7 |
+-- | 28000108 |         14 |    8 |
+-- | 28000108 |         25 |    6 |
+-- | 28000108 |         37 |    6 |
+-- | 28000108 |         37 |    7 |
+-- | 28000109 |          1 |    6 |
+-- | 28000109 |          1 |    7 |
+-- | 28000109 |          2 |    7 |
+-- | 28000109 |          2 |    8 |
+-- | 28000109 |          7 |    6 |
+-- | 28000109 |          9 |    8 |
+-- | 28000109 |         10 |    8 |
+-- | 28000109 |         11 |    6 |
+-- | 28000109 |         11 |    7 |
+-- | 28000109 |         12 |    6 |
+-- | 28000109 |         14 |    7 |
+-- | 28000109 |         14 |    8 |
+-- | 28000109 |         37 |    6 |
+-- | 28000109 |         37 |    7 |
+-- | 28000110 |          1 |    7 |
+-- | 28000110 |          1 |    8 |
+-- | 28000110 |          2 |    8 |
+-- | 28000110 |          2 |    7 |
+-- | 28000110 |          7 |    6 |
+-- | 28000110 |          9 |    6 |
+-- | 28000110 |         10 |    7 |
+-- | 28000110 |         10 |    8 |
+-- | 28000110 |         11 |    6 |
+-- | 28000110 |         12 |    7 |
+-- | 28000110 |         14 |    8 |
+-- | 28000110 |         14 |    6 |
+-- | 28000110 |         16 |    7 |
+-- | 28000110 |         25 |    8 |
+-- | 28000110 |         37 |    6 |
+-- | 28000111 |          1 |    8 |
+-- | 28000111 |          1 |    6 |
+-- | 28000111 |          2 |    8 |
+-- | 28000111 |          2 |    6 |
+-- | 28000111 |          7 |    7 |
+-- | 28000111 |          9 |    7 |
+-- | 28000111 |         10 |    6 |
+-- | 28000111 |         11 |    7 |
+-- | 28000111 |         11 |    8 |
+-- | 28000111 |         12 |    7 |
+-- | 28000111 |         14 |    6 |
+-- | 28000111 |         14 |    8 |
+-- | 28000111 |         37 |    6 |
+-- | 28000111 |         37 |    7 |
+-- | 28000112 |          1 |    7 |
+-- | 28000112 |          2 |    8 |
+-- | 28000112 |          2 |    6 |
+-- | 28000112 |          7 |    7 |
+-- | 28000112 |          9 |    6 |
+-- | 28000112 |          9 |    8 |
+-- | 28000112 |         10 |    6 |
+-- | 28000112 |         11 |    7 |
+-- | 28000112 |         11 |    8 |
+-- | 28000112 |         12 |    6 |
+-- | 28000112 |         14 |    7 |
+-- | 28000112 |         14 |    8 |
+-- | 28000112 |         25 |    6 |
+-- | 28000112 |         37 |    6 |
+-- | 28000112 |         37 |    7 |
+-- | 29000001 |          1 |    6 |
+-- | 29000001 |          1 |    7 |
+-- | 29000001 |          2 |    7 |
+-- | 29000001 |          2 |    8 |
+-- | 29000001 |          7 |    6 |
+-- | 29000001 |          9 |    8 |
+-- | 29000001 |         10 |    8 |
+-- | 29000001 |         11 |    6 |
+-- | 29000001 |         11 |    7 |
+-- | 29000001 |         12 |    6 |
+-- | 29000001 |         14 |    7 |
+-- | 29000001 |         14 |    8 |
+-- | 29000001 |         37 |    6 |
+-- | 29000001 |         37 |    7 |
+-- | 29000002 |          1 |    7 |
+-- | 29000002 |          1 |    8 |
+-- | 29000002 |          2 |    8 |
+-- | 29000002 |          2 |    7 |
+-- | 29000002 |          7 |    6 |
+-- | 29000002 |          9 |    6 |
+-- | 29000002 |         10 |    7 |
+-- | 29000002 |         10 |    8 |
+-- | 29000002 |         11 |    6 |
+-- | 29000002 |         12 |    7 |
+-- | 29000002 |         14 |    8 |
+-- | 29000002 |         14 |    6 |
+-- | 29000002 |         16 |    7 |
+-- | 29000002 |         25 |    8 |
+-- | 29000002 |         37 |    6 |
+-- | 29000003 |          1 |    8 |
+-- | 29000003 |          1 |    6 |
+-- | 29000003 |          2 |    8 |
+-- | 29000003 |          2 |    6 |
+-- | 29000003 |          7 |    7 |
+-- | 29000003 |          9 |    7 |
+-- | 29000003 |         10 |    6 |
+-- | 29000003 |         11 |    7 |
+-- | 29000003 |         11 |    8 |
+-- | 29000003 |         12 |    7 |
+-- | 29000003 |         14 |    6 |
+-- | 29000003 |         14 |    8 |
+-- | 29000003 |         37 |    6 |
+-- | 29000003 |         37 |    7 |
+-- | 29000004 |          1 |    7 |
+-- | 29000004 |          2 |    8 |
+-- | 29000004 |          2 |    6 |
+-- | 29000004 |          7 |    7 |
+-- | 29000004 |          9 |    6 |
+-- | 29000004 |          9 |    8 |
+-- | 29000004 |         10 |    6 |
+-- | 29000004 |         11 |    7 |
+-- | 29000004 |         11 |    8 |
+-- | 29000004 |         12 |    6 |
+-- | 29000004 |         14 |    7 |
+-- | 29000004 |         14 |    8 |
+-- | 29000004 |         25 |    6 |
+-- | 29000004 |         37 |    6 |
+-- | 29000004 |         37 |    7 |
+-- | 29000005 |          1 |    6 |
+-- | 29000005 |          1 |    7 |
+-- | 29000005 |          2 |    7 |
+-- | 29000005 |          2 |    8 |
+-- | 29000005 |          7 |    6 |
+-- | 29000005 |          9 |    8 |
+-- | 29000005 |         10 |    8 |
+-- | 29000005 |         11 |    6 |
+-- | 29000005 |         11 |    7 |
+-- | 29000005 |         12 |    6 |
+-- | 29000005 |         14 |    7 |
+-- | 29000005 |         14 |    8 |
+-- | 29000005 |         37 |    6 |
+-- | 29000005 |         37 |    7 |
+-- | 29000006 |          1 |    7 |
+-- | 29000006 |          1 |    8 |
+-- | 29000006 |          2 |    8 |
+-- | 29000006 |          2 |    7 |
+-- | 29000006 |          7 |    6 |
+-- | 29000006 |          9 |    6 |
+-- | 29000006 |         10 |    7 |
+-- | 29000006 |         10 |    8 |
+-- | 29000006 |         11 |    6 |
+-- | 29000006 |         12 |    7 |
+-- | 29000006 |         14 |    8 |
+-- | 29000006 |         14 |    6 |
+-- | 29000006 |         16 |    7 |
+-- | 29000006 |         25 |    8 |
+-- | 29000006 |         37 |    6 |
+-- | 29000007 |          1 |    8 |
+-- | 29000007 |          1 |    6 |
+-- | 29000007 |          2 |    8 |
+-- | 29000007 |          2 |    6 |
+-- | 29000007 |          7 |    7 |
+-- | 29000007 |          9 |    7 |
+-- | 29000007 |         10 |    6 |
+-- | 29000007 |         11 |    7 |
+-- | 29000007 |         11 |    8 |
+-- | 29000007 |         12 |    7 |
+-- | 29000007 |         14 |    6 |
+-- | 29000007 |         14 |    8 |
+-- | 29000007 |         37 |    6 |
+-- | 29000007 |         37 |    7 |
+-- | 29000008 |          1 |    7 |
+-- | 29000008 |          2 |    8 |
+-- | 29000008 |          2 |    6 |
+-- | 29000008 |          7 |    7 |
+-- | 29000008 |          9 |    6 |
+-- | 29000008 |          9 |    8 |
+-- | 29000008 |         10 |    6 |
+-- | 29000008 |         11 |    7 |
+-- | 29000008 |         11 |    8 |
+-- | 29000008 |         12 |    6 |
+-- | 29000008 |         14 |    7 |
+-- | 29000008 |         14 |    8 |
+-- | 29000008 |         25 |    6 |
+-- | 29000008 |         37 |    6 |
+-- | 29000008 |         37 |    7 |
+-- | 29000009 |          1 |    6 |
+-- | 29000009 |          1 |    7 |
+-- | 29000009 |          2 |    7 |
+-- | 29000009 |          2 |    8 |
+-- | 29000009 |          7 |    6 |
+-- | 29000009 |          9 |    8 |
+-- | 29000009 |         10 |    8 |
+-- | 29000009 |         11 |    6 |
+-- | 29000009 |         11 |    7 |
+-- | 29000009 |         12 |    6 |
+-- | 29000009 |         14 |    7 |
+-- | 29000009 |         14 |    8 |
+-- | 29000009 |         37 |    6 |
+-- | 29000009 |         37 |    7 |
+-- | 29000010 |          1 |    7 |
+-- | 29000010 |          1 |    8 |
+-- | 29000010 |          2 |    8 |
+-- | 29000010 |          2 |    7 |
+-- | 29000010 |          7 |    6 |
+-- | 29000010 |          9 |    6 |
+-- | 29000010 |         10 |    7 |
+-- | 29000010 |         10 |    8 |
+-- | 29000010 |         11 |    6 |
+-- | 29000010 |         12 |    7 |
+-- | 29000010 |         14 |    8 |
+-- | 29000010 |         14 |    6 |
+-- | 29000010 |         16 |    7 |
+-- | 29000010 |         25 |    8 |
+-- | 29000010 |         37 |    6 |
+-- | 29000011 |          1 |    8 |
+-- | 29000011 |          1 |    6 |
+-- | 29000011 |          2 |    8 |
+-- | 29000011 |          2 |    6 |
+-- | 29000011 |          7 |    7 |
+-- | 29000011 |          9 |    7 |
+-- | 29000011 |         10 |    6 |
+-- | 29000011 |         11 |    7 |
+-- | 29000011 |         11 |    8 |
+-- | 29000011 |         12 |    7 |
+-- | 29000011 |         14 |    6 |
+-- | 29000011 |         14 |    8 |
+-- | 29000011 |         37 |    6 |
+-- | 29000011 |         37 |    7 |
+-- | 29000012 |          1 |    7 |
+-- | 29000012 |          2 |    8 |
+-- | 29000012 |          2 |    6 |
+-- | 29000012 |          7 |    7 |
+-- | 29000012 |          9 |    6 |
+-- | 29000012 |          9 |    8 |
+-- | 29000012 |         10 |    6 |
+-- | 29000012 |         11 |    7 |
+-- | 29000012 |         11 |    8 |
+-- | 29000012 |         12 |    6 |
+-- | 29000012 |         14 |    7 |
+-- | 29000012 |         14 |    8 |
+-- | 29000012 |         25 |    6 |
+-- | 29000012 |         37 |    6 |
+-- | 29000012 |         37 |    7 |
+-- | 29000021 |          1 |    6 |
+-- | 29000021 |          1 |    7 |
+-- | 29000021 |          2 |    7 |
+-- | 29000021 |          2 |    8 |
+-- | 29000021 |          7 |    6 |
+-- | 29000021 |          9 |    8 |
+-- | 29000021 |         10 |    8 |
+-- | 29000021 |         11 |    6 |
+-- | 29000021 |         11 |    7 |
+-- | 29000021 |         12 |    6 |
+-- | 29000021 |         14 |    7 |
+-- | 29000021 |         14 |    8 |
+-- | 29000021 |         37 |    6 |
+-- | 29000021 |         37 |    7 |
+-- | 29000022 |          1 |    7 |
+-- | 29000022 |          1 |    8 |
+-- | 29000022 |          2 |    8 |
+-- | 29000022 |          2 |    7 |
+-- | 29000022 |          7 |    6 |
+-- | 29000022 |          9 |    6 |
+-- | 29000022 |         10 |    7 |
+-- | 29000022 |         10 |    8 |
+-- | 29000022 |         11 |    6 |
+-- | 29000022 |         12 |    7 |
+-- | 29000022 |         14 |    8 |
+-- | 29000022 |         14 |    6 |
+-- | 29000022 |         16 |    7 |
+-- | 29000022 |         25 |    8 |
+-- | 29000022 |         37 |    6 |
+-- | 29000023 |          1 |    8 |
+-- | 29000023 |          1 |    6 |
+-- | 29000023 |          2 |    8 |
+-- | 29000023 |          2 |    6 |
+-- | 29000023 |          7 |    7 |
+-- | 29000023 |          9 |    7 |
+-- | 29000023 |         10 |    6 |
+-- | 29000023 |         11 |    7 |
+-- | 29000023 |         11 |    8 |
+-- | 29000023 |         12 |    7 |
+-- | 29000023 |         14 |    6 |
+-- | 29000023 |         14 |    8 |
+-- | 29000023 |         37 |    6 |
+-- | 29000023 |         37 |    7 |
+-- | 29000024 |          1 |    7 |
+-- | 29000024 |          2 |    8 |
+-- | 29000024 |          2 |    6 |
+-- | 29000024 |          7 |    7 |
+-- | 29000024 |          9 |    6 |
+-- | 29000024 |          9 |    8 |
+-- | 29000024 |         10 |    6 |
+-- | 29000024 |         11 |    7 |
+-- | 29000024 |         11 |    8 |
+-- | 29000024 |         12 |    6 |
+-- | 29000024 |         14 |    7 |
+-- | 29000024 |         14 |    8 |
+-- | 29000024 |         25 |    6 |
+-- | 29000024 |         37 |    6 |
+-- | 29000024 |         37 |    7 |
+-- | 29000025 |          1 |    6 |
+-- | 29000025 |          1 |    7 |
+-- | 29000025 |          2 |    7 |
+-- | 29000025 |          2 |    8 |
+-- | 29000025 |          7 |    6 |
+-- | 29000025 |          9 |    8 |
+-- | 29000025 |         10 |    8 |
+-- | 29000025 |         11 |    6 |
+-- | 29000025 |         11 |    7 |
+-- | 29000025 |         12 |    6 |
+-- | 29000025 |         14 |    7 |
+-- | 29000025 |         14 |    8 |
+-- | 29000025 |         37 |    6 |
+-- | 29000025 |         37 |    7 |
+-- | 29000026 |          1 |    7 |
+-- | 29000026 |          1 |    8 |
+-- | 29000026 |          2 |    8 |
+-- | 29000026 |          2 |    7 |
+-- | 29000026 |          7 |    6 |
+-- | 29000026 |          9 |    6 |
+-- | 29000026 |         10 |    7 |
+-- | 29000026 |         10 |    8 |
+-- | 29000026 |         11 |    6 |
+-- | 29000026 |         12 |    7 |
+-- | 29000026 |         14 |    8 |
+-- | 29000026 |         14 |    6 |
+-- | 29000026 |         16 |    7 |
+-- | 29000026 |         25 |    8 |
+-- | 29000026 |         37 |    6 |
+-- | 29000027 |          1 |    8 |
+-- | 29000027 |          1 |    6 |
+-- | 29000027 |          2 |    8 |
+-- | 29000027 |          2 |    6 |
+-- | 29000027 |          7 |    7 |
+-- | 29000027 |          9 |    7 |
+-- | 29000027 |         10 |    6 |
+-- | 29000027 |         11 |    7 |
+-- | 29000027 |         11 |    8 |
+-- | 29000027 |         12 |    7 |
+-- | 29000027 |         14 |    6 |
+-- | 29000027 |         14 |    8 |
+-- | 29000027 |         37 |    6 |
+-- | 29000027 |         37 |    7 |
+-- | 29000028 |          1 |    7 |
+-- | 29000028 |          2 |    8 |
+-- | 29000028 |          2 |    6 |
+-- | 29000028 |          7 |    7 |
+-- | 29000028 |          9 |    6 |
+-- | 29000028 |          9 |    8 |
+-- | 29000028 |         10 |    6 |
+-- | 29000028 |         11 |    7 |
+-- | 29000028 |         11 |    8 |
+-- | 29000028 |         12 |    6 |
+-- | 29000028 |         14 |    7 |
+-- | 29000028 |         14 |    8 |
+-- | 29000028 |         25 |    6 |
+-- | 29000028 |         37 |    6 |
+-- | 29000028 |         37 |    7 |
+-- | 29000029 |          1 |    6 |
+-- | 29000029 |          1 |    7 |
+-- | 29000029 |          2 |    7 |
+-- | 29000029 |          2 |    8 |
+-- | 29000029 |          7 |    6 |
+-- | 29000029 |          9 |    8 |
+-- | 29000029 |         10 |    8 |
+-- | 29000029 |         11 |    6 |
+-- | 29000029 |         11 |    7 |
+-- | 29000029 |         12 |    6 |
+-- | 29000029 |         14 |    7 |
+-- | 29000029 |         14 |    8 |
+-- | 29000029 |         37 |    6 |
+-- | 29000029 |         37 |    7 |
+-- | 29000030 |          1 |    7 |
+-- | 29000030 |          1 |    8 |
+-- | 29000030 |          2 |    8 |
+-- | 29000030 |          2 |    7 |
+-- | 29000030 |          7 |    6 |
+-- | 29000030 |          9 |    6 |
+-- | 29000030 |         10 |    7 |
+-- | 29000030 |         10 |    8 |
+-- | 29000030 |         11 |    6 |
+-- | 29000030 |         12 |    7 |
+-- | 29000030 |         14 |    8 |
+-- | 29000030 |         14 |    6 |
+-- | 29000030 |         16 |    7 |
+-- | 29000030 |         25 |    8 |
+-- | 29000030 |         37 |    6 |
+-- | 29000031 |          1 |    8 |
+-- | 29000031 |          1 |    6 |
+-- | 29000031 |          2 |    8 |
+-- | 29000031 |          2 |    6 |
+-- | 29000031 |          7 |    7 |
+-- | 29000031 |          9 |    7 |
+-- | 29000031 |         10 |    6 |
+-- | 29000031 |         11 |    7 |
+-- | 29000031 |         11 |    8 |
+-- | 29000031 |         12 |    7 |
+-- | 29000031 |         14 |    6 |
+-- | 29000031 |         14 |    8 |
+-- | 29000031 |         37 |    6 |
+-- | 29000031 |         37 |    7 |
+-- | 29000032 |          1 |    7 |
+-- | 29000032 |          2 |    8 |
+-- | 29000032 |          2 |    6 |
+-- | 29000032 |          7 |    7 |
+-- | 29000032 |          9 |    6 |
+-- | 29000032 |          9 |    8 |
+-- | 29000032 |         10 |    6 |
+-- | 29000032 |         11 |    7 |
+-- | 29000032 |         11 |    8 |
+-- | 29000032 |         12 |    6 |
+-- | 29000032 |         14 |    7 |
+-- | 29000032 |         14 |    8 |
+-- | 29000032 |         25 |    6 |
+-- | 29000032 |         37 |    6 |
+-- | 29000032 |         37 |    7 |
+-- | 29000041 |          1 |    6 |
+-- | 29000041 |          1 |    7 |
+-- | 29000041 |          2 |    7 |
+-- | 29000041 |          2 |    8 |
+-- | 29000041 |          7 |    6 |
+-- | 29000041 |          9 |    8 |
+-- | 29000041 |         10 |    8 |
+-- | 29000041 |         11 |    6 |
+-- | 29000041 |         11 |    7 |
+-- | 29000041 |         12 |    6 |
+-- | 29000041 |         14 |    7 |
+-- | 29000041 |         14 |    8 |
+-- | 29000041 |         37 |    6 |
+-- | 29000041 |         37 |    7 |
+-- | 29000042 |          1 |    7 |
+-- | 29000042 |          1 |    8 |
+-- | 29000042 |          2 |    8 |
+-- | 29000042 |          2 |    7 |
+-- | 29000042 |          7 |    6 |
+-- | 29000042 |          9 |    6 |
+-- | 29000042 |         10 |    7 |
+-- | 29000042 |         10 |    8 |
+-- | 29000042 |         11 |    6 |
+-- | 29000042 |         12 |    7 |
+-- | 29000042 |         14 |    8 |
+-- | 29000042 |         14 |    6 |
+-- | 29000042 |         16 |    7 |
+-- | 29000042 |         25 |    8 |
+-- | 29000042 |         37 |    6 |
+-- | 29000043 |          1 |    8 |
+-- | 29000043 |          1 |    6 |
+-- | 29000043 |          2 |    8 |
+-- | 29000043 |          2 |    6 |
+-- | 29000043 |          7 |    7 |
+-- | 29000043 |          9 |    7 |
+-- | 29000043 |         10 |    6 |
+-- | 29000043 |         11 |    7 |
+-- | 29000043 |         11 |    8 |
+-- | 29000043 |         12 |    7 |
+-- | 29000043 |         14 |    6 |
+-- | 29000043 |         14 |    8 |
+-- | 29000043 |         37 |    6 |
+-- | 29000043 |         37 |    7 |
+-- | 29000044 |          1 |    7 |
+-- | 29000044 |          2 |    8 |
+-- | 29000044 |          2 |    6 |
+-- | 29000044 |          7 |    7 |
+-- | 29000044 |          9 |    6 |
+-- | 29000044 |          9 |    8 |
+-- | 29000044 |         10 |    6 |
+-- | 29000044 |         11 |    7 |
+-- | 29000044 |         11 |    8 |
+-- | 29000044 |         12 |    6 |
+-- | 29000044 |         14 |    7 |
+-- | 29000044 |         14 |    8 |
+-- | 29000044 |         25 |    6 |
+-- | 29000044 |         37 |    6 |
+-- | 29000044 |         37 |    7 |
+-- | 29000045 |          1 |    6 |
+-- | 29000045 |          1 |    7 |
+-- | 29000045 |          2 |    7 |
+-- | 29000045 |          2 |    8 |
+-- | 29000045 |          7 |    6 |
+-- | 29000045 |          9 |    8 |
+-- | 29000045 |         10 |    8 |
+-- | 29000045 |         11 |    6 |
+-- | 29000045 |         11 |    7 |
+-- | 29000045 |         12 |    6 |
+-- | 29000045 |         14 |    7 |
+-- | 29000045 |         14 |    8 |
+-- | 29000045 |         37 |    6 |
+-- | 29000045 |         37 |    7 |
+-- | 29000046 |          1 |    7 |
+-- | 29000046 |          1 |    8 |
+-- | 29000046 |          2 |    8 |
+-- | 29000046 |          2 |    7 |
+-- | 29000046 |          7 |    6 |
+-- | 29000046 |          9 |    6 |
+-- | 29000046 |         10 |    7 |
+-- | 29000046 |         10 |    8 |
+-- | 29000046 |         11 |    6 |
+-- | 29000046 |         12 |    7 |
+-- | 29000046 |         14 |    8 |
+-- | 29000046 |         14 |    6 |
+-- | 29000046 |         16 |    7 |
+-- | 29000046 |         25 |    8 |
+-- | 29000046 |         37 |    6 |
+-- | 29000047 |          1 |    8 |
+-- | 29000047 |          1 |    6 |
+-- | 29000047 |          2 |    8 |
+-- | 29000047 |          2 |    6 |
+-- | 29000047 |          7 |    7 |
+-- | 29000047 |          9 |    7 |
+-- | 29000047 |         10 |    6 |
+-- | 29000047 |         11 |    7 |
+-- | 29000047 |         11 |    8 |
+-- | 29000047 |         12 |    7 |
+-- | 29000047 |         14 |    6 |
+-- | 29000047 |         14 |    8 |
+-- | 29000047 |         37 |    6 |
+-- | 29000047 |         37 |    7 |
+-- | 29000048 |          1 |    7 |
+-- | 29000048 |          2 |    8 |
+-- | 29000048 |          2 |    6 |
+-- | 29000048 |          7 |    7 |
+-- | 29000048 |          9 |    6 |
+-- | 29000048 |          9 |    8 |
+-- | 29000048 |         10 |    6 |
+-- | 29000048 |         11 |    7 |
+-- | 29000048 |         11 |    8 |
+-- | 29000048 |         12 |    6 |
+-- | 29000048 |         14 |    7 |
+-- | 29000048 |         14 |    8 |
+-- | 29000048 |         25 |    6 |
+-- | 29000048 |         37 |    6 |
+-- | 29000048 |         37 |    7 |
+-- | 29000049 |          1 |    6 |
+-- | 29000049 |          1 |    7 |
+-- | 29000049 |          2 |    7 |
+-- | 29000049 |          2 |    8 |
+-- | 29000049 |          7 |    6 |
+-- | 29000049 |          9 |    8 |
+-- | 29000049 |         10 |    8 |
+-- | 29000049 |         11 |    6 |
+-- | 29000049 |         11 |    7 |
+-- | 29000049 |         12 |    6 |
+-- | 29000049 |         14 |    7 |
+-- | 29000049 |         14 |    8 |
+-- | 29000049 |         37 |    6 |
+-- | 29000049 |         37 |    7 |
+-- | 29000050 |          1 |    7 |
+-- | 29000050 |          1 |    8 |
+-- | 29000050 |          2 |    8 |
+-- | 29000050 |          2 |    7 |
+-- | 29000050 |          7 |    6 |
+-- | 29000050 |          9 |    6 |
+-- | 29000050 |         10 |    7 |
+-- | 29000050 |         10 |    8 |
+-- | 29000050 |         11 |    6 |
+-- | 29000050 |         12 |    7 |
+-- | 29000050 |         14 |    8 |
+-- | 29000050 |         14 |    6 |
+-- | 29000050 |         16 |    7 |
+-- | 29000050 |         25 |    8 |
+-- | 29000050 |         37 |    6 |
+-- | 29000051 |          1 |    8 |
+-- | 29000051 |          1 |    6 |
+-- | 29000051 |          2 |    8 |
+-- | 29000051 |          2 |    6 |
+-- | 29000051 |          7 |    7 |
+-- | 29000051 |          9 |    7 |
+-- | 29000051 |         10 |    6 |
+-- | 29000051 |         11 |    7 |
+-- | 29000051 |         11 |    8 |
+-- | 29000051 |         12 |    7 |
+-- | 29000051 |         14 |    6 |
+-- | 29000051 |         14 |    8 |
+-- | 29000051 |         37 |    6 |
+-- | 29000051 |         37 |    7 |
+-- | 29000052 |          1 |    7 |
+-- | 29000052 |          2 |    8 |
+-- | 29000052 |          2 |    6 |
+-- | 29000052 |          7 |    7 |
+-- | 29000052 |          9 |    6 |
+-- | 29000052 |          9 |    8 |
+-- | 29000052 |         10 |    6 |
+-- | 29000052 |         11 |    7 |
+-- | 29000052 |         11 |    8 |
+-- | 29000052 |         12 |    6 |
+-- | 29000052 |         14 |    7 |
+-- | 29000052 |         14 |    8 |
+-- | 29000052 |         25 |    6 |
+-- | 29000052 |         37 |    6 |
+-- | 29000052 |         37 |    7 |
+-- | 29000061 |          1 |    6 |
+-- | 29000061 |          1 |    7 |
+-- | 29000061 |          2 |    7 |
+-- | 29000061 |          2 |    8 |
+-- | 29000061 |          7 |    6 |
+-- | 29000061 |          9 |    8 |
+-- | 29000061 |         10 |    8 |
+-- | 29000061 |         11 |    6 |
+-- | 29000061 |         11 |    7 |
+-- | 29000061 |         12 |    6 |
+-- | 29000061 |         14 |    7 |
+-- | 29000061 |         14 |    8 |
+-- | 29000061 |         37 |    6 |
+-- | 29000061 |         37 |    7 |
+-- | 29000062 |          1 |    7 |
+-- | 29000062 |          1 |    8 |
+-- | 29000062 |          2 |    8 |
+-- | 29000062 |          2 |    7 |
+-- | 29000062 |          7 |    6 |
+-- | 29000062 |          9 |    6 |
+-- | 29000062 |         10 |    7 |
+-- | 29000062 |         10 |    8 |
+-- | 29000062 |         11 |    6 |
+-- | 29000062 |         12 |    7 |
+-- | 29000062 |         14 |    8 |
+-- | 29000062 |         14 |    6 |
+-- | 29000062 |         16 |    7 |
+-- | 29000062 |         25 |    8 |
+-- | 29000062 |         37 |    6 |
+-- | 29000063 |          1 |    8 |
+-- | 29000063 |          1 |    6 |
+-- | 29000063 |          2 |    8 |
+-- | 29000063 |          2 |    6 |
+-- | 29000063 |          7 |    7 |
+-- | 29000063 |          9 |    7 |
+-- | 29000063 |         10 |    6 |
+-- | 29000063 |         11 |    7 |
+-- | 29000063 |         11 |    8 |
+-- | 29000063 |         12 |    7 |
+-- | 29000063 |         14 |    6 |
+-- | 29000063 |         14 |    8 |
+-- | 29000063 |         37 |    6 |
+-- | 29000063 |         37 |    7 |
+-- | 29000064 |          1 |    7 |
+-- | 29000064 |          2 |    8 |
+-- | 29000064 |          2 |    6 |
+-- | 29000064 |          7 |    7 |
+-- | 29000064 |          9 |    6 |
+-- | 29000064 |          9 |    8 |
+-- | 29000064 |         10 |    6 |
+-- | 29000064 |         11 |    7 |
+-- | 29000064 |         11 |    8 |
+-- | 29000064 |         12 |    6 |
+-- | 29000064 |         14 |    7 |
+-- | 29000064 |         14 |    8 |
+-- | 29000064 |         25 |    6 |
+-- | 29000064 |         37 |    6 |
+-- | 29000064 |         37 |    7 |
+-- | 29000065 |          1 |    6 |
+-- | 29000065 |          1 |    7 |
+-- | 29000065 |          2 |    7 |
+-- | 29000065 |          2 |    8 |
+-- | 29000065 |          7 |    6 |
+-- | 29000065 |          9 |    8 |
+-- | 29000065 |         10 |    8 |
+-- | 29000065 |         11 |    6 |
+-- | 29000065 |         11 |    7 |
+-- | 29000065 |         12 |    6 |
+-- | 29000065 |         14 |    7 |
+-- | 29000065 |         14 |    8 |
+-- | 29000065 |         37 |    6 |
+-- | 29000065 |         37 |    7 |
+-- | 29000066 |          1 |    7 |
+-- | 29000066 |          1 |    8 |
+-- | 29000066 |          2 |    8 |
+-- | 29000066 |          2 |    7 |
+-- | 29000066 |          7 |    6 |
+-- | 29000066 |          9 |    6 |
+-- | 29000066 |         10 |    7 |
+-- | 29000066 |         10 |    8 |
+-- | 29000066 |         11 |    6 |
+-- | 29000066 |         12 |    7 |
+-- | 29000066 |         14 |    8 |
+-- | 29000066 |         14 |    6 |
+-- | 29000066 |         16 |    7 |
+-- | 29000066 |         25 |    8 |
+-- | 29000066 |         37 |    6 |
+-- | 29000067 |          1 |    8 |
+-- | 29000067 |          1 |    6 |
+-- | 29000067 |          2 |    8 |
+-- | 29000067 |          2 |    6 |
+-- | 29000067 |          7 |    7 |
+-- | 29000067 |          9 |    7 |
+-- | 29000067 |         10 |    6 |
+-- | 29000067 |         11 |    7 |
+-- | 29000067 |         11 |    8 |
+-- | 29000067 |         12 |    7 |
+-- | 29000067 |         14 |    6 |
+-- | 29000067 |         14 |    8 |
+-- | 29000067 |         37 |    6 |
+-- | 29000067 |         37 |    7 |
+-- | 29000068 |          1 |    7 |
+-- | 29000068 |          2 |    8 |
+-- | 29000068 |          2 |    6 |
+-- | 29000068 |          7 |    7 |
+-- | 29000068 |          9 |    6 |
+-- | 29000068 |          9 |    8 |
+-- | 29000068 |         10 |    6 |
+-- | 29000068 |         11 |    7 |
+-- | 29000068 |         11 |    8 |
+-- | 29000068 |         12 |    6 |
+-- | 29000068 |         14 |    7 |
+-- | 29000068 |         14 |    8 |
+-- | 29000068 |         25 |    6 |
+-- | 29000068 |         37 |    6 |
+-- | 29000068 |         37 |    7 |
+-- | 29000069 |          1 |    6 |
+-- | 29000069 |          1 |    7 |
+-- | 29000069 |          2 |    7 |
+-- | 29000069 |          2 |    8 |
+-- | 29000069 |          7 |    6 |
+-- | 29000069 |          9 |    8 |
+-- | 29000069 |         10 |    8 |
+-- | 29000069 |         11 |    6 |
+-- | 29000069 |         11 |    7 |
+-- | 29000069 |         12 |    6 |
+-- | 29000069 |         14 |    7 |
+-- | 29000069 |         14 |    8 |
+-- | 29000069 |         37 |    6 |
+-- | 29000069 |         37 |    7 |
+-- | 29000070 |          1 |    7 |
+-- | 29000070 |          1 |    8 |
+-- | 29000070 |          2 |    8 |
+-- | 29000070 |          2 |    7 |
+-- | 29000070 |          7 |    6 |
+-- | 29000070 |          9 |    6 |
+-- | 29000070 |         10 |    7 |
+-- | 29000070 |         10 |    8 |
+-- | 29000070 |         11 |    6 |
+-- | 29000070 |         12 |    7 |
+-- | 29000070 |         14 |    8 |
+-- | 29000070 |         14 |    6 |
+-- | 29000070 |         16 |    7 |
+-- | 29000070 |         25 |    8 |
+-- | 29000070 |         37 |    6 |
+-- | 29000071 |          1 |    8 |
+-- | 29000071 |          1 |    6 |
+-- | 29000071 |          2 |    8 |
+-- | 29000071 |          2 |    6 |
+-- | 29000071 |          7 |    7 |
+-- | 29000071 |          9 |    7 |
+-- | 29000071 |         10 |    6 |
+-- | 29000071 |         11 |    7 |
+-- | 29000071 |         11 |    8 |
+-- | 29000071 |         12 |    7 |
+-- | 29000071 |         14 |    6 |
+-- | 29000071 |         14 |    8 |
+-- | 29000071 |         37 |    6 |
+-- | 29000071 |         37 |    7 |
+-- | 29000072 |          1 |    7 |
+-- | 29000072 |          2 |    8 |
+-- | 29000072 |          2 |    6 |
+-- | 29000072 |          7 |    7 |
+-- | 29000072 |          9 |    6 |
+-- | 29000072 |          9 |    8 |
+-- | 29000072 |         10 |    6 |
+-- | 29000072 |         11 |    7 |
+-- | 29000072 |         11 |    8 |
+-- | 29000072 |         12 |    6 |
+-- | 29000072 |         14 |    7 |
+-- | 29000072 |         14 |    8 |
+-- | 29000072 |         25 |    6 |
+-- | 29000072 |         37 |    6 |
+-- | 29000072 |         37 |    7 |
+-- | 29000081 |          1 |    6 |
+-- | 29000081 |          1 |    7 |
+-- | 29000081 |          2 |    7 |
+-- | 29000081 |          2 |    8 |
+-- | 29000081 |          7 |    6 |
+-- | 29000081 |          9 |    8 |
+-- | 29000081 |         10 |    8 |
+-- | 29000081 |         11 |    6 |
+-- | 29000081 |         11 |    7 |
+-- | 29000081 |         12 |    6 |
+-- | 29000081 |         14 |    7 |
+-- | 29000081 |         14 |    8 |
+-- | 29000081 |         37 |    6 |
+-- | 29000081 |         37 |    7 |
+-- | 29000082 |          1 |    7 |
+-- | 29000082 |          1 |    8 |
+-- | 29000082 |          2 |    8 |
+-- | 29000082 |          2 |    7 |
+-- | 29000082 |          7 |    6 |
+-- | 29000082 |          9 |    6 |
+-- | 29000082 |         10 |    7 |
+-- | 29000082 |         10 |    8 |
+-- | 29000082 |         11 |    6 |
+-- | 29000082 |         12 |    7 |
+-- | 29000082 |         14 |    8 |
+-- | 29000082 |         14 |    6 |
+-- | 29000082 |         16 |    7 |
+-- | 29000082 |         25 |    8 |
+-- | 29000082 |         37 |    6 |
+-- | 29000083 |          1 |    8 |
+-- | 29000083 |          1 |    6 |
+-- | 29000083 |          2 |    8 |
+-- | 29000083 |          2 |    6 |
+-- | 29000083 |          7 |    7 |
+-- | 29000083 |          9 |    7 |
+-- | 29000083 |         10 |    6 |
+-- | 29000083 |         11 |    7 |
+-- | 29000083 |         11 |    8 |
+-- | 29000083 |         12 |    7 |
+-- | 29000083 |         14 |    6 |
+-- | 29000083 |         14 |    8 |
+-- | 29000083 |         37 |    6 |
+-- | 29000083 |         37 |    7 |
+-- | 29000084 |          1 |    7 |
+-- | 29000084 |          2 |    8 |
+-- | 29000084 |          2 |    6 |
+-- | 29000084 |          7 |    7 |
+-- | 29000084 |          9 |    6 |
+-- | 29000084 |          9 |    8 |
+-- | 29000084 |         10 |    6 |
+-- | 29000084 |         11 |    7 |
+-- | 29000084 |         11 |    8 |
+-- | 29000084 |         12 |    6 |
+-- | 29000084 |         14 |    7 |
+-- | 29000084 |         14 |    8 |
+-- | 29000084 |         25 |    6 |
+-- | 29000084 |         37 |    6 |
+-- | 29000084 |         37 |    7 |
+-- | 29000085 |          1 |    6 |
+-- | 29000085 |          1 |    7 |
+-- | 29000085 |          2 |    7 |
+-- | 29000085 |          2 |    8 |
+-- | 29000085 |          7 |    6 |
+-- | 29000085 |          9 |    8 |
+-- | 29000085 |         10 |    8 |
+-- | 29000085 |         11 |    6 |
+-- | 29000085 |         11 |    7 |
+-- | 29000085 |         12 |    6 |
+-- | 29000085 |         14 |    7 |
+-- | 29000085 |         14 |    8 |
+-- | 29000085 |         37 |    6 |
+-- | 29000085 |         37 |    7 |
+-- | 29000086 |          1 |    7 |
+-- | 29000086 |          1 |    8 |
+-- | 29000086 |          2 |    8 |
+-- | 29000086 |          2 |    7 |
+-- | 29000086 |          7 |    6 |
+-- | 29000086 |          9 |    6 |
+-- | 29000086 |         10 |    7 |
+-- | 29000086 |         10 |    8 |
+-- | 29000086 |         11 |    6 |
+-- | 29000086 |         12 |    7 |
+-- | 29000086 |         14 |    8 |
+-- | 29000086 |         14 |    6 |
+-- | 29000086 |         16 |    7 |
+-- | 29000086 |         25 |    8 |
+-- | 29000086 |         37 |    6 |
+-- | 29000087 |          1 |    8 |
+-- | 29000087 |          1 |    6 |
+-- | 29000087 |          2 |    8 |
+-- | 29000087 |          2 |    6 |
+-- | 29000087 |          7 |    7 |
+-- | 29000087 |          9 |    7 |
+-- | 29000087 |         10 |    6 |
+-- | 29000087 |         11 |    7 |
+-- | 29000087 |         11 |    8 |
+-- | 29000087 |         12 |    7 |
+-- | 29000087 |         14 |    6 |
+-- | 29000087 |         14 |    8 |
+-- | 29000087 |         37 |    6 |
+-- | 29000087 |         37 |    7 |
+-- | 29000088 |          1 |    7 |
+-- | 29000088 |          2 |    8 |
+-- | 29000088 |          2 |    6 |
+-- | 29000088 |          7 |    7 |
+-- | 29000088 |          9 |    6 |
+-- | 29000088 |          9 |    8 |
+-- | 29000088 |         10 |    6 |
+-- | 29000088 |         11 |    7 |
+-- | 29000088 |         11 |    8 |
+-- | 29000088 |         12 |    6 |
+-- | 29000088 |         14 |    7 |
+-- | 29000088 |         14 |    8 |
+-- | 29000088 |         25 |    6 |
+-- | 29000088 |         37 |    6 |
+-- | 29000088 |         37 |    7 |
+-- | 29000089 |          1 |    6 |
+-- | 29000089 |          1 |    7 |
+-- | 29000089 |          2 |    7 |
+-- | 29000089 |          2 |    8 |
+-- | 29000089 |          7 |    6 |
+-- | 29000089 |          9 |    8 |
+-- | 29000089 |         10 |    8 |
+-- | 29000089 |         11 |    6 |
+-- | 29000089 |         11 |    7 |
+-- | 29000089 |         12 |    6 |
+-- | 29000089 |         14 |    7 |
+-- | 29000089 |         14 |    8 |
+-- | 29000089 |         37 |    6 |
+-- | 29000089 |         37 |    7 |
+-- | 29000090 |          1 |    7 |
+-- | 29000090 |          1 |    8 |
+-- | 29000090 |          2 |    8 |
+-- | 29000090 |          2 |    7 |
+-- | 29000090 |          7 |    6 |
+-- | 29000090 |          9 |    6 |
+-- | 29000090 |         10 |    7 |
+-- | 29000090 |         10 |    8 |
+-- | 29000090 |         11 |    6 |
+-- | 29000090 |         12 |    7 |
+-- | 29000090 |         14 |    8 |
+-- | 29000090 |         14 |    6 |
+-- | 29000090 |         16 |    7 |
+-- | 29000090 |         25 |    8 |
+-- | 29000090 |         37 |    6 |
+-- | 29000091 |          1 |    8 |
+-- | 29000091 |          1 |    6 |
+-- | 29000091 |          2 |    8 |
+-- | 29000091 |          2 |    6 |
+-- | 29000091 |          7 |    7 |
+-- | 29000091 |          9 |    7 |
+-- | 29000091 |         10 |    6 |
+-- | 29000091 |         11 |    7 |
+-- | 29000091 |         11 |    8 |
+-- | 29000091 |         12 |    7 |
+-- | 29000091 |         14 |    6 |
+-- | 29000091 |         14 |    8 |
+-- | 29000091 |         37 |    6 |
+-- | 29000091 |         37 |    7 |
+-- | 29000092 |          1 |    7 |
+-- | 29000092 |          2 |    8 |
+-- | 29000092 |          2 |    6 |
+-- | 29000092 |          7 |    7 |
+-- | 29000092 |          9 |    6 |
+-- | 29000092 |          9 |    8 |
+-- | 29000092 |         10 |    6 |
+-- | 29000092 |         11 |    7 |
+-- | 29000092 |         11 |    8 |
+-- | 29000092 |         12 |    6 |
+-- | 29000092 |         14 |    7 |
+-- | 29000092 |         14 |    8 |
+-- | 29000092 |         25 |    6 |
+-- | 29000092 |         37 |    6 |
+-- | 29000092 |         37 |    7 |
+-- | 29000101 |          1 |    6 |
+-- | 29000101 |          1 |    7 |
+-- | 29000101 |          2 |    7 |
+-- | 29000101 |          2 |    8 |
+-- | 29000101 |          7 |    6 |
+-- | 29000101 |          9 |    8 |
+-- | 29000101 |         10 |    8 |
+-- | 29000101 |         11 |    6 |
+-- | 29000101 |         11 |    7 |
+-- | 29000101 |         12 |    6 |
+-- | 29000101 |         14 |    7 |
+-- | 29000101 |         14 |    8 |
+-- | 29000101 |         37 |    6 |
+-- | 29000101 |         37 |    7 |
+-- | 29000102 |          1 |    7 |
+-- | 29000102 |          1 |    8 |
+-- | 29000102 |          2 |    8 |
+-- | 29000102 |          2 |    7 |
+-- | 29000102 |          7 |    6 |
+-- | 29000102 |          9 |    6 |
+-- | 29000102 |         10 |    7 |
+-- | 29000102 |         10 |    8 |
+-- | 29000102 |         11 |    6 |
+-- | 29000102 |         12 |    7 |
+-- | 29000102 |         14 |    8 |
+-- | 29000102 |         14 |    6 |
+-- | 29000102 |         16 |    7 |
+-- | 29000102 |         25 |    8 |
+-- | 29000102 |         37 |    6 |
+-- | 29000103 |          1 |    8 |
+-- | 29000103 |          1 |    6 |
+-- | 29000103 |          2 |    8 |
+-- | 29000103 |          2 |    6 |
+-- | 29000103 |          7 |    7 |
+-- | 29000103 |          9 |    7 |
+-- | 29000103 |         10 |    6 |
+-- | 29000103 |         11 |    7 |
+-- | 29000103 |         11 |    8 |
+-- | 29000103 |         12 |    7 |
+-- | 29000103 |         14 |    6 |
+-- | 29000103 |         14 |    8 |
+-- | 29000103 |         37 |    6 |
+-- | 29000103 |         37 |    7 |
+-- | 29000104 |          1 |    7 |
+-- | 29000104 |          2 |    8 |
+-- | 29000104 |          2 |    6 |
+-- | 29000104 |          7 |    7 |
+-- | 29000104 |          9 |    6 |
+-- | 29000104 |          9 |    8 |
+-- | 29000104 |         10 |    6 |
+-- | 29000104 |         11 |    7 |
+-- | 29000104 |         11 |    8 |
+-- | 29000104 |         12 |    6 |
+-- | 29000104 |         14 |    7 |
+-- | 29000104 |         14 |    8 |
+-- | 29000104 |         25 |    6 |
+-- | 29000104 |         37 |    6 |
+-- | 29000104 |         37 |    7 |
+-- | 29000105 |          1 |    6 |
+-- | 29000105 |          1 |    7 |
+-- | 29000105 |          2 |    7 |
+-- | 29000105 |          2 |    8 |
+-- | 29000105 |          7 |    6 |
+-- | 29000105 |          9 |    8 |
+-- | 29000105 |         10 |    8 |
+-- | 29000105 |         11 |    6 |
+-- | 29000105 |         11 |    7 |
+-- | 29000105 |         12 |    6 |
+-- | 29000105 |         14 |    7 |
+-- | 29000105 |         14 |    8 |
+-- | 29000105 |         37 |    6 |
+-- | 29000105 |         37 |    7 |
+-- | 29000106 |          1 |    7 |
+-- | 29000106 |          1 |    8 |
+-- | 29000106 |          2 |    8 |
+-- | 29000106 |          2 |    7 |
+-- | 29000106 |          7 |    6 |
+-- | 29000106 |          9 |    6 |
+-- | 29000106 |         10 |    7 |
+-- | 29000106 |         10 |    8 |
+-- | 29000106 |         11 |    6 |
+-- | 29000106 |         12 |    7 |
+-- | 29000106 |         14 |    8 |
+-- | 29000106 |         14 |    6 |
+-- | 29000106 |         16 |    7 |
+-- | 29000106 |         25 |    8 |
+-- | 29000106 |         37 |    6 |
+-- | 29000107 |          1 |    8 |
+-- | 29000107 |          1 |    6 |
+-- | 29000107 |          2 |    8 |
+-- | 29000107 |          2 |    6 |
+-- | 29000107 |          7 |    7 |
+-- | 29000107 |          9 |    7 |
+-- | 29000107 |         10 |    6 |
+-- | 29000107 |         11 |    7 |
+-- | 29000107 |         11 |    8 |
+-- | 29000107 |         12 |    7 |
+-- | 29000107 |         14 |    6 |
+-- | 29000107 |         14 |    8 |
+-- | 29000107 |         37 |    6 |
+-- | 29000107 |         37 |    7 |
+-- | 29000108 |          1 |    7 |
+-- | 29000108 |          2 |    8 |
+-- | 29000108 |          2 |    6 |
+-- | 29000108 |          7 |    7 |
+-- | 29000108 |          9 |    6 |
+-- | 29000108 |          9 |    8 |
+-- | 29000108 |         10 |    6 |
+-- | 29000108 |         11 |    7 |
+-- | 29000108 |         11 |    8 |
+-- | 29000108 |         12 |    6 |
+-- | 29000108 |         14 |    7 |
+-- | 29000108 |         14 |    8 |
+-- | 29000108 |         25 |    6 |
+-- | 29000108 |         37 |    6 |
+-- | 29000108 |         37 |    7 |
+-- | 29000109 |          1 |    6 |
+-- | 29000109 |          1 |    7 |
+-- | 29000109 |          2 |    7 |
+-- | 29000109 |          2 |    8 |
+-- | 29000109 |          7 |    6 |
+-- | 29000109 |          9 |    8 |
+-- | 29000109 |         10 |    8 |
+-- | 29000109 |         11 |    6 |
+-- | 29000109 |         11 |    7 |
+-- | 29000109 |         12 |    6 |
+-- | 29000109 |         14 |    7 |
+-- | 29000109 |         14 |    8 |
+-- | 29000109 |         37 |    6 |
+-- | 29000109 |         37 |    7 |
+-- | 29000110 |          1 |    7 |
+-- | 29000110 |          1 |    8 |
+-- | 29000110 |          2 |    8 |
+-- | 29000110 |          2 |    7 |
+-- | 29000110 |          7 |    6 |
+-- | 29000110 |          9 |    6 |
+-- | 29000110 |         10 |    7 |
+-- | 29000110 |         10 |    8 |
+-- | 29000110 |         11 |    6 |
+-- | 29000110 |         12 |    7 |
+-- | 29000110 |         14 |    8 |
+-- | 29000110 |         14 |    6 |
+-- | 29000110 |         16 |    7 |
+-- | 29000110 |         25 |    8 |
+-- | 29000110 |         37 |    6 |
+-- | 29000111 |          1 |    8 |
+-- | 29000111 |          1 |    6 |
+-- | 29000111 |          2 |    8 |
+-- | 29000111 |          2 |    6 |
+-- | 29000111 |          7 |    7 |
+-- | 29000111 |          9 |    7 |
+-- | 29000111 |         10 |    6 |
+-- | 29000111 |         11 |    7 |
+-- | 29000111 |         11 |    8 |
+-- | 29000111 |         12 |    7 |
+-- | 29000111 |         14 |    6 |
+-- | 29000111 |         14 |    8 |
+-- | 29000111 |         37 |    6 |
+-- | 29000111 |         37 |    7 |
+-- | 29000112 |          1 |    7 |
+-- | 29000112 |          2 |    8 |
+-- | 29000112 |          2 |    6 |
+-- | 29000112 |          7 |    7 |
+-- | 29000112 |          9 |    6 |
+-- | 29000112 |          9 |    8 |
+-- | 29000112 |         10 |    6 |
+-- | 29000112 |         11 |    7 |
+-- | 29000112 |         11 |    8 |
+-- | 29000112 |         12 |    6 |
+-- | 29000112 |         14 |    7 |
+-- | 29000112 |         14 |    8 |
+-- | 29000112 |         25 |    6 |
+-- | 29000112 |         37 |    6 |
+-- | 29000112 |         37 |    7 |
+-- +----------+------------+------+
+
+
+-- 2
+
+-- Alumnos ordenados por edad (usando YEAR)
+
+/*Esta consulta resulta útil porque permite ordenar o identificar a los alumnos según su edad calculada. Utiliza la función 
+YEAR(CURDATE()) - YEAR(Fecha_Nacimiento) para obtener los años cumplidos de cada estudiante de manera automática, 
+sin tener que actualizar los datos manualmente cada año.
+Con esta información es posible saber qué alumnos ya son mayores de 18 y, por ejemplo, 
+pueden retirarse solos de la escuela o participar en actividades que requieren una edad mínima. 
+También facilita el análisis de grupos para excursiones, proyectos o autorizaciones especiales.*/
+
+SELECT Nombre, Apellido, YEAR(CURDATE()) - YEAR(Fecha_Nacimiento) AS Edad
+FROM Alumnos;
+
+-- +-------------+---------------+------+
+-- | Nombre      | Apellido      | Edad |
+-- +-------------+---------------+------+
+-- | Sofía       | García        |   14 |
+-- | Mateo       | Fernández     |   14 |
+-- | Valentina   | López         |   14 |
+-- | Benjamín    | Martínez      |   14 |
+-- | Emma        | Gómez         |   14 |
+-- | Thiago      | Díaz          |   14 |
+-- | Isabella    | Silva         |   14 |
+-- | Lucas       | Torres        |   14 |
+-- | Camila      | Rojas         |   14 |
+-- | Matías      | Morales       |   14 |
+-- | Luna        | Castro        |   14 |
+-- | Santiago    | Pérez         |   14 |
+-- | Emma        | Alvarez       |   14 |
+-- | Juan        | Vargas        |   14 |
+-- | Agustina    | Cabrera       |   14 |
+-- | Tomás       | Campos        |   14 |
+-- | Sofía       | Ibarra        |   14 |
+-- | Lucas       | Pineda        |   14 |
+-- | Valeria     | Fuentes       |   14 |
+-- | Diego       | Valdez        |   14 |
+-- | María       | Miranda       |   14 |
+-- | Bruno       | Luna          |   14 |
+-- | Isabel      | Mendoza       |   14 |
+-- | Martín      | Ramos         |   14 |
+-- | Catalina    | Moreno        |   14 |
+-- | Juan        | Bravo         |   14 |
+-- | Florencia   | Salinas       |   14 |
+-- | Santiago    | Mora          |   14 |
+-- | Agustina    | Santana       |   14 |
+-- | Lucas       | Ibáñez        |   14 |
+-- | María       | Camacho       |   14 |
+-- | Tomás       | Estrada       |   14 |
+-- | Isabella    | Valle         |   14 |
+-- | Matías      | Rey           |   14 |
+-- | Mía         | Crespo        |   14 |
+-- | Bruno       | Flores        |   14 |
+-- | Isabella    | Romero        |   14 |
+-- | Mateo       | Santos        |   14 |
+-- | Sofía       | Rojas         |   14 |
+-- | Benjamín    | Ortiz         |   14 |
+-- | Emma        | Castillo      |   14 |
+-- | Thiago      | Herrera       |   14 |
+-- | Camila      | Morales       |   14 |
+-- | Matías      | Molina        |   14 |
+-- | Luna        | Fuentes       |   14 |
+-- | Santiago    | Miranda       |   14 |
+-- | Mía         | Salazar       |   14 |
+-- | Agustín     | Reyes         |   14 |
+-- | Isabel      | Paz           |   14 |
+-- | Bruno       | Núñez         |   14 |
+-- | Lucía       | Salinas       |   14 |
+-- | Facundo     | Santana       |   14 |
+-- | Micaela     | Ibáñez        |   14 |
+-- | Julián      | Camacho       |   14 |
+-- | Emilia      | Estrada       |   14 |
+-- | Matías      | Valle         |   14 |
+-- | Lucía       | Rey           |   14 |
+-- | Gabriel     | Crespo        |   14 |
+-- | Catalina    | Flores        |   14 |
+-- | Martín      | Ortiz         |   14 |
+-- | Luna        | Ortiz         |   14 |
+-- | Santiago    | Castillo      |   14 |
+-- | Mía         | Herrera       |   14 |
+-- | Agustín     | Morales       |   14 |
+-- | Emma        | Molina        |   14 |
+-- | Martín      | Fuentes       |   14 |
+-- | Catalina    | Valdez        |   14 |
+-- | Diego       | Miranda       |   14 |
+-- | Julia       | Luna          |   14 |
+-- | Julián      | Mendoza       |   14 |
+-- | Emma        | Ramos         |   14 |
+-- | Lucas       | Paz           |   14 |
+-- | Ana         | Vargas        |   15 |
+-- | Martín      | Salinas       |   15 |
+-- | Carla       | Mendoza       |   15 |
+-- | Lucas       | Cabrera       |   15 |
+-- | Laura       | Campos        |   15 |
+-- | Sergio      | Fernández     |   15 |
+-- | Mariana     | Pineda        |   15 |
+-- | Diego       | Herrera       |   15 |
+-- | Verónica    | Reyes         |   15 |
+-- | Facundo     | Ortiz         |   15 |
+-- | Gabriela    | Castro        |   15 |
+-- | Pablo       | Paz           |   15 |
+-- | Agustina    | Pacheco       |   15 |
+-- | Martín      | Bravo         |   15 |
+-- | Julieta     | Vargas        |   15 |
+-- | Leandro     | Miranda       |   15 |
+-- | Valentina   | Luna          |   15 |
+-- | Santiago    | Campos        |   15 |
+-- | Camila      | Castillo      |   15 |
+-- | Bruno       | Romero        |   15 |
+-- | Florencia   | Mora          |   15 |
+-- | Lucas       | Salinas       |   15 |
+-- | Emilia      | Ibarra        |   15 |
+-- | Tomás       | Reyes         |   15 |
+-- | Carla       | Domínguez     |   15 |
+-- | Pablo       | Herrera       |   15 |
+-- | Lucía       | Morales       |   15 |
+-- | Matías      | Molina        |   15 |
+-- | Emilia      | Fuentes       |   15 |
+-- | Ramiro      | Valdez        |   15 |
+-- | Paula       | Miranda       |   15 |
+-- | Diego       | Luna          |   15 |
+-- | María       | Vega          |   15 |
+-- | Javier      | Salinas       |   15 |
+-- | Florencia   | Ramos         |   15 |
+-- | Sergio      | Ortiz         |    5 |
+-- | Gabriela    | Flores        |   15 |
+-- | Ramiro      | Ortiz         |   15 |
+-- | Natalia     | Sosa          |   15 |
+-- | Javier      | León          |   15 |
+-- | Lucía       | Rivas         |   15 |
+-- | Tomás       | Campos        |   15 |
+-- | María       | Navarro       |   15 |
+-- | Diego       | Romero        |   15 |
+-- | Paula       | Santos        |   15 |
+-- | Lucas       | Rojas         |   15 |
+-- | Emilio      | Ortiz         |   15 |
+-- | Florencia   | Castillo      |   15 |
+-- | Sergio      | Cabrera       |   15 |
+-- | Natalia     | Campos        |   15 |
+-- | Pablo       | Suárez        |   15 |
+-- | Camila      | Ramos         |   15 |
+-- | Bruno       | Ortiz         |   15 |
+-- | Isabel      | Castillo      |   15 |
+-- | Lucas       | Herrera       |   15 |
+-- | Emilia      | Morales       |   15 |
+-- | Martín      | Molina        |   15 |
+-- | Sofía       | Fuentes       |   15 |
+-- | Diego       | Valdez        |   15 |
+-- | Lucía       | Miranda       |   15 |
+-- | Matías      | Salazar       |   15 |
+-- | Florencia   | Ramos         |   15 |
+-- | Emilio      | Ortiz         |   15 |
+-- | Paula       | Castillo      |   15 |
+-- | Lucas       | Romero        |   15 |
+-- | Isabel      | Mora          |   15 |
+-- | Javier      | Salinas       |   15 |
+-- | Micaela     | Ibarra        |   15 |
+-- | Ramiro      | Reyes         |   15 |
+-- | Natalia     | Pacheco       |   15 |
+-- | Bruno       | Vargas        |   15 |
+-- | Sofía       | Salinas       |   15 |
+-- | Lautaro     | Benítez       |   16 |
+-- | Abril       | Coronel       |   16 |
+-- | Santino     | Montenegro    |   16 |
+-- | Juana       | Perdomo       |   16 |
+-- | Bautista    | Almada        |   16 |
+-- | Victoria    | Quiroga       |   16 |
+-- | Franco      | Figueroa      |   16 |
+-- | Clara       | Medrano       |   16 |
+-- | Tomás       | Bermúdez      |   16 |
+-- | Renata      | Chávez        |   16 |
+-- | Iván        | Olmedo        |   16 |
+-- | Bianca      | Correa        |   16 |
+-- | Alan        | Ojeda         |   16 |
+-- | Sol         | Alfaro        |   16 |
+-- | Pablo       | Téllez        |   16 |
+-- | Magdalena   | Cardozo       |   16 |
+-- | Elías       | Villagra      |   16 |
+-- | Lola        | Peña          |   16 |
+-- | Matheo      | Ferreyra      |   16 |
+-- | Candelaria  | Maldonado     |   16 |
+-- | Axel        | Reina         |   16 |
+-- | Alma        | Vera          |   16 |
+-- | Thiago      | Aguirre       |   16 |
+-- | Marina      | Barrios       |   16 |
+-- | Ignacio     | Galván        |   16 |
+-- | Valentina   | Arévalo       |   16 |
+-- | Dante       | Vivas         |   16 |
+-- | Milagros    | Sánchez       |   16 |
+-- | Emilio      | Carrizo       |   16 |
+-- | Paula       | Tejada        |   16 |
+-- | Simón       | Cabral        |   16 |
+-- | Camila      | Villafañe     |   16 |
+-- | Mauricio    | Riveros       |   16 |
+-- | Aitana      | Fonseca       |   16 |
+-- | Esteban     | Lagos         |   16 |
+-- | Martina     | Esquivel      |   16 |
+-- | Lucas       | Navarro       |   16 |
+-- | Emilia      | Ocampo        |   16 |
+-- | Matías      | Silva         |   16 |
+-- | Lucía       | Morán         |   16 |
+-- | Gonzalo     | Salcedo       |   16 |
+-- | Sofía       | Durán         |   16 |
+-- | Martín      | Calvo         |   16 |
+-- | Josefina    | Villavicencio |   16 |
+-- | Sebastián   | Acosta        |   16 |
+-- | Isabel      | Ríos          |   16 |
+-- | Felipe      | Montes        |   16 |
+-- | Micaela     | Romero        |   16 |
+-- | Agustín     | Toha          |   16 |
+-- | Tamara      | Frías         |   16 |
+-- | Maximiliano | Saiz          |   16 |
+-- | Candela     | Lucero        |   16 |
+-- | Nicolás     | Patiño        |   16 |
+-- | Rocío       | Alonso        |   16 |
+-- | Fabián      | Vega          |   16 |
+-- | Mariela     | Bravo         |   16 |
+-- | Oscar       | Tello         |   16 |
+-- | Adriana     | Castillo      |   16 |
+-- | Benjamín    | Oliva         |   16 |
+-- | Daniela     | Campos        |   16 |
+-- | Mauricio    | Carranza      |   16 |
+-- | Milena      | Araya         |   16 |
+-- | Gustavo     | Villaflor     |   16 |
+-- | Zoe         | Peñaloza      |   16 |
+-- | Ramón       | Quiñones      |   16 |
+-- | Miranda     | Godoy         |   16 |
+-- | Damián      | Valdés        |   16 |
+-- | Verónica    | Mejía         |   16 |
+-- | Renzo       | Barcena       |   16 |
+-- | Margarita   | Estévez       |   16 |
+-- | Elian       | Silvestre     |   16 |
+-- | Ainhoa      | Santana       |   16 |
+-- | Ezequiel    | Corvalán      |   17 |
+-- | Pamela      | Ferreyra      |   17 |
+-- | Agustina    | Ojeda         |   17 |
+-- | Leandro     | Funes         |   17 |
+-- | Cintia      | Vázquez       |   17 |
+-- | Joaquín     | Domínguez     |   17 |
+-- | Nerea       | Camposano     |   17 |
+-- | Franco      | Yáñez         |   17 |
+-- | Bianca      | Ortega        |   17 |
+-- | Axel        | Ibarra        |   17 |
+-- | Tobías      | Quiroga       |   17 |
+-- | Camila      | Barrios       |   17 |
+-- | Jonás       | Correa        |   17 |
+-- | Mónica      | Ferrari       |   17 |
+-- | Mauricio    | Godoy         |   17 |
+-- | Bárbara     | Salvatierra   |   17 |
+-- | Pablo       | Sierra        |   17 |
+-- | Tamara      | Bustos        |   17 |
+-- | Federico    | Vallejos      |   17 |
+-- | Mariela     | Santoro       |   17 |
+-- | Iván        | Báez          |   17 |
+-- | Antonella   | Coronel       |   17 |
+-- | Rodrigo     | Aguilar       |   17 |
+-- | Carla       | Duré          |   17 |
+-- | Enzo        | Recalde       |   17 |
+-- | Gabriela    | Morales       |   17 |
+-- | Luciano     | Pizarro       |   17 |
+-- | Mariela     | Tello         |   17 |
+-- | Facundo     | Herrera       |   17 |
+-- | Romina      | Fariña        |   17 |
+-- | Gustavo     | Santana       |   17 |
+-- | Daniela     | Morel         |   17 |
+-- | Kevin       | Aguirre       |   17 |
+-- | Magalí      | Navarro       |   17 |
+-- | Nicolás     | Santibáñez    |   17 |
+-- | Lara        | Cabrera       |   17 |
+-- | Tomás       | Serrano       |   17 |
+-- | Fiorella    | Bustamante    |   17 |
+-- | Mateo       | Cardozo       |   17 |
+-- | Camila      | Figueroa      |   17 |
+-- | Benjamín    | Espinoza      |   17 |
+-- | Marina      | Galarza       |   17 |
+-- | Franco      | Palacios      |   17 |
+-- | Agustina    | Ortigoza      |   17 |
+-- | Lucas       | Quintana      |   17 |
+-- | Florencia   | Sánchez       |   17 |
+-- | Alejandro   | Bravo         |   17 |
+-- | Tamara      | Caballero     |   17 |
+-- | Sebastian   | Signorello    |   24 |
+-- | Eliana      | Cedeño        |   17 |
+-- | Marcos      | Fiorini       |   17 |
+-- | Daniela     | Montes        |   17 |
+-- | Lucio       | Salmerón      |   17 |
+-- | Micaela     | Ojeda         |   17 |
+-- | Diego       | Paz           |   17 |
+-- | Paula       | Tobares       |   17 |
+-- | Alan        | Serra         |   17 |
+-- | Valeria     | Andrada       |   17 |
+-- | Cristian    | Melgarejo     |   17 |
+-- | Julieta     | Cornejo       |   17 |
+-- | Mauricio    | Ahumada       |   17 |
+-- | Verónica    | Aragón        |   17 |
+-- | Iván        | Barroso       |   17 |
+-- | Camila      | Cardenas      |   17 |
+-- | Emanuel     | Zárate        |   17 |
+-- | Andrea      | Gudiño        |   17 |
+-- | Oscar       | Mena          |   17 |
+-- | Rocío       | Olivera       |   17 |
+-- | Pedro       | Villarreal    |   17 |
+-- | Valentina   | Ravelo        |   17 |
+-- | Gonzalo     | Medina        |   17 |
+-- | Melisa      | Torres        |   17 |
+-- | Damián      | Rosales       |   18 |
+-- | Gisela      | Ferraresi     |   18 |
+-- | Marcos      | Cordero       |   18 |
+-- | Rocío       | Acosta        |   18 |
+-- | Santiago    | Bermúdez      |   18 |
+-- | Miriam      | Garrido       |   18 |
+-- | Adrián      | Villalba      |   18 |
+-- | Sabrina     | Espinoza      |   18 |
+-- | Kevin       | Mercado       |   18 |
+-- | Natalia     | Bravo         |   18 |
+-- | Ariel       | Paz           |   18 |
+-- | Mariela     | Sepúlveda     |   18 |
+-- | Julián      | Bustos        |   18 |
+-- | Daniela     | Rojas         |   18 |
+-- | Maximiliano | Zárate        |   18 |
+-- | Ailén       | Domínguez     |   18 |
+-- | Hernán      | Moya          |   18 |
+-- | Verónica    | Pizarro       |   18 |
+-- | Rodrigo     | Cáceres       |   18 |
+-- | Patricia    | Vidal         |   18 |
+-- | Sergio      | Coronel       |   18 |
+-- | Vanesa      | Silva         |   18 |
+-- | Martín      | Agüero        |   18 |
+-- | Florencia   | Lagos         |   18 |
+-- | Franco      | Quinteros     |   18 |
+-- | Carolina    | Paredes       |   18 |
+-- | Leandro     | Salvatierra   |   18 |
+-- | Noelia      | Montenegro    |   18 |
+-- | Mauricio    | Olivera       |   18 |
+-- | Romina      | Villarreal    |   18 |
+-- | Federico    | Cruz          |   18 |
+-- | Julieta     | Ponce         |   18 |
+-- | Iván        | Alcaraz       |   18 |
+-- | Gabriela    | Medina        |   18 |
+-- | Pablo       | Serrano       |   18 |
+-- | Daiana      | Torres        |   18 |
+-- | Felipe      | Lemus         |   18 |
+-- | Micaela     | Godoy         |   18 |
+-- | Sergio      | Moreno        |   18 |
+-- | Bianca      | Acosta        |   18 |
+-- | Cristian    | Delgado       |   18 |
+-- | Valeria     | Aguirre       |   18 |
+-- | Ariel       | Gómez         |   18 |
+-- | Lorena      | Paz           |   18 |
+-- | Gastón      | Caballero     |   18 |
+-- | Mariela     | Funes         |   18 |
+-- | Jorge       | Ramos         |   18 |
+-- | Alejandra   | Salas         |   18 |
+-- | Fabián      | Rosendo       |   18 |
+-- | Eliana      | Prieto        |   18 |
+-- | Mariano     | Ojeda         |   18 |
+-- | Natalia     | Sarmiento     |   18 |
+-- | Iván        | Benítez       |   18 |
+-- | Patricia    | Guerrero      |   18 |
+-- | Alejandro   | Fleitas       |   18 |
+-- | Vanina      | Ayala         |   18 |
+-- | Javier      | Galarza       |   18 |
+-- | Sabrina     | Meza          |   18 |
+-- | Nahuel      | Espínola      |   18 |
+-- | Florencia   | Barrios       |   18 |
+-- | Cristian    | Cáceres       |   18 |
+-- | Laura       | Morales       |   18 |
+-- | Agustín     | Zúñiga        |   18 |
+-- | Sofía       | Aguilar       |   18 |
+-- | Brian       | Ledesma       |   18 |
+-- | Luciana     | Funes         |   18 |
+-- | Héctor      | Márquez       |   18 |
+-- | Rocío       | Montes        |   18 |
+-- | Emanuel     | Villanueva    |   18 |
+-- | Brenda      | Arce          |   18 |
+-- | Fernando    | Ojeda         |   18 |
+-- | Jimena      | Britez        |   18 |
+-- | Ignacio     | Maldini       |   19 |
+-- | Valeria     | Ortega        |   19 |
+-- | Mauricio    | Santoro       |   19 |
+-- | Pamela      | Téllez        |   19 |
+-- | Leandro     | Fiorito       |   19 |
+-- | Romina      | Mancini       |   19 |
+-- | Facundo     | Alarcón       |   19 |
+-- | Tamara      | Quintana      |   19 |
+-- | Esteban     | Toledo        |   19 |
+-- | Laura       | Pellegrini    |   19 |
+-- | Pablo       | Centurión     |   19 |
+-- | Silvina     | Marelli       |   19 |
+-- | Franco      | Silvestre     |   19 |
+-- | Micaela     | Durán         |   19 |
+-- | Jorge       | Pintos        |   19 |
+-- | Patricia    | Almada        |   19 |
+-- | Oscar       | Figueroa      |   19 |
+-- | Adriana     | Salas         |   19 |
+-- | Damián      | Ferreyra      |   19 |
+-- | Florencia   | Palacios      |   19 |
+-- | Emanuel     | Ojeda         |   19 |
+-- | Karina      | Benítez       |   19 |
+-- | Luis        | Miranda       |   19 |
+-- | Gloria      | Chávez        |   19 |
+-- | Hernán      | Villalba      |   19 |
+-- | Carolina    | Marino        |   19 |
+-- | Rodrigo     | Arancibia     |   19 |
+-- | Sandra      | Escobar       |   19 |
+-- | Iván        | Varela        |   19 |
+-- | Rocío       | Toja          |   19 |
+-- | Gonzalo     | Lozano        |   19 |
+-- | Julieta     | Páez          |   19 |
+-- | Ezequiel    | Vallejos      |   19 |
+-- | Marcela     | Pizarro       |   19 |
+-- | Sebastián   | Bravo         |   19 |
+-- | Adela       | Zapata        |   19 |
+-- | Alejandro   | Falcón        |   19 |
+-- | Mónica      | Corvalán      |   19 |
+-- | Cristian    | Santillán     |   19 |
+-- | Viviana     | Pereira       |   19 |
+-- | Pablo       | Cáceres       |   19 |
+-- | Gabriela    | Márquez       |   19 |
+-- | Hugo        | Bustos        |   19 |
+-- | Teresa      | Roldán        |   19 |
+-- | Martín      | Saavedra      |   19 |
+-- | Graciela    | Valverde      |   19 |
+-- | Claudio     | Ocampo        |   19 |
+-- | Nadia       | Ramírez       |   19 |
+-- | Ignacio     | Quiroga       |   19 |
+-- | Mariela     | Téllez        |   19 |
+-- | Oscar       | Carrizo       |   19 |
+-- | Patricia    | Valdez        |   19 |
+-- | Adrián      | Serrano       |   19 |
+-- | Rosa        | Meza          |   19 |
+-- | Federico    | Olivera       |   19 |
+-- | Cecilia     | Prieto        |   19 |
+-- | Matías      | Barrera       |   19 |
+-- | Daniela     | Lagos         |   19 |
+-- | Tomás       | Zárate        |   19 |
+-- | Elena       | Ojeda         |   19 |
+-- | Héctor      | Vega          |   19 |
+-- | Luciana     | Peñaloza      |   19 |
+-- | Nicolás     | Moyano        |   19 |
+-- | Beatriz     | Riquelme      |   19 |
+-- | Andrés      | Barrios       |   19 |
+-- | Liliana     | Giménez       |   19 |
+-- | Esteban     | Toledo        |   19 |
+-- | Ruth        | Calderón      |   19 |
+-- | Germán      | Roldán        |   19 |
+-- | Adriana     | Silva         |   19 |
+-- | Cristian    | Montenegro    |   19 |
+-- | Griselda    | Aguirre       |   19 |
+-- +-------------+---------------+------+
+
+-- Promedio de notas por especialidad
+
+/*Esta consulta se utiliza para conocer el promedio general de calificaciones por cada especialidad. 
+Mediante los LEFT JOIN se relacionan los alumnos con sus cursos y con sus calificaciones, 
+lo que permite tomar todas las notas registradas dentro de cada especialidad. Luego, con GROUP BY c.Especialidad 
+se agrupan los datos y AVG(ca.Nota) calcula el promedio correspondiente a cada una.
+Este tipo de información resulta útil para comparar el rendimiento académico entre especialidades,
+analizar si alguna presenta mayores desafíos o exigencias, y tomar decisiones institucionales orientadas 
+al acompañamiento educativo.*/
+
+SELECT 
+    IFNULL(c.Especialidad, 'Ciclo Básico') AS Especialidad,
+    ROUND(AVG(ca.Nota), 2) AS Nota_Promedio
+FROM Alumnos a
+LEFT JOIN Cursos c
+    ON a.Anio_Division = c.Anio_Division
+LEFT JOIN Calificaciones ca
+    ON ca.DNI_A = a.DNI
+GROUP BY IFNULL(c.Especialidad, 'Ciclo Básico');
+
+
+-- +--------------+---------------+
+-- | Especialidad | Nota_Promedio |
+-- +--------------+---------------+
+-- | Automotor    |          7.08 |
+-- | Ciclo B?sico |          7.23 |
+-- | Computación |          7.47 |
+-- +--------------+---------------+
+
+
+-- 3
+
+-- Promedio de notas por materia
+
+/*Esta consulta se utiliza para obtener el promedio de calificaciones de cada materia. La función AVG(nota) calcula el promedio y el group by
+de ID_materia organiza los resultados de forma que cada materia tenga su propio valor promedio. 
+Este es útil para evaluar el rendimiento general de los alumnos en cada asignatura, detectar materia con resultados mas bajos que podrían requerir
+esfuerzos, y generar reportes academicos para la institución.*/
+
+SELECT ID_Materia, AVG(Nota) AS Promedio
+FROM Calificaciones
+GROUP BY ID_Materia;
+-- +------------+----------+
+-- | ID_Materia | Promedio |
+-- +------------+----------+
+-- |          1 |   6.7500 |
+-- |          2 |   7.2500 |
+-- |          7 |   6.2500 |
+-- |          9 |   7.2500 |
+-- |         10 |   7.7500 |
+-- |         11 |   6.7500 |
+-- |         12 |   6.7500 |
+-- |         14 |   7.2500 |
+-- |         16 |   9.2500 |
+-- |         17 |   9.5000 |
+-- |         25 |   5.7500 |
+-- |         37 |   6.2500 |
+-- +------------+----------+
+
+-- Materias cuyo promedio sea mayor a 7
+/*Esta consulta se utiliza para identificar las materias cuyo rendimiento académico promedio es mayor a 7. 
+Para lograrlo, primero agrupa las calificaciones por materia mediante GROUP BY, y luego calcula el promedio de las notas con la función AVG.
+El filtro HAVING AVG(Nota) > 7 se aplica sobre el resultado de ese cálculo, l
+o que permite mostrar únicamente las materias en las que los alumnos están teniendo un buen desempeño general.
+Es una consulta muy útil para evaluar la calidad educativa, detectar áreas en las que los estudiantes se destacan 
+y generar reportes para tomar decisiones pedagógicas.*/
+
+SELECT ID_Materia, AVG(Nota) AS Promedio
+FROM Calificaciones
+GROUP BY ID_Materia
+HAVING AVG(Nota) > 7;
+
+-- +------------+----------+
+-- | ID_Materia | Promedio |
+-- +------------+----------+
+-- |          2 |   7.2500 |
+-- |          9 |   7.2500 |
+-- |         10 |   7.7500 |
+-- |         14 |   7.2500 |
+-- |         16 |   9.2500 |
+-- |         17 |   9.5000 |
+-- +------------+----------+
+
+
+
+-- 4
+
+-- Alumnos de 3 año ordenados por apellido
+/*Esta consulta sirve para identificar a los alumnos que están cursando tercer año, 
+ya que en esa etapa suelen enfrentar el cambio hacia su especialidad y pueden requerir un mayor acompañamiento académico.
+La condición LIKE '3%' permite seleccionar todas las divisiones correspondientes a tercer año sin necesidad de detallarlas una por una.
+Posteriormente se ordenan los resultados por apellido en forma ascendente mediante ORDER BY, 
+lo que facilita organizar la información para listados o seguimiento personalizado.*/
+
+SELECT Nombre, Apellido 
+FROM Alumnos where Anio_Division LIKE '3%'
+ORDER BY Apellido ASC;
+
+-- +-------------+---------------+
+-- | Nombre      | Apellido      |
+-- +-------------+---------------+
+-- | Sebastián   | Acosta        |
+-- | Thiago      | Aguirre       |
+-- | Sol         | Alfaro        |
+-- | Bautista    | Almada        |
+-- | Rocío       | Alonso        |
+-- | Milena      | Araya         |
+-- | Valentina   | Arévalo       |
+-- | Renzo       | Barcena       |
+-- | Marina      | Barrios       |
+-- | Lautaro     | Benítez       |
+-- | Tomás       | Bermúdez      |
+-- | Mariela     | Bravo         |
+-- | Simón       | Cabral        |
+-- | Martín      | Calvo         |
+-- | Daniela     | Campos        |
+-- | Magdalena   | Cardozo       |
+-- | Mauricio    | Carranza      |
+-- | Emilio      | Carrizo       |
+-- | Adriana     | Castillo      |
+-- | Renata      | Chávez        |
+-- | Abril       | Coronel       |
+-- | Bianca      | Correa        |
+-- | Sofía       | Durán         |
+-- | Martina     | Esquivel      |
+-- | Margarita   | Estévez       |
+-- | Matheo      | Ferreyra      |
+-- | Franco      | Figueroa      |
+-- | Aitana      | Fonseca       |
+-- | Tamara      | Frías         |
+-- | Ignacio     | Galván        |
+-- | Miranda     | Godoy         |
+-- | Esteban     | Lagos         |
+-- | Candela     | Lucero        |
+-- | Candelaria  | Maldonado     |
+-- | Clara       | Medrano       |
+-- | Verónica    | Mejía         |
+-- | Santino     | Montenegro    |
+-- | Felipe      | Montes        |
+-- | Lucía       | Morán         |
+-- | Lucas       | Navarro       |
+-- | Emilia      | Ocampo        |
+-- | Alan        | Ojeda         |
+-- | Benjamín    | Oliva         |
+-- | Iván        | Olmedo        |
+-- | Nicolás     | Patiño        |
+-- | Lola        | Peña          |
+-- | Zoe         | Peñaloza      |
+-- | Juana       | Perdomo       |
+-- | Ramón       | Quiñones      |
+-- | Victoria    | Quiroga       |
+-- | Axel        | Reina         |
+-- | Isabel      | Ríos          |
+-- | Mauricio    | Riveros       |
+-- | Micaela     | Romero        |
+-- | Maximiliano | Saiz          |
+-- | Gonzalo     | Salcedo       |
+-- | Milagros    | Sánchez       |
+-- | Ainhoa      | Santana       |
+-- | Matías      | Silva         |
+-- | Elian       | Silvestre     |
+-- | Paula       | Tejada        |
+-- | Pablo       | Téllez        |
+-- | Oscar       | Tello         |
+-- | Agustín     | Toha          |
+-- | Damián      | Valdés        |
+-- | Fabián      | Vega          |
+-- | Alma        | Vera          |
+-- | Camila      | Villafañe     |
+-- | Gustavo     | Villaflor     |
+-- | Elías       | Villagra      |
+-- | Josefina    | Villavicencio |
+-- | Dante       | Vivas         |
+-- +-------------+---------------+
+
+-- Calificaciones del segundo cuatrimestre ordenadas de mayor a menor
+/*Esta consulta se utiliza para obtener todas las calificaciones correspondientes al segundo cuatrimestre 
+y mostrarlas ordenadas de mayor a menor. Filtra primero los registros con WHERE cuatrimestre = 2 para enfocarse únicamente en ese período 
+y luego utiliza ORDER BY Nota DESC para que las notas más altas aparezcan primero.
+Esto resulta útil para identificar rápidamente a los alumnos con mejor desempeño,
+analizar patrones de rendimiento por materia o preparar reportes de seguimiento académico.*/
+
+SELECT DNI_A, ID_Materia, Nota 
+FROM Calificaciones where cuatrimestre=2
+ORDER BY Nota DESC;
+
+-- +----------+------------+------+
+-- | DNI_A    | ID_Materia | Nota |
+-- +----------+------------+------+
+-- | 28000005 |         17 |   10 |
+-- | 28000088 |         17 |   10 |
+-- | 28000106 |         16 |   10 |
+-- | 28000062 |         16 |   10 |
+-- | 28000082 |         16 |   10 |
+-- | 28000007 |         16 |   10 |
+-- | 28000007 |         17 |   10 |
+-- | 28000032 |         17 |   10 |
+-- | 28000027 |         16 |   10 |
+-- | 28000087 |         17 |   10 |
+-- | 28000087 |         16 |   10 |
+-- | 28000027 |         17 |   10 |
+-- | 29000003 |         17 |   10 |
+-- | 28000104 |         17 |   10 |
+-- | 28000041 |         17 |   10 |
+-- | 28000026 |         16 |   10 |
+-- | 28000089 |         17 |   10 |
+-- | 28000042 |         16 |   10 |
+-- | 28000110 |         16 |   10 |
+-- | 29000007 |         17 |   10 |
+-- | 28000021 |         17 |   10 |
+-- | 29000007 |         16 |   10 |
+-- | 29000001 |         17 |   10 |
+-- | 28000068 |         17 |   10 |
+-- | 28000006 |         16 |   10 |
+-- | 28000047 |         17 |   10 |
+-- | 28000061 |         17 |   10 |
+-- | 29000005 |         17 |   10 |
+-- | 28000063 |         17 |   10 |
+-- | 28000012 |         17 |   10 |
+-- | 28000064 |         17 |   10 |
+-- | 28000083 |         16 |   10 |
+-- | 28000083 |         17 |   10 |
+-- | 28000028 |         17 |   10 |
+-- | 28000065 |         17 |   10 |
+-- | 28000010 |         16 |   10 |
+-- | 28000029 |         17 |   10 |
+-- | 28000105 |         17 |   10 |
+-- | 28000011 |         17 |   10 |
+-- | 28000011 |         16 |   10 |
+-- | 28000084 |         17 |   10 |
+-- | 28000108 |         17 |   10 |
+-- | 28000085 |         17 |   10 |
+-- | 28000030 |         16 |   10 |
+-- | 28000063 |         16 |   10 |
+-- | 28000008 |         17 |   10 |
+-- | 28000109 |         17 |   10 |
+-- | 28000067 |         17 |   10 |
+-- | 28000031 |         17 |   10 |
+-- | 28000031 |         16 |   10 |
+-- | 28000086 |         16 |   10 |
+-- | 28000067 |         16 |   10 |
+-- | 29000003 |         16 |   10 |
+-- | 29000002 |         16 |   10 |
+-- | 28000009 |         17 |   10 |
+-- | 29000006 |         16 |   10 |
+-- | 28000066 |         16 |   10 |
+-- | 28000047 |         16 |   10 |
+-- | 28000002 |         16 |   10 |
+-- | 28000112 |         17 |   10 |
+-- | 28000045 |         17 |   10 |
+-- | 28000107 |         16 |   10 |
+-- | 28000111 |         16 |   10 |
+-- | 28000092 |         17 |   10 |
+-- | 28000070 |         16 |   10 |
+-- | 28000050 |         16 |   10 |
+-- | 28000107 |         17 |   10 |
+-- | 28000044 |         17 |   10 |
+-- | 28000003 |         16 |   10 |
+-- | 28000049 |         17 |   10 |
+-- | 28000024 |         17 |   10 |
+-- | 28000102 |         16 |   10 |
+-- | 28000071 |         16 |   10 |
+-- | 28000071 |         17 |   10 |
+-- | 28000048 |         17 |   10 |
+-- | 28000001 |         17 |   10 |
+-- | 28000023 |         17 |   10 |
+-- | 28000046 |         16 |   10 |
+-- | 28000023 |         16 |   10 |
+-- | 28000101 |         17 |   10 |
+-- | 28000111 |         17 |   10 |
+-- | 28000103 |         16 |   10 |
+-- | 28000003 |         17 |   10 |
+-- | 29000008 |         17 |   10 |
+-- | 28000091 |         17 |   10 |
+-- | 28000025 |         17 |   10 |
+-- | 28000051 |         16 |   10 |
+-- | 28000043 |         16 |   10 |
+-- | 28000069 |         17 |   10 |
+-- | 28000081 |         17 |   10 |
+-- | 28000004 |         17 |   10 |
+-- | 28000051 |         17 |   10 |
+-- | 28000043 |         17 |   10 |
+-- | 28000022 |         16 |   10 |
+-- | 29000004 |         17 |   10 |
+-- | 28000103 |         17 |   10 |
+-- | 28000090 |         16 |   10 |
+-- | 28000091 |         16 |   10 |
+-- | 28000052 |         17 |   10 |
+-- | 28000072 |         17 |   10 |
+-- | 29000082 |         16 |   10 |
+-- | 29000086 |         16 |   10 |
+-- | 29000046 |         16 |   10 |
+-- | 29000024 |         17 |   10 |
+-- | 29000087 |         16 |   10 |
+-- | 29000087 |         17 |   10 |
+-- | 29000045 |         17 |   10 |
+-- | 29000088 |         17 |   10 |
+-- | 29000025 |         17 |   10 |
+-- | 29000044 |         17 |   10 |
+-- | 29000090 |         16 |   10 |
+-- | 29000112 |         17 |   10 |
+-- | 29000108 |         17 |   10 |
+-- | 29000047 |         16 |   10 |
+-- | 29000047 |         17 |   10 |
+-- | 29000049 |         17 |   10 |
+-- | 29000089 |         17 |   10 |
+-- | 29000083 |         16 |   10 |
+-- | 29000022 |         16 |   10 |
+-- | 29000083 |         17 |   10 |
+-- | 29000052 |         17 |   10 |
+-- | 29000048 |         17 |   10 |
+-- | 29000084 |         17 |   10 |
+-- | 29000085 |         17 |   10 |
+-- | 29000023 |         16 |   10 |
+-- | 29000023 |         17 |   10 |
+-- | 29000026 |         16 |   10 |
+-- | 29000091 |         16 |   10 |
+-- | 29000043 |         17 |   10 |
+-- | 29000103 |         16 |   10 |
+-- | 29000103 |         17 |   10 |
+-- | 29000032 |         17 |   10 |
+-- | 29000029 |         17 |   10 |
+-- | 29000107 |         17 |   10 |
+-- | 29000107 |         16 |   10 |
+-- | 29000104 |         17 |   10 |
+-- | 29000031 |         17 |   10 |
+-- | 29000031 |         16 |   10 |
+-- | 29000030 |         16 |   10 |
+-- | 29000105 |         17 |   10 |
+-- | 29000028 |         17 |   10 |
+-- | 29000041 |         17 |   10 |
+-- | 29000109 |         17 |   10 |
+-- | 29000043 |         16 |   10 |
+-- | 29000091 |         17 |   10 |
+-- | 29000111 |         17 |   10 |
+-- | 29000111 |         16 |   10 |
+-- | 29000092 |         17 |   10 |
+-- | 29000027 |         16 |   10 |
+-- | 29000027 |         17 |   10 |
+-- | 29000042 |         16 |   10 |
+-- | 29000110 |         16 |   10 |
+-- | 29000101 |         17 |   10 |
+-- | 29000102 |         16 |   10 |
+-- | 29000106 |         16 |   10 |
+-- | 29000011 |         16 |   10 |
+-- | 29000067 |         17 |   10 |
+-- | 29000011 |         17 |   10 |
+-- | 29000063 |         16 |   10 |
+-- | 29000051 |         16 |   10 |
+-- | 29000051 |         17 |   10 |
+-- | 29000012 |         17 |   10 |
+-- | 29000071 |         17 |   10 |
+-- | 29000069 |         17 |   10 |
+-- | 29000066 |         16 |   10 |
+-- | 29000067 |         16 |   10 |
+-- | 29000061 |         17 |   10 |
+-- | 29000010 |         16 |   10 |
+-- | 29000062 |         16 |   10 |
+-- | 29000070 |         16 |   10 |
+-- | 29000071 |         16 |   10 |
+-- | 29000063 |         17 |   10 |
+-- | 29000009 |         17 |   10 |
+-- | 29000064 |         17 |   10 |
+-- | 29000021 |         17 |   10 |
+-- | 29000081 |         17 |   10 |
+-- | 29000068 |         17 |   10 |
+-- | 29000050 |         16 |   10 |
+-- | 29000072 |         17 |   10 |
+-- | 29000065 |         17 |   10 |
+-- | 29000068 |         16 |    9 |
+-- | 29000062 |         17 |    9 |
+-- | 29000102 |          9 |    9 |
+-- | 29000045 |         16 |    9 |
+-- | 29000062 |          9 |    9 |
+-- | 29000101 |         10 |    9 |
+-- | 29000042 |          9 |    9 |
+-- | 29000042 |         17 |    9 |
+-- | 29000101 |         16 |    9 |
+-- | 29000092 |         10 |    9 |
+-- | 29000092 |         16 |    9 |
+-- | 29000043 |         10 |    9 |
+-- | 29000043 |          9 |    9 |
+-- | 29000067 |         10 |    9 |
+-- | 29000067 |          9 |    9 |
+-- | 29000032 |         10 |    9 |
+-- | 29000104 |         16 |    9 |
+-- | 29000066 |          9 |    9 |
+-- | 29000106 |          9 |    9 |
+-- | 29000105 |         10 |    9 |
+-- | 29000065 |         16 |    9 |
+-- | 29000105 |         16 |    9 |
+-- | 29000065 |         10 |    9 |
+-- | 29000064 |         10 |    9 |
+-- | 29000031 |         10 |    9 |
+-- | 29000104 |         10 |    9 |
+-- | 29000032 |         16 |    9 |
+-- | 29000063 |          9 |    9 |
+-- | 29000041 |         16 |    9 |
+-- | 29000102 |         17 |    9 |
+-- | 29000103 |          9 |    9 |
+-- | 29000063 |         10 |    9 |
+-- | 29000041 |         10 |    9 |
+-- | 29000103 |         10 |    9 |
+-- | 29000109 |         10 |    9 |
+-- | 29000047 |          9 |    9 |
+-- | 29000066 |         17 |    9 |
+-- | 29000031 |          9 |    9 |
+-- | 29000050 |          9 |    9 |
+-- | 29000048 |         10 |    9 |
+-- | 29000085 |         10 |    9 |
+-- | 29000085 |         16 |    9 |
+-- | 29000072 |         10 |    9 |
+-- | 29000086 |          9 |    9 |
+-- | 29000047 |         10 |    9 |
+-- | 29000068 |         10 |    9 |
+-- | 29000071 |         10 |    9 |
+-- | 29000086 |         17 |    9 |
+-- | 29000087 |          9 |    9 |
+-- | 29000051 |         10 |    9 |
+-- | 29000084 |         16 |    9 |
+-- | 29000082 |          9 |    9 |
+-- | 29000082 |         17 |    9 |
+-- | 29000049 |         16 |    9 |
+-- | 29000083 |          9 |    9 |
+-- | 29000083 |         10 |    9 |
+-- | 29000081 |         16 |    9 |
+-- | 29000050 |         17 |    9 |
+-- | 29000084 |         10 |    9 |
+-- | 29000072 |         16 |    9 |
+-- | 29000048 |         16 |    9 |
+-- | 29000087 |         10 |    9 |
+-- | 29000046 |         17 |    9 |
+-- | 29000052 |         10 |    9 |
+-- | 29000090 |          9 |    9 |
+-- | 29000044 |         16 |    9 |
+-- | 29000090 |         17 |    9 |
+-- | 29000044 |         10 |    9 |
+-- | 29000091 |          9 |    9 |
+-- | 29000051 |          9 |    9 |
+-- | 29000091 |         10 |    9 |
+-- | 29000069 |         16 |    9 |
+-- | 29000061 |         10 |    9 |
+-- | 29000069 |         10 |    9 |
+-- | 29000049 |         10 |    9 |
+-- | 29000070 |          9 |    9 |
+-- | 29000071 |          9 |    9 |
+-- | 29000070 |         17 |    9 |
+-- | 29000052 |         16 |    9 |
+-- | 29000046 |          9 |    9 |
+-- | 29000088 |         10 |    9 |
+-- | 29000088 |         16 |    9 |
+-- | 29000064 |         16 |    9 |
+-- | 29000045 |         10 |    9 |
+-- | 29000089 |         10 |    9 |
+-- | 29000089 |         16 |    9 |
+-- | 29000061 |         16 |    9 |
+-- | 29000111 |         10 |    9 |
+-- | 29000026 |          9 |    9 |
+-- | 30000001 |         17 |    9 |
+-- | 30000001 |         27 |    9 |
+-- | 30000010 |         27 |    9 |
+-- | 29000025 |         16 |    9 |
+-- | 30000010 |         17 |    9 |
+-- | 30000002 |         12 |    9 |
+-- | 30000002 |         32 |    9 |
+-- | 30000011 |         12 |    9 |
+-- | 29000112 |         16 |    9 |
+-- | 29000011 |         10 |    9 |
+-- | 30000012 |          2 |    9 |
+-- | 29000025 |         10 |    9 |
+-- | 29000027 |         10 |    9 |
+-- | 29000081 |         10 |    9 |
+-- | 30000011 |         32 |    9 |
+-- | 29000112 |         10 |    9 |
+-- | 29000011 |          9 |    9 |
+-- | 29000026 |         17 |    9 |
+-- | 29000012 |         10 |    9 |
+-- | 30000003 |          2 |    9 |
+-- | 29000023 |          9 |    9 |
+-- | 30000005 |         32 |    9 |
+-- | 29000021 |         16 |    9 |
+-- | 30000006 |          2 |    9 |
+-- | 30000007 |         27 |    9 |
+-- | 29000022 |         17 |    9 |
+-- | 30000006 |         32 |    9 |
+-- | 30000007 |         17 |    9 |
+-- | 30000008 |         12 |    9 |
+-- | 29000021 |         10 |    9 |
+-- | 30000004 |         27 |    9 |
+-- | 30000009 |         32 |    9 |
+-- | 30000003 |         32 |    9 |
+-- | 29000012 |         16 |    9 |
+-- | 29000024 |         16 |    9 |
+-- | 30000009 |          2 |    9 |
+-- | 29000024 |         10 |    9 |
+-- | 30000004 |         17 |    9 |
+-- | 30000008 |         32 |    9 |
+-- | 29000022 |          9 |    9 |
+-- | 29000111 |          9 |    9 |
+-- | 29000009 |         16 |    9 |
+-- | 30000041 |          6 |    9 |
+-- | 29000107 |         10 |    9 |
+-- | 29000009 |         10 |    9 |
+-- | 29000010 |          9 |    9 |
+-- | 30000005 |         12 |    9 |
+-- | 29000109 |         16 |    9 |
+-- | 30000042 |          6 |    9 |
+-- | 29000029 |         10 |    9 |
+-- | 29000108 |         16 |    9 |
+-- | 29000030 |          9 |    9 |
+-- | 29000108 |         10 |    9 |
+-- | 30000041 |          8 |    9 |
+-- | 29000029 |         16 |    9 |
+-- | 29000023 |         10 |    9 |
+-- | 29000028 |         16 |    9 |
+-- | 29000107 |          9 |    9 |
+-- | 29000027 |          9 |    9 |
+-- | 29000106 |         17 |    9 |
+-- | 29000110 |         17 |    9 |
+-- | 29000010 |         17 |    9 |
+-- | 30000012 |         32 |    9 |
+-- | 29000028 |         10 |    9 |
+-- | 29000030 |         17 |    9 |
+-- | 29000110 |          9 |    9 |
+-- | 28000026 |         17 |    9 |
+-- | 28000069 |         16 |    9 |
+-- | 28000071 |          9 |    9 |
+-- | 28000028 |         16 |    9 |
+-- | 28000066 |         17 |    9 |
+-- | 29000004 |         10 |    9 |
+-- | 28000108 |         10 |    9 |
+-- | 28000024 |         10 |    9 |
+-- | 28000071 |         10 |    9 |
+-- | 28000069 |         10 |    9 |
+-- | 28000026 |          9 |    9 |
+-- | 28000068 |         10 |    9 |
+-- | 28000024 |         16 |    9 |
+-- | 28000025 |         10 |    9 |
+-- | 28000027 |         10 |    9 |
+-- | 28000070 |         17 |    9 |
+-- | 28000025 |         16 |    9 |
+-- | 28000027 |          9 |    9 |
+-- | 28000068 |         16 |    9 |
+-- | 28000028 |         10 |    9 |
+-- | 29000004 |         16 |    9 |
+-- | 28000067 |         10 |    9 |
+-- | 28000067 |          9 |    9 |
+-- | 28000108 |         16 |    9 |
+-- | 28000070 |          9 |    9 |
+-- | 28000048 |         10 |    9 |
+-- | 28000111 |          9 |    9 |
+-- | 28000051 |          9 |    9 |
+-- | 28000044 |         10 |    9 |
+-- | 28000051 |         10 |    9 |
+-- | 28000091 |          9 |    9 |
+-- | 28000052 |         10 |    9 |
+-- | 28000043 |         10 |    9 |
+-- | 28000043 |          9 |    9 |
+-- | 29000001 |         10 |    9 |
+-- | 28000052 |         16 |    9 |
+-- | 28000110 |         17 |    9 |
+-- | 28000042 |         17 |    9 |
+-- | 28000111 |         10 |    9 |
+-- | 28000044 |         16 |    9 |
+-- | 28000050 |         17 |    9 |
+-- | 28000047 |         10 |    9 |
+-- | 28000047 |          9 |    9 |
+-- | 28000112 |         10 |    9 |
+-- | 28000048 |         16 |    9 |
+-- | 28000046 |         17 |    9 |
+-- | 28000049 |         10 |    9 |
+-- | 28000046 |          9 |    9 |
+-- | 28000112 |         16 |    9 |
+-- | 28000049 |         16 |    9 |
+-- | 28000045 |         16 |    9 |
+-- | 28000045 |         10 |    9 |
+-- | 28000050 |          9 |    9 |
+-- | 29000001 |         16 |    9 |
+-- | 28000042 |          9 |    9 |
+-- | 28000031 |          9 |    9 |
+-- | 29000002 |         17 |    9 |
+-- | 28000064 |         16 |    9 |
+-- | 28000030 |         17 |    9 |
+-- | 28000109 |         10 |    9 |
+-- | 28000065 |         10 |    9 |
+-- | 28000030 |          9 |    9 |
+-- | 28000065 |         16 |    9 |
+-- | 28000029 |         16 |    9 |
+-- | 29000003 |          9 |    9 |
+-- | 28000066 |          9 |    9 |
+-- | 28000029 |         10 |    9 |
+-- | 28000031 |         10 |    9 |
+-- | 28000064 |         10 |    9 |
+-- | 28000109 |         16 |    9 |
+-- | 28000061 |         10 |    9 |
+-- | 28000041 |         16 |    9 |
+-- | 28000062 |          9 |    9 |
+-- | 28000041 |         10 |    9 |
+-- | 28000110 |          9 |    9 |
+-- | 28000062 |         17 |    9 |
+-- | 28000032 |         16 |    9 |
+-- | 28000063 |          9 |    9 |
+-- | 29000002 |          9 |    9 |
+-- | 28000063 |         10 |    9 |
+-- | 28000032 |         10 |    9 |
+-- | 28000061 |         16 |    9 |
+-- | 29000003 |         10 |    9 |
+-- | 28000011 |         10 |    9 |
+-- | 28000086 |         17 |    9 |
+-- | 28000008 |         16 |    9 |
+-- | 28000087 |          9 |    9 |
+-- | 28000087 |         10 |    9 |
+-- | 28000008 |         10 |    9 |
+-- | 28000088 |         10 |    9 |
+-- | 29000007 |          9 |    9 |
+-- | 28000088 |         16 |    9 |
+-- | 28000007 |         10 |    9 |
+-- | 28000007 |          9 |    9 |
+-- | 29000007 |         10 |    9 |
+-- | 28000105 |         10 |    9 |
+-- | 28000009 |         10 |    9 |
+-- | 29000006 |         17 |    9 |
+-- | 28000011 |          9 |    9 |
+-- | 28000084 |         16 |    9 |
+-- | 29000006 |          9 |    9 |
+-- | 28000010 |         17 |    9 |
+-- | 28000085 |         10 |    9 |
+-- | 28000006 |         17 |    9 |
+-- | 28000105 |         16 |    9 |
+-- | 28000010 |          9 |    9 |
+-- | 28000085 |         16 |    9 |
+-- | 28000009 |         16 |    9 |
+-- | 28000086 |          9 |    9 |
+-- | 28000104 |         16 |    9 |
+-- | 28000089 |         10 |    9 |
+-- | 28000092 |         16 |    9 |
+-- | 29000008 |         16 |    9 |
+-- | 28000002 |         17 |    9 |
+-- | 28000101 |         10 |    9 |
+-- | 28000002 |          9 |    9 |
+-- | 28000101 |         16 |    9 |
+-- | 28000103 |         10 |    9 |
+-- | 28000001 |         16 |    9 |
+-- | 28000102 |          9 |    9 |
+-- | 28000103 |          9 |    9 |
+-- | 28000001 |         10 |    9 |
+-- | 28000003 |          9 |    9 |
+-- | 28000003 |         10 |    9 |
+-- | 28000092 |         10 |    9 |
+-- | 28000006 |          9 |    9 |
+-- | 28000089 |         16 |    9 |
+-- | 28000005 |         16 |    9 |
+-- | 28000090 |          9 |    9 |
+-- | 28000005 |         10 |    9 |
+-- | 28000104 |         10 |    9 |
+-- | 28000090 |         17 |    9 |
+-- | 28000004 |         16 |    9 |
+-- | 28000091 |         10 |    9 |
+-- | 28000004 |         10 |    9 |
+-- | 29000008 |         10 |    9 |
+-- | 28000102 |         17 |    9 |
+-- | 28000084 |         10 |    9 |
+-- | 28000012 |         10 |    9 |
+-- | 28000107 |          9 |    9 |
+-- | 29000005 |         16 |    9 |
+-- | 28000082 |         17 |    9 |
+-- | 28000072 |         10 |    9 |
+-- | 28000106 |          9 |    9 |
+-- | 28000081 |         10 |    9 |
+-- | 28000022 |         17 |    9 |
+-- | 28000023 |          9 |    9 |
+-- | 28000106 |         17 |    9 |
+-- | 28000023 |         10 |    9 |
+-- | 28000022 |          9 |    9 |
+-- | 28000082 |          9 |    9 |
+-- | 28000107 |         10 |    9 |
+-- | 28000081 |         16 |    9 |
+-- | 28000083 |          9 |    9 |
+-- | 28000012 |         16 |    9 |
+-- | 28000072 |         16 |    9 |
+-- | 29000005 |         10 |    9 |
+-- | 28000021 |         16 |    9 |
+-- | 28000083 |         10 |    9 |
+-- | 28000021 |         10 |    9 |
+-- | 40000065 |         12 |    9 |
+-- | 50000065 |         12 |    9 |
+-- | 50000063 |         32 |    9 |
+-- | 50000031 |         12 |    9 |
+-- | 50000003 |         24 |    9 |
+-- | 40000067 |         17 |    9 |
+-- | 50000092 |         24 |    9 |
+-- | 40000067 |         27 |    9 |
+-- | 50000084 |         23 |    9 |
+-- | 50000064 |         17 |    9 |
+-- | 50000030 |         27 |    9 |
+-- | 50000003 |          7 |    9 |
+-- | 50000092 |          7 |    9 |
+-- | 50000023 |         32 |    9 |
+-- | 50000030 |         17 |    9 |
+-- | 40000068 |         12 |    9 |
+-- | 50000069 |         32 |    9 |
+-- | 50000064 |         27 |    9 |
+-- | 50000023 |          2 |    9 |
+-- | 50000031 |         32 |    9 |
+-- | 50000101 |         17 |    9 |
+-- | 50000041 |         23 |    9 |
+-- | 50000022 |         12 |    9 |
+-- | 50000083 |         24 |    9 |
+-- | 50000102 |         12 |    9 |
+-- | 40000065 |         32 |    9 |
+-- | 50000062 |         12 |    9 |
+-- | 50000070 |         27 |    9 |
+-- | 50000004 |         23 |    9 |
+-- | 50000032 |         32 |    9 |
+-- | 40000066 |          2 |    9 |
+-- | 50000022 |         32 |    9 |
+-- | 50000062 |         32 |    9 |
+-- | 50000101 |         27 |    9 |
+-- | 50000063 |          2 |    9 |
+-- | 50000032 |          2 |    9 |
+-- | 50000070 |         17 |    9 |
+-- | 40000066 |         32 |    9 |
+-- | 50000091 |         11 |    9 |
+-- | 40000068 |         32 |    9 |
+-- | 50000002 |         11 |    9 |
+-- | 50000086 |          7 |    9 |
+-- | 50000089 |          7 |    9 |
+-- | 50000027 |         27 |    9 |
+-- | 50000025 |         12 |    9 |
+-- | 50000027 |         17 |    9 |
+-- | 50000088 |         11 |    9 |
+-- | 40000071 |         12 |    9 |
+-- | 50000068 |         12 |    9 |
+-- | 40000072 |         32 |    9 |
+-- | 50000025 |         32 |    9 |
+-- | 50000067 |         17 |    9 |
+-- | 40000071 |         32 |    9 |
+-- | 50000026 |         32 |    9 |
+-- | 50000087 |         23 |    9 |
+-- | 50000086 |         24 |    9 |
+-- | 50000067 |         27 |    9 |
+-- | 40000072 |          2 |    9 |
+-- | 50000068 |         32 |    9 |
+-- | 40000070 |         27 |    9 |
+-- | 50000066 |         32 |    9 |
+-- | 50000029 |         32 |    9 |
+-- | 40000069 |          2 |    9 |
+-- | 50000085 |         11 |    9 |
+-- | 50000090 |         23 |    9 |
+-- | 50000024 |         17 |    9 |
+-- | 50000029 |          2 |    9 |
+-- | 50000049 |         24 |    9 |
+-- | 50000024 |         27 |    9 |
+-- | 50000065 |         32 |    9 |
+-- | 40000069 |         32 |    9 |
+-- | 50000028 |         32 |    9 |
+-- | 50000001 |         23 |    9 |
+-- | 50000069 |          2 |    9 |
+-- | 50000066 |          2 |    9 |
+-- | 50000028 |         12 |    9 |
+-- | 50000089 |         24 |    9 |
+-- | 40000070 |         17 |    9 |
+-- | 50000026 |          2 |    9 |
+-- | 40000064 |         27 |    9 |
+-- | 50000105 |         12 |    9 |
+-- | 50000046 |         24 |    9 |
+-- | 40000062 |         12 |    9 |
+-- | 50000012 |          7 |    9 |
+-- | 50000072 |          2 |    9 |
+-- | 50000046 |          7 |    9 |
+-- | 50000052 |          7 |    9 |
+-- | 50000010 |         23 |    9 |
+-- | 40000062 |         32 |    9 |
+-- | 50000007 |         23 |    9 |
+-- | 50000104 |         27 |    9 |
+-- | 50000045 |         11 |    9 |
+-- | 40000063 |          2 |    9 |
+-- | 50000104 |         17 |    9 |
+-- | 50000012 |         24 |    9 |
+-- | 50000051 |         11 |    9 |
+-- | 50000008 |         11 |    9 |
+-- | 50000081 |         23 |    9 |
+-- | 40000051 |         24 |    9 |
+-- | 50000009 |         24 |    9 |
+-- | 40000052 |          2 |    9 |
+-- | 50000049 |          7 |    9 |
+-- | 40000052 |         13 |    9 |
+-- | 50000106 |          2 |    9 |
+-- | 40000052 |         25 |    9 |
+-- | 50000050 |         23 |    9 |
+-- | 50000048 |         11 |    9 |
+-- | 50000009 |          7 |    9 |
+-- | 50000072 |         32 |    9 |
+-- | 40000061 |         17 |    9 |
+-- | 50000105 |         32 |    9 |
+-- | 40000061 |         27 |    9 |
+-- | 50000047 |         23 |    9 |
+-- | 50000011 |         11 |    9 |
+-- | 50000082 |         11 |    9 |
+-- | 50000083 |          7 |    9 |
+-- | 50000102 |         32 |    9 |
+-- | 50000043 |         24 |    9 |
+-- | 50000061 |         27 |    9 |
+-- | 50000042 |         11 |    9 |
+-- | 50000061 |         17 |    9 |
+-- | 50000103 |         32 |    9 |
+-- | 50000006 |          7 |    9 |
+-- | 50000021 |         27 |    9 |
+-- | 50000043 |          7 |    9 |
+-- | 50000103 |          2 |    9 |
+-- | 40000064 |         17 |    9 |
+-- | 50000071 |         12 |    9 |
+-- | 50000006 |         24 |    9 |
+-- | 50000071 |         32 |    9 |
+-- | 50000052 |         24 |    9 |
+-- | 50000021 |         17 |    9 |
+-- | 50000044 |         23 |    9 |
+-- | 40000063 |         32 |    9 |
+-- | 50000005 |         11 |    9 |
+-- | 60000069 |         32 |    9 |
+-- | 60000007 |         10 |    9 |
+-- | 60000089 |         22 |    9 |
+-- | 60000068 |         12 |    9 |
+-- | 60000041 |         10 |    9 |
+-- | 60000006 |         22 |    9 |
+-- | 60000041 |         23 |    9 |
+-- | 60000006 |          9 |    9 |
+-- | 60000006 |          2 |    9 |
+-- | 60000090 |         10 |    9 |
+-- | 60000005 |         29 |    9 |
+-- | 60000042 |          4 |    9 |
+-- | 60000007 |         23 |    9 |
+-- | 60000032 |         32 |    9 |
+-- | 60000089 |          9 |    9 |
+-- | 60000009 |          9 |    9 |
+-- | 60000031 |         32 |    9 |
+-- | 60000009 |          2 |    9 |
+-- | 60000008 |         29 |    9 |
+-- | 60000088 |         23 |    9 |
+-- | 60000008 |         23 |    9 |
+-- | 60000088 |         29 |    9 |
+-- | 60000069 |          2 |    9 |
+-- | 60000089 |          2 |    9 |
+-- | 60000008 |          4 |    9 |
+-- | 60000068 |         32 |    9 |
+-- | 60000005 |         23 |    9 |
+-- | 60000032 |          2 |    9 |
+-- | 60000003 |          9 |    9 |
+-- | 60000091 |         23 |    9 |
+-- | 60000003 |          2 |    9 |
+-- | 60000046 |          2 |    9 |
+-- | 60000002 |         29 |    9 |
+-- | 60000091 |         29 |    9 |
+-- | 60000002 |         23 |    9 |
+-- | 60000044 |         23 |    9 |
+-- | 60000092 |          2 |    9 |
+-- | 60000066 |         32 |    9 |
+-- | 60000002 |          4 |    9 |
+-- | 60000044 |         10 |    9 |
+-- | 60000003 |         22 |    9 |
+-- | 60000091 |          4 |    9 |
+-- | 60000067 |         27 |    9 |
+-- | 60000090 |         23 |    9 |
+-- | 60000005 |          4 |    9 |
+-- | 60000042 |         23 |    9 |
+-- | 60000042 |         29 |    9 |
+-- | 60000043 |          2 |    9 |
+-- | 60000067 |         17 |    9 |
+-- | 60000004 |         23 |    9 |
+-- | 60000043 |          9 |    9 |
+-- | 60000004 |         10 |    9 |
+-- | 60000043 |         22 |    9 |
+-- | 60000092 |          9 |    9 |
+-- | 60000009 |         22 |    9 |
+-- | 60000082 |         23 |    9 |
+-- | 60000023 |          2 |    9 |
+-- | 60000084 |         23 |    9 |
+-- | 60000027 |         17 |    9 |
+-- | 60000022 |         32 |    9 |
+-- | 60000082 |         29 |    9 |
+-- | 60000027 |         27 |    9 |
+-- | 60000085 |          4 |    9 |
+-- | 60000022 |         12 |    9 |
+-- | 60000072 |         32 |    9 |
+-- | 60000085 |         23 |    9 |
+-- | 60000085 |         29 |    9 |
+-- | 60000084 |         10 |    9 |
+-- | 60000081 |         10 |    9 |
+-- | 60000026 |         32 |    9 |
+-- | 60000083 |          2 |    9 |
+-- | 60000025 |         12 |    9 |
+-- | 60000083 |          9 |    9 |
+-- | 60000024 |         27 |    9 |
+-- | 60000025 |         32 |    9 |
+-- | 60000082 |          4 |    9 |
+-- | 60000024 |         17 |    9 |
+-- | 60000083 |         22 |    9 |
+-- | 60000026 |          2 |    9 |
+-- | 60000081 |         23 |    9 |
+-- | 60000023 |         32 |    9 |
+-- | 60000028 |         12 |    9 |
+-- | 60000072 |          2 |    9 |
+-- | 60000087 |         10 |    9 |
+-- | 60000070 |         27 |    9 |
+-- | 60000011 |          4 |    9 |
+-- | 60000030 |         17 |    9 |
+-- | 60000029 |          2 |    9 |
+-- | 60000087 |         23 |    9 |
+-- | 60000010 |         23 |    9 |
+-- | 60000030 |         27 |    9 |
+-- | 60000070 |         17 |    9 |
+-- | 60000010 |         10 |    9 |
+-- | 60000088 |          4 |    9 |
+-- | 60000011 |         23 |    9 |
+-- | 60000011 |         29 |    9 |
+-- | 60000012 |          2 |    9 |
+-- | 60000086 |          2 |    9 |
+-- | 60000021 |         27 |    9 |
+-- | 60000021 |         17 |    9 |
+-- | 60000028 |         32 |    9 |
+-- | 60000086 |          9 |    9 |
+-- | 60000071 |         32 |    9 |
+-- | 60000086 |         22 |    9 |
+-- | 60000012 |         22 |    9 |
+-- | 60000071 |         12 |    9 |
+-- | 60000012 |          9 |    9 |
+-- | 60000029 |         32 |    9 |
+-- | 60000031 |         12 |    9 |
+-- | 60000049 |          2 |    9 |
+-- | 50000110 |         17 |    9 |
+-- | 60000052 |         22 |    9 |
+-- | 50000108 |         32 |    9 |
+-- | 60000105 |         12 |    9 |
+-- | 50000111 |         32 |    9 |
+-- | 60000104 |         17 |    9 |
+-- | 60000051 |          4 |    9 |
+-- | 60000049 |         22 |    9 |
+-- | 60000047 |         10 |    9 |
+-- | 50000108 |         12 |    9 |
+-- | 50000112 |          2 |    9 |
+-- | 50000107 |         27 |    9 |
+-- | 60000101 |         27 |    9 |
+-- | 60000065 |         12 |    9 |
+-- | 50000107 |         17 |    9 |
+-- | 60000103 |          2 |    9 |
+-- | 60000052 |          9 |    9 |
+-- | 60000104 |         27 |    9 |
+-- | 60000051 |         23 |    9 |
+-- | 60000048 |         29 |    9 |
+-- | 60000102 |         32 |    9 |
+-- | 60000051 |         29 |    9 |
+-- | 60000064 |         27 |    9 |
+-- | 60000048 |         23 |    9 |
+-- | 60000062 |         32 |    9 |
+-- | 60000063 |          2 |    9 |
+-- | 60000049 |          9 |    9 |
+-- | 50000110 |         27 |    9 |
+-- | 50000111 |         12 |    9 |
+-- | 60000052 |          2 |    9 |
+-- | 60000048 |          4 |    9 |
+-- | 60000064 |         17 |    9 |
+-- | 60000101 |         17 |    9 |
+-- | 60000047 |         23 |    9 |
+-- | 60000046 |          9 |    9 |
+-- | 50000109 |         32 |    9 |
+-- | 60000061 |         27 |    9 |
+-- | 60000062 |         12 |    9 |
+-- | 60000103 |         32 |    9 |
+-- | 60000046 |         22 |    9 |
+-- | 60000045 |         29 |    9 |
+-- | 60000066 |          2 |    9 |
+-- | 60000045 |         23 |    9 |
+-- | 60000001 |         10 |    9 |
+-- | 60000092 |         22 |    9 |
+-- | 60000050 |         10 |    9 |
+-- | 50000106 |         32 |    9 |
+-- | 60000102 |         12 |    9 |
+-- | 60000045 |          4 |    9 |
+-- | 60000105 |         32 |    9 |
+-- | 60000061 |         17 |    9 |
+-- | 50000112 |         32 |    9 |
+-- | 60000001 |         23 |    9 |
+-- | 60000050 |         23 |    9 |
+-- | 50000109 |          2 |    9 |
+-- | 60000063 |         32 |    9 |
+-- | 60000065 |         32 |    9 |
+-- | 30000071 |         32 |    9 |
+-- | 30000064 |         17 |    9 |
+-- | 30000106 |         32 |    9 |
+-- | 40000022 |         32 |    9 |
+-- | 40000023 |          2 |    9 |
+-- | 30000106 |          2 |    9 |
+-- | 30000063 |         32 |    9 |
+-- | 40000023 |         32 |    9 |
+-- | 30000072 |         32 |    9 |
+-- | 30000105 |         32 |    9 |
+-- | 40000021 |         27 |    9 |
+-- | 30000064 |         27 |    9 |
+-- | 40000011 |         24 |    9 |
+-- | 30000065 |         12 |    9 |
+-- | 40000012 |          2 |    9 |
+-- | 40000012 |         13 |    9 |
+-- | 30000107 |         27 |    9 |
+-- | 40000012 |         25 |    9 |
+-- | 30000107 |         17 |    9 |
+-- | 30000072 |          2 |    9 |
+-- | 40000021 |         17 |    9 |
+-- | 30000105 |         12 |    9 |
+-- | 40000024 |         17 |    9 |
+-- | 40000024 |         27 |    9 |
+-- | 40000027 |         17 |    9 |
+-- | 30000082 |          6 |    9 |
+-- | 40000027 |         27 |    9 |
+-- | 30000103 |         32 |    9 |
+-- | 30000061 |         27 |    9 |
+-- | 40000028 |         12 |    9 |
+-- | 30000061 |         17 |    9 |
+-- | 30000103 |          2 |    9 |
+-- | 40000028 |         32 |    9 |
+-- | 40000026 |         32 |    9 |
+-- | 30000062 |         12 |    9 |
+-- | 30000063 |          2 |    9 |
+-- | 30000081 |          6 |    9 |
+-- | 40000025 |         12 |    9 |
+-- | 30000104 |         27 |    9 |
+-- | 30000062 |         32 |    9 |
+-- | 40000025 |         32 |    9 |
+-- | 30000081 |          8 |    9 |
+-- | 40000026 |          2 |    9 |
+-- | 30000104 |         17 |    9 |
+-- | 40000029 |          2 |    9 |
+-- | 30000112 |         32 |    9 |
+-- | 40000003 |         25 |    9 |
+-- | 30000068 |         12 |    9 |
+-- | 30000070 |         17 |    9 |
+-- | 30000110 |         27 |    9 |
+-- | 40000004 |         12 |    9 |
+-- | 40000004 |         24 |    9 |
+-- | 30000070 |         27 |    9 |
+-- | 30000110 |         17 |    9 |
+-- | 40000005 |         24 |    9 |
+-- | 40000003 |         13 |    9 |
+-- | 40000003 |          2 |    9 |
+-- | 30000112 |          2 |    9 |
+-- | 40000001 |         12 |    9 |
+-- | 30000111 |         32 |    9 |
+-- | 40000001 |         24 |    9 |
+-- | 30000069 |          2 |    9 |
+-- | 40000002 |         12 |    9 |
+-- | 30000111 |         12 |    9 |
+-- | 40000002 |         24 |    9 |
+-- | 30000068 |         32 |    9 |
+-- | 40000006 |          2 |    9 |
+-- | 30000067 |         27 |    9 |
+-- | 40000006 |         13 |    9 |
+-- | 30000071 |         12 |    9 |
+-- | 30000108 |         32 |    9 |
+-- | 40000009 |         25 |    9 |
+-- | 30000066 |          2 |    9 |
+-- | 30000069 |         32 |    9 |
+-- | 30000108 |         12 |    9 |
+-- | 40000010 |         12 |    9 |
+-- | 40000010 |         24 |    9 |
+-- | 30000065 |         32 |    9 |
+-- | 40000009 |         13 |    9 |
+-- | 40000009 |          2 |    9 |
+-- | 30000067 |         17 |    9 |
+-- | 40000006 |         25 |    9 |
+-- | 30000109 |         32 |    9 |
+-- | 40000007 |         12 |    9 |
+-- | 40000007 |         24 |    9 |
+-- | 40000008 |         12 |    9 |
+-- | 30000066 |         32 |    9 |
+-- | 30000109 |          2 |    9 |
+-- | 40000008 |         24 |    9 |
+-- | 40000011 |         12 |    9 |
+-- | 30000102 |         32 |    9 |
+-- | 30000046 |          3 |    9 |
+-- | 30000089 |          3 |    9 |
+-- | 40000042 |         24 |    9 |
+-- | 40000048 |         12 |    9 |
+-- | 30000045 |          6 |    9 |
+-- | 40000043 |          2 |    9 |
+-- | 40000043 |         13 |    9 |
+-- | 30000085 |          6 |    9 |
+-- | 30000091 |          6 |    9 |
+-- | 40000048 |         24 |    9 |
+-- | 30000049 |          3 |    9 |
+-- | 30000049 |         15 |    9 |
+-- | 30000044 |          8 |    9 |
+-- | 40000049 |         13 |    9 |
+-- | 40000049 |          2 |    9 |
+-- | 40000041 |         24 |    9 |
+-- | 30000046 |         15 |    9 |
+-- | 30000092 |          3 |    9 |
+-- | 40000042 |         12 |    9 |
+-- | 30000048 |          6 |    9 |
+-- | 30000086 |         15 |    9 |
+-- | 40000045 |         12 |    9 |
+-- | 40000045 |         24 |    9 |
+-- | 30000090 |          6 |    9 |
+-- | 40000046 |          2 |    9 |
+-- | 40000046 |         13 |    9 |
+-- | 30000086 |          3 |    9 |
+-- | 30000089 |         15 |    9 |
+-- | 40000046 |         25 |    9 |
+-- | 30000047 |          6 |    9 |
+-- | 30000090 |          8 |    9 |
+-- | 40000043 |         25 |    9 |
+-- | 40000005 |         12 |    9 |
+-- | 40000047 |         24 |    9 |
+-- | 30000044 |          6 |    9 |
+-- | 40000044 |         12 |    9 |
+-- | 40000047 |         12 |    9 |
+-- | 40000044 |         24 |    9 |
+-- | 30000047 |          8 |    9 |
+-- | 40000041 |         12 |    9 |
+-- | 40000051 |         12 |    9 |
+-- | 30000051 |          6 |    9 |
+-- | 30000043 |         15 |    9 |
+-- | 30000101 |         27 |    9 |
+-- | 30000083 |         15 |    9 |
+-- | 40000030 |         27 |    9 |
+-- | 40000050 |         12 |    9 |
+-- | 30000087 |          8 |    9 |
+-- | 40000050 |         24 |    9 |
+-- | 40000030 |         17 |    9 |
+-- | 30000052 |          3 |    9 |
+-- | 40000022 |         12 |    9 |
+-- | 30000043 |          3 |    9 |
+-- | 30000102 |         12 |    9 |
+-- | 30000083 |          3 |    9 |
+-- | 30000052 |         15 |    9 |
+-- | 40000029 |         32 |    9 |
+-- | 30000101 |         17 |    9 |
+-- | 40000031 |         32 |    9 |
+-- | 30000084 |          6 |    9 |
+-- | 30000092 |         15 |    9 |
+-- | 30000084 |          8 |    9 |
+-- | 30000050 |          6 |    9 |
+-- | 40000031 |         12 |    9 |
+-- | 40000032 |         32 |    9 |
+-- | 30000050 |          8 |    9 |
+-- | 30000088 |          6 |    9 |
+-- | 40000032 |          2 |    9 |
+-- | 30000087 |          6 |    9 |
+-- | 40000049 |         25 |    9 |
+-- | 60000108 |         32 |    9 |
+-- | 60000110 |         17 |    9 |
+-- | 60000107 |         17 |    9 |
+-- | 60000111 |         32 |    9 |
+-- | 60000106 |         32 |    9 |
+-- | 60000110 |         27 |    9 |
+-- | 60000109 |          2 |    9 |
+-- | 60000107 |         27 |    9 |
+-- | 60000112 |          2 |    9 |
+-- | 60000111 |         12 |    9 |
+-- | 60000109 |         32 |    9 |
+-- | 60000112 |         32 |    9 |
+-- | 60000106 |          2 |    9 |
+-- | 60000108 |         12 |    9 |
+-- | 60000108 |          4 |    8 |
+-- | 60000110 |         12 |    8 |
+-- | 60000111 |          4 |    8 |
+-- | 60000110 |         35 |    8 |
+-- | 60000108 |         27 |    8 |
+-- | 60000110 |          1 |    8 |
+-- | 60000109 |         27 |    8 |
+-- | 60000109 |         12 |    8 |
+-- | 60000110 |         26 |    8 |
+-- | 60000109 |         36 |    8 |
+-- | 60000108 |         35 |    8 |
+-- | 60000110 |         32 |    8 |
+-- | 60000109 |         34 |    8 |
+-- | 60000107 |         35 |    8 |
+-- | 60000106 |         34 |    8 |
+-- | 60000106 |         27 |    8 |
+-- | 60000112 |         12 |    8 |
+-- | 60000112 |         36 |    8 |
+-- | 60000107 |          1 |    8 |
+-- | 60000112 |         27 |    8 |
+-- | 60000111 |         35 |    8 |
+-- | 60000106 |         12 |    8 |
+-- | 60000106 |         36 |    8 |
+-- | 60000111 |         27 |    8 |
+-- | 60000107 |         32 |    8 |
+-- | 60000112 |         34 |    8 |
+-- | 60000107 |         26 |    8 |
+-- | 60000107 |         12 |    8 |
+-- | 50000072 |         36 |    8 |
+-- | 50000067 |         35 |    8 |
+-- | 50000025 |          4 |    8 |
+-- | 50000021 |         35 |    8 |
+-- | 50000023 |         36 |    8 |
+-- | 50000025 |         27 |    8 |
+-- | 50000072 |         27 |    8 |
+-- | 50000011 |         24 |    8 |
+-- | 50000022 |          4 |    8 |
+-- | 50000022 |         27 |    8 |
+-- | 50000068 |         27 |    8 |
+-- | 50000069 |         12 |    8 |
+-- | 50000068 |          4 |    8 |
+-- | 50000010 |         22 |    8 |
+-- | 50000070 |         35 |    8 |
+-- | 50000071 |          4 |    8 |
+-- | 50000072 |         34 |    8 |
+-- | 50000025 |         35 |    8 |
+-- | 50000010 |         24 |    8 |
+-- | 50000070 |         32 |    8 |
+-- | 50000011 |          1 |    8 |
+-- | 50000068 |         35 |    8 |
+-- | 50000024 |         35 |    8 |
+-- | 50000024 |          1 |    8 |
+-- | 50000069 |         36 |    8 |
+-- | 50000012 |         11 |    8 |
+-- | 50000069 |         27 |    8 |
+-- | 50000023 |         34 |    8 |
+-- | 50000023 |         12 |    8 |
+-- | 50000012 |         21 |    8 |
+-- | 50000021 |         12 |    8 |
+-- | 50000071 |         35 |    8 |
+-- | 50000070 |          1 |    8 |
+-- | 50000021 |          1 |    8 |
+-- | 50000071 |         27 |    8 |
+-- | 50000024 |         12 |    8 |
+-- | 50000070 |         12 |    8 |
+-- | 50000032 |         34 |    8 |
+-- | 50000024 |         32 |    8 |
+-- | 50000011 |          8 |    8 |
+-- | 50000021 |         32 |    8 |
+-- | 50000070 |         26 |    8 |
+-- | 50000022 |         35 |    8 |
+-- | 50000011 |         23 |    8 |
+-- | 50000023 |         27 |    8 |
+-- | 50000021 |         26 |    8 |
+-- | 50000024 |         26 |    8 |
+-- | 50000072 |         12 |    8 |
+-- | 50000069 |         34 |    8 |
+-- | 50000041 |          5 |    8 |
+-- | 50000043 |         11 |    8 |
+-- | 50000043 |         21 |    8 |
+-- | 50000061 |         12 |    8 |
+-- | 50000044 |          5 |    8 |
+-- | 50000044 |          7 |    8 |
+-- | 50000061 |          1 |    8 |
+-- | 50000044 |         22 |    8 |
+-- | 50000044 |         24 |    8 |
+-- | 50000045 |          1 |    8 |
+-- | 50000061 |         26 |    8 |
+-- | 50000065 |         27 |    8 |
+-- | 50000042 |         24 |    8 |
+-- | 50000041 |          7 |    8 |
+-- | 50000062 |          4 |    8 |
+-- | 50000041 |         22 |    8 |
+-- | 50000041 |         24 |    8 |
+-- | 50000042 |          1 |    8 |
+-- | 50000061 |         35 |    8 |
+-- | 50000042 |          8 |    8 |
+-- | 50000061 |         32 |    8 |
+-- | 50000042 |         23 |    8 |
+-- | 50000052 |         21 |    8 |
+-- | 50000045 |          8 |    8 |
+-- | 50000052 |         11 |    8 |
+-- | 50000051 |          1 |    8 |
+-- | 50000050 |         24 |    8 |
+-- | 50000048 |          8 |    8 |
+-- | 50000050 |         22 |    8 |
+-- | 50000048 |         23 |    8 |
+-- | 50000048 |         24 |    8 |
+-- | 50000050 |          7 |    8 |
+-- | 50000049 |         11 |    8 |
+-- | 50000049 |         21 |    8 |
+-- | 50000048 |          1 |    8 |
+-- | 50000047 |         24 |    8 |
+-- | 50000047 |         22 |    8 |
+-- | 50000045 |         23 |    8 |
+-- | 50000045 |         24 |    8 |
+-- | 50000051 |         24 |    8 |
+-- | 50000046 |         11 |    8 |
+-- | 50000046 |         21 |    8 |
+-- | 50000051 |         23 |    8 |
+-- | 50000047 |          5 |    8 |
+-- | 50000047 |          7 |    8 |
+-- | 50000051 |          8 |    8 |
+-- | 50000050 |          5 |    8 |
+-- | 50000032 |         36 |    8 |
+-- | 50000067 |         32 |    8 |
+-- | 50000027 |         32 |    8 |
+-- | 50000027 |         35 |    8 |
+-- | 50000066 |         27 |    8 |
+-- | 50000028 |          4 |    8 |
+-- | 50000066 |         12 |    8 |
+-- | 50000028 |         27 |    8 |
+-- | 50000065 |         35 |    8 |
+-- | 50000028 |         35 |    8 |
+-- | 50000029 |         12 |    8 |
+-- | 50000066 |         34 |    8 |
+-- | 50000027 |         26 |    8 |
+-- | 50000066 |         36 |    8 |
+-- | 50000026 |         12 |    8 |
+-- | 50000067 |         26 |    8 |
+-- | 50000026 |         27 |    8 |
+-- | 50000026 |         34 |    8 |
+-- | 50000067 |         12 |    8 |
+-- | 50000026 |         36 |    8 |
+-- | 50000027 |          1 |    8 |
+-- | 50000067 |          1 |    8 |
+-- | 50000027 |         12 |    8 |
+-- | 50000031 |         27 |    8 |
+-- | 50000065 |          4 |    8 |
+-- | 50000029 |         27 |    8 |
+-- | 50000031 |          4 |    8 |
+-- | 50000063 |         36 |    8 |
+-- | 50000063 |         34 |    8 |
+-- | 50000063 |         27 |    8 |
+-- | 50000031 |         35 |    8 |
+-- | 50000063 |         12 |    8 |
+-- | 50000032 |         12 |    8 |
+-- | 50000062 |         35 |    8 |
+-- | 50000032 |         27 |    8 |
+-- | 50000064 |          1 |    8 |
+-- | 50000030 |         35 |    8 |
+-- | 50000064 |         12 |    8 |
+-- | 50000064 |         35 |    8 |
+-- | 50000029 |         34 |    8 |
+-- | 50000029 |         36 |    8 |
+-- | 50000030 |          1 |    8 |
+-- | 50000064 |         32 |    8 |
+-- | 50000030 |         12 |    8 |
+-- | 50000064 |         26 |    8 |
+-- | 50000030 |         26 |    8 |
+-- | 50000030 |         32 |    8 |
+-- | 50000062 |         27 |    8 |
+-- | 50000010 |          7 |    8 |
+-- | 50000101 |         12 |    8 |
+-- | 50000091 |         23 |    8 |
+-- | 40000068 |         27 |    8 |
+-- | 50000091 |          8 |    8 |
+-- | 40000068 |         35 |    8 |
+-- | 50000091 |          1 |    8 |
+-- | 50000090 |         24 |    8 |
+-- | 40000069 |         12 |    8 |
+-- | 50000090 |         22 |    8 |
+-- | 40000069 |         27 |    8 |
+-- | 50000091 |         24 |    8 |
+-- | 40000068 |          4 |    8 |
+-- | 50000088 |         23 |    8 |
+-- | 40000066 |         36 |    8 |
+-- | 40000067 |          1 |    8 |
+-- | 50000101 |          1 |    8 |
+-- | 40000067 |         12 |    8 |
+-- | 40000067 |         26 |    8 |
+-- | 40000067 |         32 |    8 |
+-- | 50000092 |         21 |    8 |
+-- | 50000092 |         11 |    8 |
+-- | 40000067 |         35 |    8 |
+-- | 50000090 |          7 |    8 |
+-- | 50000090 |          5 |    8 |
+-- | 40000071 |         27 |    8 |
+-- | 50000088 |          1 |    8 |
+-- | 50000087 |         24 |    8 |
+-- | 40000071 |         35 |    8 |
+-- | 50000087 |         22 |    8 |
+-- | 50000087 |          7 |    8 |
+-- | 40000072 |         12 |    8 |
+-- | 50000087 |          5 |    8 |
+-- | 40000072 |         27 |    8 |
+-- | 50000088 |          8 |    8 |
+-- | 40000071 |          4 |    8 |
+-- | 50000088 |         24 |    8 |
+-- | 40000069 |         34 |    8 |
+-- | 40000069 |         36 |    8 |
+-- | 40000070 |          1 |    8 |
+-- | 50000089 |         21 |    8 |
+-- | 40000070 |         12 |    8 |
+-- | 50000089 |         11 |    8 |
+-- | 40000070 |         26 |    8 |
+-- | 40000070 |         32 |    8 |
+-- | 40000070 |         35 |    8 |
+-- | 50000086 |         21 |    8 |
+-- | 40000066 |         34 |    8 |
+-- | 50000005 |         24 |    8 |
+-- | 40000061 |         35 |    8 |
+-- | 50000105 |          4 |    8 |
+-- | 40000062 |          4 |    8 |
+-- | 50000104 |         35 |    8 |
+-- | 50000104 |         32 |    8 |
+-- | 40000062 |         35 |    8 |
+-- | 50000104 |         26 |    8 |
+-- | 50000104 |         12 |    8 |
+-- | 40000063 |         12 |    8 |
+-- | 50000105 |         27 |    8 |
+-- | 40000061 |         32 |    8 |
+-- | 40000061 |         26 |    8 |
+-- | 50000106 |         27 |    8 |
+-- | 40000051 |         30 |    8 |
+-- | 50000106 |         12 |    8 |
+-- | 40000052 |         14 |    8 |
+-- | 40000052 |         24 |    8 |
+-- | 40000052 |         30 |    8 |
+-- | 40000061 |          1 |    8 |
+-- | 50000105 |         35 |    8 |
+-- | 40000061 |         12 |    8 |
+-- | 50000104 |          1 |    8 |
+-- | 40000063 |         27 |    8 |
+-- | 40000065 |          4 |    8 |
+-- | 50000102 |         27 |    8 |
+-- | 40000065 |         27 |    8 |
+-- | 50000102 |          4 |    8 |
+-- | 40000065 |         35 |    8 |
+-- | 50000101 |         35 |    8 |
+-- | 50000101 |         32 |    8 |
+-- | 40000066 |         12 |    8 |
+-- | 50000101 |         26 |    8 |
+-- | 50000102 |         35 |    8 |
+-- | 40000064 |         35 |    8 |
+-- | 40000064 |         32 |    8 |
+-- | 50000103 |         36 |    8 |
+-- | 50000103 |         34 |    8 |
+-- | 40000063 |         34 |    8 |
+-- | 40000063 |         36 |    8 |
+-- | 40000064 |          1 |    8 |
+-- | 50000103 |         27 |    8 |
+-- | 40000064 |         12 |    8 |
+-- | 40000064 |         26 |    8 |
+-- | 50000103 |         12 |    8 |
+-- | 40000066 |         27 |    8 |
+-- | 50000085 |          8 |    8 |
+-- | 50000084 |          5 |    8 |
+-- | 50000004 |         22 |    8 |
+-- | 50000004 |         24 |    8 |
+-- | 50000005 |          1 |    8 |
+-- | 50000010 |          5 |    8 |
+-- | 50000005 |          8 |    8 |
+-- | 50000083 |         21 |    8 |
+-- | 50000005 |         23 |    8 |
+-- | 50000084 |          7 |    8 |
+-- | 50000004 |          7 |    8 |
+-- | 50000002 |         23 |    8 |
+-- | 50000002 |         24 |    8 |
+-- | 50000085 |          1 |    8 |
+-- | 50000084 |         24 |    8 |
+-- | 50000003 |         11 |    8 |
+-- | 50000003 |         21 |    8 |
+-- | 50000084 |         22 |    8 |
+-- | 50000004 |          5 |    8 |
+-- | 50000083 |         11 |    8 |
+-- | 40000062 |         27 |    8 |
+-- | 50000006 |         11 |    8 |
+-- | 50000008 |          8 |    8 |
+-- | 50000081 |         24 |    8 |
+-- | 50000008 |         23 |    8 |
+-- | 50000008 |         24 |    8 |
+-- | 50000081 |         22 |    8 |
+-- | 50000009 |         11 |    8 |
+-- | 50000009 |         21 |    8 |
+-- | 50000081 |          7 |    8 |
+-- | 50000082 |          1 |    8 |
+-- | 50000008 |          1 |    8 |
+-- | 50000006 |         21 |    8 |
+-- | 50000082 |         24 |    8 |
+-- | 50000082 |         23 |    8 |
+-- | 50000007 |          5 |    8 |
+-- | 50000007 |          7 |    8 |
+-- | 50000082 |          8 |    8 |
+-- | 50000007 |         22 |    8 |
+-- | 50000007 |         24 |    8 |
+-- | 50000081 |          5 |    8 |
+-- | 50000001 |          5 |    8 |
+-- | 50000085 |         23 |    8 |
+-- | 50000001 |         24 |    8 |
+-- | 50000001 |          7 |    8 |
+-- | 50000002 |          1 |    8 |
+-- | 50000002 |          8 |    8 |
+-- | 50000086 |         11 |    8 |
+-- | 40000072 |         34 |    8 |
+-- | 50000085 |         24 |    8 |
+-- | 50000001 |         22 |    8 |
+-- | 40000072 |         36 |    8 |
+-- | 30000007 |         26 |    8 |
+-- | 30000007 |         32 |    8 |
+-- | 30000008 |         35 |    8 |
+-- | 30000042 |          1 |    8 |
+-- | 29000072 |         14 |    8 |
+-- | 29000082 |         25 |    8 |
+-- | 29000072 |         11 |    8 |
+-- | 30000007 |         12 |    8 |
+-- | 30000008 |         27 |    8 |
+-- | 29000065 |         14 |    8 |
+-- | 29000067 |         14 |    8 |
+-- | 29000082 |         10 |    8 |
+-- | 29000065 |          9 |    8 |
+-- | 29000009 |          9 |    8 |
+-- | 29000066 |          1 |    8 |
+-- | 30000007 |         35 |    8 |
+-- | 29000065 |          2 |    8 |
+-- | 29000081 |         14 |    8 |
+-- | 30000008 |          4 |    8 |
+-- | 30000042 |         11 |    8 |
+-- | 29000082 |          1 |    8 |
+-- | 29000081 |          9 |    8 |
+-- | 29000081 |          2 |    8 |
+-- | 30000009 |         12 |    8 |
+-- | 30000009 |         27 |    8 |
+-- | 30000010 |         35 |    8 |
+-- | 29000066 |         25 |    8 |
+-- | 30000012 |         36 |    8 |
+-- | 30000011 |          4 |    8 |
+-- | 29000069 |         14 |    8 |
+-- | 29000084 |         11 |    8 |
+-- | 29000069 |          9 |    8 |
+-- | 30000012 |         34 |    8 |
+-- | 29000067 |         11 |    8 |
+-- | 29000069 |          2 |    8 |
+-- | 30000011 |         27 |    8 |
+-- | 30000012 |         27 |    8 |
+-- | 29000068 |         11 |    8 |
+-- | 30000011 |         35 |    8 |
+-- | 29000068 |          9 |    8 |
+-- | 30000010 |         32 |    8 |
+-- | 29000070 |          1 |    8 |
+-- | 29000072 |          9 |    8 |
+-- | 30000041 |         15 |    8 |
+-- | 29000071 |         14 |    8 |
+-- | 29000071 |         11 |    8 |
+-- | 29000066 |         10 |    8 |
+-- | 30000009 |         34 |    8 |
+-- | 30000009 |         36 |    8 |
+-- | 29000068 |         14 |    8 |
+-- | 29000070 |         25 |    8 |
+-- | 30000010 |          1 |    8 |
+-- | 30000010 |         12 |    8 |
+-- | 30000041 |          7 |    8 |
+-- | 30000010 |         26 |    8 |
+-- | 30000041 |          3 |    8 |
+-- | 29000070 |         10 |    8 |
+-- | 30000012 |         12 |    8 |
+-- | 29000090 |         10 |    8 |
+-- | 29000111 |         14 |    8 |
+-- | 29000111 |         11 |    8 |
+-- | 29000101 |          2 |    8 |
+-- | 29000101 |          9 |    8 |
+-- | 29000110 |         25 |    8 |
+-- | 29000101 |         14 |    8 |
+-- | 29000110 |         10 |    8 |
+-- | 29000102 |          1 |    8 |
+-- | 29000092 |         14 |    8 |
+-- | 29000092 |         11 |    8 |
+-- | 29000112 |          9 |    8 |
+-- | 30000001 |         12 |    8 |
+-- | 29000090 |         25 |    8 |
+-- | 30000001 |          1 |    8 |
+-- | 29000091 |         11 |    8 |
+-- | 29000091 |         14 |    8 |
+-- | 29000112 |         14 |    8 |
+-- | 29000112 |         11 |    8 |
+-- | 29000092 |          9 |    8 |
+-- | 29000102 |         10 |    8 |
+-- | 29000110 |          1 |    8 |
+-- | 29000108 |          9 |    8 |
+-- | 29000105 |          2 |    8 |
+-- | 29000105 |          9 |    8 |
+-- | 29000107 |         14 |    8 |
+-- | 29000105 |         14 |    8 |
+-- | 29000107 |         11 |    8 |
+-- | 29000106 |          1 |    8 |
+-- | 29000106 |         25 |    8 |
+-- | 29000104 |         14 |    8 |
+-- | 29000104 |         11 |    8 |
+-- | 29000108 |         11 |    8 |
+-- | 29000109 |         14 |    8 |
+-- | 29000102 |         25 |    8 |
+-- | 30000042 |         19 |    8 |
+-- | 29000109 |          2 |    8 |
+-- | 29000103 |         11 |    8 |
+-- | 29000103 |         14 |    8 |
+-- | 29000104 |          9 |    8 |
+-- | 29000108 |         14 |    8 |
+-- | 29000106 |         10 |    8 |
+-- | 30000001 |         26 |    8 |
+-- | 30000007 |          1 |    8 |
+-- | 30000005 |         27 |    8 |
+-- | 29000085 |         14 |    8 |
+-- | 29000109 |          9 |    8 |
+-- | 30000005 |          4 |    8 |
+-- | 30000004 |         35 |    8 |
+-- | 30000004 |         32 |    8 |
+-- | 29000086 |          1 |    8 |
+-- | 29000086 |         10 |    8 |
+-- | 29000085 |          9 |    8 |
+-- | 29000085 |          2 |    8 |
+-- | 29000084 |         14 |    8 |
+-- | 30000006 |         36 |    8 |
+-- | 29000083 |         11 |    8 |
+-- | 30000006 |         34 |    8 |
+-- | 29000083 |         14 |    8 |
+-- | 29000084 |          9 |    8 |
+-- | 30000006 |         27 |    8 |
+-- | 30000006 |         12 |    8 |
+-- | 30000005 |         35 |    8 |
+-- | 30000004 |         26 |    8 |
+-- | 30000004 |         12 |    8 |
+-- | 30000002 |         35 |    8 |
+-- | 30000002 |         27 |    8 |
+-- | 29000089 |          2 |    8 |
+-- | 29000089 |          9 |    8 |
+-- | 30000002 |          4 |    8 |
+-- | 29000089 |         14 |    8 |
+-- | 30000001 |         35 |    8 |
+-- | 29000090 |          1 |    8 |
+-- | 29000088 |         14 |    8 |
+-- | 29000088 |         11 |    8 |
+-- | 29000088 |          9 |    8 |
+-- | 29000086 |         25 |    8 |
+-- | 30000004 |          1 |    8 |
+-- | 30000003 |         36 |    8 |
+-- | 30000003 |         34 |    8 |
+-- | 29000087 |         11 |    8 |
+-- | 29000087 |         14 |    8 |
+-- | 30000003 |         27 |    8 |
+-- | 30000003 |         12 |    8 |
+-- | 30000001 |         32 |    8 |
+-- | 29000061 |         14 |    8 |
+-- | 29000052 |         11 |    8 |
+-- | 29000052 |          9 |    8 |
+-- | 29000022 |         25 |    8 |
+-- | 29000030 |         10 |    8 |
+-- | 29000046 |         10 |    8 |
+-- | 29000032 |         11 |    8 |
+-- | 29000030 |          1 |    8 |
+-- | 29000048 |          9 |    8 |
+-- | 29000051 |         14 |    8 |
+-- | 29000023 |         11 |    8 |
+-- | 29000051 |         11 |    8 |
+-- | 29000022 |         10 |    8 |
+-- | 29000046 |          1 |    8 |
+-- | 29000030 |         25 |    8 |
+-- | 29000021 |          2 |    8 |
+-- | 29000045 |          9 |    8 |
+-- | 29000061 |          9 |    8 |
+-- | 29000021 |          9 |    8 |
+-- | 29000031 |         14 |    8 |
+-- | 29000061 |          2 |    8 |
+-- | 29000031 |         11 |    8 |
+-- | 29000021 |         14 |    8 |
+-- | 29000045 |         14 |    8 |
+-- | 29000022 |          1 |    8 |
+-- | 29000052 |         14 |    8 |
+-- | 29000029 |         14 |    8 |
+-- | 29000046 |         25 |    8 |
+-- | 29000025 |          2 |    8 |
+-- | 29000027 |         14 |    8 |
+-- | 29000025 |          9 |    8 |
+-- | 29000049 |         14 |    8 |
+-- | 29000027 |         11 |    8 |
+-- | 29000025 |         14 |    8 |
+-- | 29000049 |          9 |    8 |
+-- | 29000049 |          2 |    8 |
+-- | 29000026 |         25 |    8 |
+-- | 29000026 |          1 |    8 |
+-- | 29000026 |         10 |    8 |
+-- | 29000047 |         14 |    8 |
+-- | 29000028 |          9 |    8 |
+-- | 29000047 |         11 |    8 |
+-- | 29000023 |         14 |    8 |
+-- | 29000029 |          9 |    8 |
+-- | 29000029 |          2 |    8 |
+-- | 29000050 |         25 |    8 |
+-- | 29000028 |         14 |    8 |
+-- | 29000024 |          9 |    8 |
+-- | 29000048 |         14 |    8 |
+-- | 29000024 |         11 |    8 |
+-- | 29000050 |         10 |    8 |
+-- | 29000024 |         14 |    8 |
+-- | 29000028 |         11 |    8 |
+-- | 29000048 |         11 |    8 |
+-- | 29000010 |         25 |    8 |
+-- | 29000011 |         11 |    8 |
+-- | 29000044 |          9 |    8 |
+-- | 29000044 |         11 |    8 |
+-- | 29000042 |         10 |    8 |
+-- | 29000011 |         14 |    8 |
+-- | 29000062 |         25 |    8 |
+-- | 29000064 |          9 |    8 |
+-- | 29000044 |         14 |    8 |
+-- | 29000050 |          1 |    8 |
+-- | 29000010 |          1 |    8 |
+-- | 29000042 |          1 |    8 |
+-- | 29000041 |         14 |    8 |
+-- | 29000063 |         14 |    8 |
+-- | 29000063 |         11 |    8 |
+-- | 29000010 |         10 |    8 |
+-- | 29000043 |         14 |    8 |
+-- | 29000041 |          9 |    8 |
+-- | 29000041 |          2 |    8 |
+-- | 29000064 |         11 |    8 |
+-- | 29000032 |         14 |    8 |
+-- | 29000009 |         14 |    8 |
+-- | 29000062 |          1 |    8 |
+-- | 29000012 |          9 |    8 |
+-- | 29000012 |         14 |    8 |
+-- | 29000043 |         11 |    8 |
+-- | 29000032 |          9 |    8 |
+-- | 29000045 |          2 |    8 |
+-- | 29000042 |         25 |    8 |
+-- | 29000064 |         14 |    8 |
+-- | 29000062 |         10 |    8 |
+-- | 29000012 |         11 |    8 |
+-- | 28000091 |         11 |    8 |
+-- | 28000092 |         11 |    8 |
+-- | 28000070 |         10 |    8 |
+-- | 28000081 |          2 |    8 |
+-- | 28000070 |          1 |    8 |
+-- | 28000092 |          9 |    8 |
+-- | 28000091 |         14 |    8 |
+-- | 28000090 |         25 |    8 |
+-- | 28000081 |         14 |    8 |
+-- | 28000052 |         14 |    8 |
+-- | 28000069 |         14 |    8 |
+-- | 28000110 |         25 |    8 |
+-- | 28000051 |         11 |    8 |
+-- | 28000052 |         11 |    8 |
+-- | 28000104 |          9 |    8 |
+-- | 28000088 |         11 |    8 |
+-- | 28000052 |          9 |    8 |
+-- | 28000081 |          9 |    8 |
+-- | 28000090 |         10 |    8 |
+-- | 28000051 |         14 |    8 |
+-- | 28000104 |         11 |    8 |
+-- | 28000050 |         25 |    8 |
+-- | 28000049 |          2 |    8 |
+-- | 28000102 |          1 |    8 |
+-- | 28000072 |          9 |    8 |
+-- | 28000107 |         14 |    8 |
+-- | 28000102 |         10 |    8 |
+-- | 28000048 |         14 |    8 |
+-- | 28000048 |         11 |    8 |
+-- | 28000107 |         11 |    8 |
+-- | 28000071 |         14 |    8 |
+-- | 28000048 |          9 |    8 |
+-- | 28000032 |          9 |    8 |
+-- | 28000102 |         25 |    8 |
+-- | 28000049 |          9 |    8 |
+-- | 28000103 |         11 |    8 |
+-- | 28000072 |         11 |    8 |
+-- | 28000092 |         14 |    8 |
+-- | 28000111 |         11 |    8 |
+-- | 28000050 |         10 |    8 |
+-- | 28000072 |         14 |    8 |
+-- | 28000111 |         14 |    8 |
+-- | 28000050 |          1 |    8 |
+-- | 28000103 |         14 |    8 |
+-- | 28000101 |          2 |    8 |
+-- | 28000070 |         25 |    8 |
+-- | 28000101 |          9 |    8 |
+-- | 28000049 |         14 |    8 |
+-- | 28000101 |         14 |    8 |
+-- | 28000063 |         14 |    8 |
+-- | 28000084 |         11 |    8 |
+-- | 28000085 |         14 |    8 |
+-- | 28000065 |          9 |    8 |
+-- | 28000105 |         14 |    8 |
+-- | 28000086 |          1 |    8 |
+-- | 28000106 |         10 |    8 |
+-- | 28000082 |         25 |    8 |
+-- | 28000064 |         14 |    8 |
+-- | 28000109 |         14 |    8 |
+-- | 28000086 |         10 |    8 |
+-- | 28000108 |         14 |    8 |
+-- | 28000064 |         11 |    8 |
+-- | 28000068 |          9 |    8 |
+-- | 28000064 |          9 |    8 |
+-- | 28000071 |         11 |    8 |
+-- | 28000109 |          9 |    8 |
+-- | 28000066 |         25 |    8 |
+-- | 28000106 |          1 |    8 |
+-- | 28000084 |         14 |    8 |
+-- | 28000084 |          9 |    8 |
+-- | 28000066 |         10 |    8 |
+-- | 28000083 |         14 |    8 |
+-- | 28000083 |         11 |    8 |
+-- | 28000085 |          2 |    8 |
+-- | 28000109 |          2 |    8 |
+-- | 28000066 |          1 |    8 |
+-- | 28000085 |          9 |    8 |
+-- | 28000067 |         11 |    8 |
+-- | 28000067 |         14 |    8 |
+-- | 28000086 |         25 |    8 |
+-- | 28000105 |          9 |    8 |
+-- | 28000062 |          1 |    8 |
+-- | 28000106 |         25 |    8 |
+-- | 28000089 |          2 |    8 |
+-- | 28000069 |          2 |    8 |
+-- | 28000065 |         14 |    8 |
+-- | 28000061 |         14 |    8 |
+-- | 28000089 |          9 |    8 |
+-- | 28000108 |          9 |    8 |
+-- | 28000104 |         14 |    8 |
+-- | 28000061 |          9 |    8 |
+-- | 28000069 |          9 |    8 |
+-- | 28000089 |         14 |    8 |
+-- | 28000061 |          2 |    8 |
+-- | 28000110 |         10 |    8 |
+-- | 28000082 |          1 |    8 |
+-- | 28000105 |          2 |    8 |
+-- | 28000082 |         10 |    8 |
+-- | 28000063 |         11 |    8 |
+-- | 28000068 |         11 |    8 |
+-- | 28000087 |         11 |    8 |
+-- | 28000108 |         11 |    8 |
+-- | 28000087 |         14 |    8 |
+-- | 28000088 |          9 |    8 |
+-- | 28000068 |         14 |    8 |
+-- | 28000110 |          1 |    8 |
+-- | 28000062 |         25 |    8 |
+-- | 28000088 |         14 |    8 |
+-- | 28000062 |         10 |    8 |
+-- | 28000090 |          1 |    8 |
+-- | 28000112 |          9 |    8 |
+-- | 28000005 |          9 |    8 |
+-- | 28000030 |         25 |    8 |
+-- | 29000002 |         25 |    8 |
+-- | 28000030 |         10 |    8 |
+-- | 28000008 |          9 |    8 |
+-- | 28000008 |         11 |    8 |
+-- | 28000030 |          1 |    8 |
+-- | 28000008 |         14 |    8 |
+-- | 28000009 |          2 |    8 |
+-- | 28000029 |         14 |    8 |
+-- | 29000006 |         25 |    8 |
+-- | 28000029 |          9 |    8 |
+-- | 28000009 |          9 |    8 |
+-- | 28000029 |          2 |    8 |
+-- | 28000009 |         14 |    8 |
+-- | 28000028 |         14 |    8 |
+-- | 28000024 |         14 |    8 |
+-- | 28000031 |         11 |    8 |
+-- | 28000031 |         14 |    8 |
+-- | 28000041 |         14 |    8 |
+-- | 29000002 |          1 |    8 |
+-- | 28000005 |         14 |    8 |
+-- | 28000041 |          9 |    8 |
+-- | 29000003 |         11 |    8 |
+-- | 28000041 |          2 |    8 |
+-- | 28000006 |          1 |    8 |
+-- | 28000006 |         10 |    8 |
+-- | 28000032 |         14 |    8 |
+-- | 28000032 |         11 |    8 |
+-- | 29000007 |         14 |    8 |
+-- | 28000006 |         25 |    8 |
+-- | 29000007 |         11 |    8 |
+-- | 28000007 |         11 |    8 |
+-- | 28000007 |         14 |    8 |
+-- | 29000003 |         14 |    8 |
+-- | 28000028 |         11 |    8 |
+-- | 28000028 |          9 |    8 |
+-- | 28000025 |          9 |    8 |
+-- | 29000004 |         14 |    8 |
+-- | 28000025 |          2 |    8 |
+-- | 28000012 |         11 |    8 |
+-- | 28000012 |         14 |    8 |
+-- | 28000024 |         11 |    8 |
+-- | 28000021 |          2 |    8 |
+-- | 28000021 |          9 |    8 |
+-- | 29000005 |         14 |    8 |
+-- | 28000021 |         14 |    8 |
+-- | 28000023 |         14 |    8 |
+-- | 28000023 |         11 |    8 |
+-- | 28000022 |          1 |    8 |
+-- | 29000005 |          2 |    8 |
+-- | 28000022 |         10 |    8 |
+-- | 28000012 |          9 |    8 |
+-- | 29000006 |          1 |    8 |
+-- | 28000025 |         14 |    8 |
+-- | 28000024 |          9 |    8 |
+-- | 28000010 |          1 |    8 |
+-- | 28000027 |         14 |    8 |
+-- | 28000010 |         10 |    8 |
+-- | 29000006 |         10 |    8 |
+-- | 28000027 |         11 |    8 |
+-- | 28000010 |         25 |    8 |
+-- | 28000026 |         25 |    8 |
+-- | 29000005 |          9 |    8 |
+-- | 28000011 |         11 |    8 |
+-- | 29000004 |          9 |    8 |
+-- | 28000026 |         10 |    8 |
+-- | 28000011 |         14 |    8 |
+-- | 28000026 |          1 |    8 |
+-- | 29000004 |         11 |    8 |
+-- | 28000022 |         25 |    8 |
+-- | 29000001 |          9 |    8 |
+-- | 29000008 |         11 |    8 |
+-- | 28000002 |          1 |    8 |
+-- | 28000112 |         14 |    8 |
+-- | 28000002 |         10 |    8 |
+-- | 29000009 |          2 |    8 |
+-- | 28000046 |         25 |    8 |
+-- | 28000043 |         14 |    8 |
+-- | 28000001 |         14 |    8 |
+-- | 28000004 |         11 |    8 |
+-- | 28000043 |         11 |    8 |
+-- | 28000112 |         11 |    8 |
+-- | 28000003 |         14 |    8 |
+-- | 28000044 |          9 |    8 |
+-- | 28000002 |         25 |    8 |
+-- | 28000045 |          2 |    8 |
+-- | 29000008 |         14 |    8 |
+-- | 28000045 |         14 |    8 |
+-- | 28000044 |         14 |    8 |
+-- | 29000001 |          2 |    8 |
+-- | 28000046 |          1 |    8 |
+-- | 28000003 |         11 |    8 |
+-- | 28000045 |          9 |    8 |
+-- | 28000046 |         10 |    8 |
+-- | 28000044 |         11 |    8 |
+-- | 28000065 |          2 |    8 |
+-- | 28000001 |          9 |    8 |
+-- | 28000047 |         14 |    8 |
+-- | 28000001 |          2 |    8 |
+-- | 28000047 |         11 |    8 |
+-- | 28000004 |          9 |    8 |
+-- | 28000042 |         25 |    8 |
+-- | 29000001 |         14 |    8 |
+-- | 28000004 |         14 |    8 |
+-- | 29000002 |         10 |    8 |
+-- | 28000042 |          1 |    8 |
+-- | 28000042 |         10 |    8 |
+-- | 29000008 |          9 |    8 |
+-- | 28000005 |          2 |    8 |
+-- | 30000111 |         27 |    8 |
+-- | 30000089 |          7 |    8 |
+-- | 30000088 |         19 |    8 |
+-- | 30000088 |          1 |    8 |
+-- | 30000108 |         27 |    8 |
+-- | 30000110 |         32 |    8 |
+-- | 30000110 |         12 |    8 |
+-- | 30000112 |         12 |    8 |
+-- | 30000110 |         35 |    8 |
+-- | 30000109 |         36 |    8 |
+-- | 30000111 |         35 |    8 |
+-- | 30000111 |          4 |    8 |
+-- | 30000087 |         15 |    8 |
+-- | 30000089 |          6 |    8 |
+-- | 30000110 |          1 |    8 |
+-- | 30000110 |         26 |    8 |
+-- | 30000088 |         11 |    8 |
+-- | 30000109 |         34 |    8 |
+-- | 30000109 |         27 |    8 |
+-- | 30000109 |         12 |    8 |
+-- | 30000101 |         26 |    8 |
+-- | 30000101 |         12 |    8 |
+-- | 30000104 |         32 |    8 |
+-- | 30000104 |         35 |    8 |
+-- | 30000101 |          1 |    8 |
+-- | 30000105 |          4 |    8 |
+-- | 30000105 |         27 |    8 |
+-- | 30000092 |          7 |    8 |
+-- | 30000104 |         26 |    8 |
+-- | 30000104 |         12 |    8 |
+-- | 30000102 |         35 |    8 |
+-- | 30000103 |         12 |    8 |
+-- | 30000102 |          4 |    8 |
+-- | 30000103 |         27 |    8 |
+-- | 30000101 |         32 |    8 |
+-- | 30000103 |         34 |    8 |
+-- | 30000103 |         36 |    8 |
+-- | 30000104 |          1 |    8 |
+-- | 30000105 |         35 |    8 |
+-- | 30000106 |         12 |    8 |
+-- | 30000091 |          1 |    8 |
+-- | 30000107 |         35 |    8 |
+-- | 30000090 |         15 |    8 |
+-- | 30000108 |          4 |    8 |
+-- | 30000090 |          7 |    8 |
+-- | 30000106 |         34 |    8 |
+-- | 30000108 |         35 |    8 |
+-- | 30000090 |          3 |    8 |
+-- | 30000107 |         32 |    8 |
+-- | 30000107 |         26 |    8 |
+-- | 30000092 |          6 |    8 |
+-- | 30000106 |         27 |    8 |
+-- | 30000101 |         35 |    8 |
+-- | 30000106 |         36 |    8 |
+-- | 30000107 |          1 |    8 |
+-- | 30000091 |         19 |    8 |
+-- | 30000107 |         12 |    8 |
+-- | 30000091 |         11 |    8 |
+-- | 30000102 |         27 |    8 |
+-- | 40000026 |         12 |    8 |
+-- | 40000029 |         36 |    8 |
+-- | 40000030 |          1 |    8 |
+-- | 40000030 |         12 |    8 |
+-- | 40000030 |         26 |    8 |
+-- | 40000030 |         32 |    8 |
+-- | 40000030 |         35 |    8 |
+-- | 40000031 |          4 |    8 |
+-- | 40000031 |         27 |    8 |
+-- | 40000031 |         35 |    8 |
+-- | 40000032 |         12 |    8 |
+-- | 40000032 |         27 |    8 |
+-- | 40000029 |         34 |    8 |
+-- | 40000029 |         27 |    8 |
+-- | 40000029 |         12 |    8 |
+-- | 40000026 |         27 |    8 |
+-- | 40000026 |         34 |    8 |
+-- | 40000026 |         36 |    8 |
+-- | 40000027 |          1 |    8 |
+-- | 40000027 |         12 |    8 |
+-- | 40000027 |         26 |    8 |
+-- | 40000027 |         32 |    8 |
+-- | 40000027 |         35 |    8 |
+-- | 40000028 |          4 |    8 |
+-- | 40000028 |         27 |    8 |
+-- | 40000028 |         35 |    8 |
+-- | 40000032 |         34 |    8 |
+-- | 40000032 |         36 |    8 |
+-- | 40000041 |          3 |    8 |
+-- | 40000046 |         30 |    8 |
+-- | 40000047 |          3 |    8 |
+-- | 40000047 |         17 |    8 |
+-- | 40000048 |          1 |    8 |
+-- | 40000048 |         13 |    8 |
+-- | 40000048 |         30 |    8 |
+-- | 40000049 |         14 |    8 |
+-- | 40000049 |         24 |    8 |
+-- | 40000049 |         30 |    8 |
+-- | 40000050 |          3 |    8 |
+-- | 40000050 |         17 |    8 |
+-- | 40000046 |         24 |    8 |
+-- | 40000046 |         14 |    8 |
+-- | 40000045 |         30 |    8 |
+-- | 40000041 |         17 |    8 |
+-- | 40000042 |          1 |    8 |
+-- | 40000042 |         13 |    8 |
+-- | 40000042 |         30 |    8 |
+-- | 40000043 |         14 |    8 |
+-- | 40000043 |         24 |    8 |
+-- | 40000043 |         30 |    8 |
+-- | 40000044 |          3 |    8 |
+-- | 40000044 |         17 |    8 |
+-- | 40000045 |          1 |    8 |
+-- | 40000045 |         13 |    8 |
+-- | 40000051 |          1 |    8 |
+-- | 30000112 |         27 |    8 |
+-- | 40000005 |         30 |    8 |
+-- | 40000006 |         14 |    8 |
+-- | 40000006 |         24 |    8 |
+-- | 40000006 |         30 |    8 |
+-- | 40000007 |          3 |    8 |
+-- | 40000007 |         17 |    8 |
+-- | 40000008 |          1 |    8 |
+-- | 40000008 |         13 |    8 |
+-- | 40000008 |         30 |    8 |
+-- | 40000009 |         14 |    8 |
+-- | 40000009 |         24 |    8 |
+-- | 40000005 |         13 |    8 |
+-- | 40000005 |          1 |    8 |
+-- | 40000004 |         17 |    8 |
+-- | 30000112 |         34 |    8 |
+-- | 30000112 |         36 |    8 |
+-- | 40000001 |          3 |    8 |
+-- | 40000001 |         17 |    8 |
+-- | 40000002 |          1 |    8 |
+-- | 40000002 |         13 |    8 |
+-- | 40000002 |         30 |    8 |
+-- | 40000003 |         14 |    8 |
+-- | 40000003 |         24 |    8 |
+-- | 40000003 |         30 |    8 |
+-- | 40000004 |          3 |    8 |
+-- | 40000009 |         30 |    8 |
+-- | 40000010 |          3 |    8 |
+-- | 40000010 |         17 |    8 |
+-- | 40000023 |         12 |    8 |
+-- | 40000023 |         27 |    8 |
+-- | 40000023 |         34 |    8 |
+-- | 40000023 |         36 |    8 |
+-- | 40000024 |          1 |    8 |
+-- | 40000024 |         12 |    8 |
+-- | 40000024 |         26 |    8 |
+-- | 40000024 |         32 |    8 |
+-- | 40000024 |         35 |    8 |
+-- | 40000025 |          4 |    8 |
+-- | 40000025 |         27 |    8 |
+-- | 40000022 |         35 |    8 |
+-- | 40000022 |         27 |    8 |
+-- | 40000022 |          4 |    8 |
+-- | 40000011 |          1 |    8 |
+-- | 40000011 |         13 |    8 |
+-- | 40000011 |         30 |    8 |
+-- | 40000012 |         14 |    8 |
+-- | 40000012 |         24 |    8 |
+-- | 40000012 |         30 |    8 |
+-- | 40000021 |          1 |    8 |
+-- | 40000021 |         12 |    8 |
+-- | 40000021 |         26 |    8 |
+-- | 40000021 |         32 |    8 |
+-- | 40000021 |         35 |    8 |
+-- | 40000025 |         35 |    8 |
+-- | 30000067 |         26 |    8 |
+-- | 40000051 |         13 |    8 |
+-- | 30000082 |         11 |    8 |
+-- | 30000047 |         15 |    8 |
+-- | 30000063 |         12 |    8 |
+-- | 30000066 |         27 |    8 |
+-- | 30000082 |          1 |    8 |
+-- | 30000070 |         12 |    8 |
+-- | 30000063 |         27 |    8 |
+-- | 30000045 |          1 |    8 |
+-- | 30000081 |         15 |    8 |
+-- | 30000070 |         26 |    8 |
+-- | 30000081 |          7 |    8 |
+-- | 30000066 |         34 |    8 |
+-- | 30000061 |          1 |    8 |
+-- | 30000044 |         15 |    8 |
+-- | 30000069 |         34 |    8 |
+-- | 30000044 |          3 |    8 |
+-- | 30000067 |          1 |    8 |
+-- | 30000083 |          7 |    8 |
+-- | 30000044 |          7 |    8 |
+-- | 30000083 |          6 |    8 |
+-- | 30000069 |         36 |    8 |
+-- | 30000066 |         36 |    8 |
+-- | 30000062 |         35 |    8 |
+-- | 30000082 |         19 |    8 |
+-- | 30000051 |         11 |    8 |
+-- | 30000070 |          1 |    8 |
+-- | 30000081 |          3 |    8 |
+-- | 30000070 |         32 |    8 |
+-- | 30000063 |         34 |    8 |
+-- | 30000072 |         12 |    8 |
+-- | 30000064 |         32 |    8 |
+-- | 30000050 |          3 |    8 |
+-- | 30000045 |         19 |    8 |
+-- | 30000050 |         15 |    8 |
+-- | 30000065 |         27 |    8 |
+-- | 30000064 |         35 |    8 |
+-- | 30000071 |         35 |    8 |
+-- | 30000046 |          6 |    8 |
+-- | 30000050 |          7 |    8 |
+-- | 30000065 |          4 |    8 |
+-- | 30000046 |          7 |    8 |
+-- | 30000064 |         26 |    8 |
+-- | 30000071 |          4 |    8 |
+-- | 30000064 |         12 |    8 |
+-- | 30000047 |          7 |    8 |
+-- | 30000051 |          1 |    8 |
+-- | 30000072 |         36 |    8 |
+-- | 30000066 |         12 |    8 |
+-- | 30000063 |         36 |    8 |
+-- | 30000064 |          1 |    8 |
+-- | 30000072 |         34 |    8 |
+-- | 30000070 |         35 |    8 |
+-- | 30000047 |          3 |    8 |
+-- | 30000045 |         11 |    8 |
+-- | 30000072 |         27 |    8 |
+-- | 30000065 |         35 |    8 |
+-- | 30000071 |         27 |    8 |
+-- | 30000068 |         27 |    8 |
+-- | 30000085 |         19 |    8 |
+-- | 30000043 |          7 |    8 |
+-- | 30000085 |          1 |    8 |
+-- | 30000061 |         32 |    8 |
+-- | 30000085 |         11 |    8 |
+-- | 30000069 |         12 |    8 |
+-- | 30000061 |         35 |    8 |
+-- | 30000049 |          6 |    8 |
+-- | 30000052 |          7 |    8 |
+-- | 30000067 |         35 |    8 |
+-- | 30000086 |          6 |    8 |
+-- | 30000061 |         26 |    8 |
+-- | 30000087 |          7 |    8 |
+-- | 30000048 |         19 |    8 |
+-- | 30000087 |          3 |    8 |
+-- | 30000068 |          4 |    8 |
+-- | 30000061 |         12 |    8 |
+-- | 30000068 |         35 |    8 |
+-- | 30000043 |          6 |    8 |
+-- | 30000086 |          7 |    8 |
+-- | 30000048 |         11 |    8 |
+-- | 30000067 |         32 |    8 |
+-- | 30000062 |          4 |    8 |
+-- | 30000067 |         12 |    8 |
+-- | 30000069 |         27 |    8 |
+-- | 30000048 |          1 |    8 |
+-- | 30000084 |          7 |    8 |
+-- | 30000049 |          7 |    8 |
+-- | 30000084 |          3 |    8 |
+-- | 30000084 |         15 |    8 |
+-- | 30000051 |         19 |    8 |
+-- | 30000052 |          6 |    8 |
+-- | 30000062 |         27 |    8 |
+-- | 60000050 |         22 |    8 |
+-- | 60000051 |         22 |    8 |
+-- | 60000030 |          1 |    8 |
+-- | 60000071 |          4 |    8 |
+-- | 60000051 |          3 |    8 |
+-- | 60000063 |         27 |    8 |
+-- | 60000029 |         27 |    8 |
+-- | 60000050 |         21 |    8 |
+-- | 60000028 |         27 |    8 |
+-- | 60000029 |         12 |    8 |
+-- | 60000029 |         36 |    8 |
+-- | 60000028 |         35 |    8 |
+-- | 60000063 |         12 |    8 |
+-- | 60000071 |         27 |    8 |
+-- | 60000087 |         22 |    8 |
+-- | 60000029 |         34 |    8 |
+-- | 60000071 |         35 |    8 |
+-- | 60000031 |          4 |    8 |
+-- | 60000070 |         35 |    8 |
+-- | 60000051 |          1 |    8 |
+-- | 60000051 |         10 |    8 |
+-- | 60000026 |         34 |    8 |
+-- | 60000026 |         27 |    8 |
+-- | 60000081 |         21 |    8 |
+-- | 60000081 |         22 |    8 |
+-- | 60000062 |         27 |    8 |
+-- | 60000026 |         12 |    8 |
+-- | 60000082 |         10 |    8 |
+-- | 60000061 |         12 |    8 |
+-- | 60000082 |          1 |    8 |
+-- | 60000025 |         35 |    8 |
+-- | 60000082 |          3 |    8 |
+-- | 60000061 |         26 |    8 |
+-- | 60000025 |         27 |    8 |
+-- | 60000061 |         32 |    8 |
+-- | 60000082 |         22 |    8 |
+-- | 60000062 |          4 |    8 |
+-- | 60000061 |          1 |    8 |
+-- | 60000072 |         12 |    8 |
+-- | 60000081 |          9 |    8 |
+-- | 60000028 |          4 |    8 |
+-- | 60000072 |         27 |    8 |
+-- | 60000027 |         35 |    8 |
+-- | 60000052 |          4 |    8 |
+-- | 60000027 |         32 |    8 |
+-- | 60000072 |         34 |    8 |
+-- | 60000062 |         35 |    8 |
+-- | 60000052 |         20 |    8 |
+-- | 60000072 |         36 |    8 |
+-- | 60000027 |         12 |    8 |
+-- | 60000081 |          2 |    8 |
+-- | 60000052 |         23 |    8 |
+-- | 60000052 |         28 |    8 |
+-- | 60000027 |          1 |    8 |
+-- | 60000026 |         36 |    8 |
+-- | 60000027 |         26 |    8 |
+-- | 60000045 |          1 |    8 |
+-- | 60000065 |         27 |    8 |
+-- | 60000067 |         26 |    8 |
+-- | 60000047 |          2 |    8 |
+-- | 60000042 |         22 |    8 |
+-- | 60000047 |          9 |    8 |
+-- | 60000067 |         32 |    8 |
+-- | 60000065 |          4 |    8 |
+-- | 60000047 |         21 |    8 |
+-- | 60000047 |         22 |    8 |
+-- | 60000045 |          3 |    8 |
+-- | 60000042 |          3 |    8 |
+-- | 60000061 |         35 |    8 |
+-- | 60000042 |          1 |    8 |
+-- | 60000067 |         35 |    8 |
+-- | 60000048 |          1 |    8 |
+-- | 60000064 |         35 |    8 |
+-- | 60000041 |         22 |    8 |
+-- | 60000046 |         28 |    8 |
+-- | 60000046 |         23 |    8 |
+-- | 60000043 |          4 |    8 |
+-- | 60000066 |         27 |    8 |
+-- | 60000045 |         10 |    8 |
+-- | 60000066 |         12 |    8 |
+-- | 60000044 |         22 |    8 |
+-- | 60000045 |         22 |    8 |
+-- | 60000044 |         21 |    8 |
+-- | 60000065 |         35 |    8 |
+-- | 60000046 |          4 |    8 |
+-- | 60000044 |          9 |    8 |
+-- | 60000066 |         34 |    8 |
+-- | 60000066 |         36 |    8 |
+-- | 60000044 |          2 |    8 |
+-- | 60000067 |          1 |    8 |
+-- | 60000043 |         28 |    8 |
+-- | 60000046 |         20 |    8 |
+-- | 60000043 |         20 |    8 |
+-- | 60000067 |         12 |    8 |
+-- | 60000041 |         21 |    8 |
+-- | 60000048 |          3 |    8 |
+-- | 60000041 |          9 |    8 |
+-- | 60000069 |         34 |    8 |
+-- | 60000049 |         23 |    8 |
+-- | 60000069 |         36 |    8 |
+-- | 60000043 |         23 |    8 |
+-- | 60000070 |          1 |    8 |
+-- | 60000030 |         35 |    8 |
+-- | 60000070 |         12 |    8 |
+-- | 60000049 |         28 |    8 |
+-- | 60000050 |          2 |    8 |
+-- | 60000030 |         32 |    8 |
+-- | 60000064 |          1 |    8 |
+-- | 60000063 |         36 |    8 |
+-- | 60000030 |         26 |    8 |
+-- | 60000050 |          9 |    8 |
+-- | 60000070 |         26 |    8 |
+-- | 60000030 |         12 |    8 |
+-- | 60000063 |         34 |    8 |
+-- | 60000064 |         12 |    8 |
+-- | 60000049 |         20 |    8 |
+-- | 60000031 |         27 |    8 |
+-- | 60000068 |          4 |    8 |
+-- | 60000048 |         10 |    8 |
+-- | 60000041 |          2 |    8 |
+-- | 60000032 |         36 |    8 |
+-- | 60000032 |         34 |    8 |
+-- | 60000068 |         27 |    8 |
+-- | 60000064 |         32 |    8 |
+-- | 60000048 |         22 |    8 |
+-- | 60000032 |         27 |    8 |
+-- | 60000068 |         35 |    8 |
+-- | 60000032 |         12 |    8 |
+-- | 60000064 |         26 |    8 |
+-- | 60000042 |         10 |    8 |
+-- | 60000049 |          4 |    8 |
+-- | 60000069 |         12 |    8 |
+-- | 60000031 |         35 |    8 |
+-- | 60000069 |         27 |    8 |
+-- | 60000070 |         32 |    8 |
+-- | 60000025 |          4 |    8 |
+-- | 60000102 |         35 |    8 |
+-- | 50000110 |         12 |    8 |
+-- | 60000089 |         28 |    8 |
+-- | 60000007 |          2 |    8 |
+-- | 60000089 |         23 |    8 |
+-- | 60000007 |          9 |    8 |
+-- | 60000103 |         12 |    8 |
+-- | 60000089 |         20 |    8 |
+-- | 60000007 |         21 |    8 |
+-- | 60000006 |         28 |    8 |
+-- | 60000006 |         23 |    8 |
+-- | 60000090 |          2 |    8 |
+-- | 60000090 |         22 |    8 |
+-- | 60000090 |         21 |    8 |
+-- | 60000005 |         22 |    8 |
+-- | 50000110 |         32 |    8 |
+-- | 60000090 |          9 |    8 |
+-- | 60000006 |          4 |    8 |
+-- | 60000006 |         20 |    8 |
+-- | 50000110 |         26 |    8 |
+-- | 60000007 |         22 |    8 |
+-- | 50000110 |          1 |    8 |
+-- | 60000008 |          1 |    8 |
+-- | 60000009 |         20 |    8 |
+-- | 60000103 |         34 |    8 |
+-- | 60000103 |         36 |    8 |
+-- | 60000009 |         23 |    8 |
+-- | 60000009 |         28 |    8 |
+-- | 60000088 |          3 |    8 |
+-- | 60000010 |          2 |    8 |
+-- | 50000109 |         12 |    8 |
+-- | 60000088 |         10 |    8 |
+-- | 60000009 |          4 |    8 |
+-- | 50000109 |         27 |    8 |
+-- | 60000089 |          4 |    8 |
+-- | 60000008 |          3 |    8 |
+-- | 60000008 |         10 |    8 |
+-- | 50000109 |         36 |    8 |
+-- | 60000008 |         22 |    8 |
+-- | 50000109 |         34 |    8 |
+-- | 60000088 |         22 |    8 |
+-- | 60000103 |         27 |    8 |
+-- | 60000104 |          1 |    8 |
+-- | 50000112 |         12 |    8 |
+-- | 60000092 |         23 |    8 |
+-- | 60000001 |          9 |    8 |
+-- | 60000001 |         21 |    8 |
+-- | 60000001 |         22 |    8 |
+-- | 60000092 |         20 |    8 |
+-- | 50000111 |         27 |    8 |
+-- | 60000002 |          1 |    8 |
+-- | 60000102 |          4 |    8 |
+-- | 60000092 |         28 |    8 |
+-- | 60000001 |          2 |    8 |
+-- | 60000101 |          1 |    8 |
+-- | 60000101 |         26 |    8 |
+-- | 60000101 |         32 |    8 |
+-- | 50000112 |         27 |    8 |
+-- | 60000101 |         12 |    8 |
+-- | 50000111 |         35 |    8 |
+-- | 50000112 |         34 |    8 |
+-- | 60000101 |         35 |    8 |
+-- | 50000112 |         36 |    8 |
+-- | 60000002 |          3 |    8 |
+-- | 60000092 |          4 |    8 |
+-- | 60000002 |         10 |    8 |
+-- | 50000111 |          4 |    8 |
+-- | 60000004 |          9 |    8 |
+-- | 60000102 |         27 |    8 |
+-- | 60000004 |         21 |    8 |
+-- | 60000004 |         22 |    8 |
+-- | 60000091 |          1 |    8 |
+-- | 50000110 |         35 |    8 |
+-- | 60000005 |          1 |    8 |
+-- | 60000091 |          3 |    8 |
+-- | 60000004 |          2 |    8 |
+-- | 60000091 |         10 |    8 |
+-- | 60000021 |          1 |    8 |
+-- | 60000002 |         22 |    8 |
+-- | 60000003 |          4 |    8 |
+-- | 60000091 |         22 |    8 |
+-- | 60000003 |         20 |    8 |
+-- | 50000108 |         35 |    8 |
+-- | 60000003 |         23 |    8 |
+-- | 60000003 |         28 |    8 |
+-- | 60000005 |          3 |    8 |
+-- | 60000105 |         27 |    8 |
+-- | 50000107 |         32 |    8 |
+-- | 60000023 |         36 |    8 |
+-- | 60000105 |          4 |    8 |
+-- | 50000106 |         36 |    8 |
+-- | 60000085 |         22 |    8 |
+-- | 60000021 |         35 |    8 |
+-- | 60000021 |         32 |    8 |
+-- | 60000024 |          1 |    8 |
+-- | 60000083 |         28 |    8 |
+-- | 60000021 |         26 |    8 |
+-- | 60000086 |          4 |    8 |
+-- | 60000021 |         12 |    8 |
+-- | 60000104 |         35 |    8 |
+-- | 50000106 |         34 |    8 |
+-- | 60000086 |         20 |    8 |
+-- | 60000022 |          4 |    8 |
+-- | 60000085 |         10 |    8 |
+-- | 50000107 |          1 |    8 |
+-- | 60000023 |         12 |    8 |
+-- | 60000084 |          9 |    8 |
+-- | 60000084 |         21 |    8 |
+-- | 60000084 |         22 |    8 |
+-- | 60000023 |         27 |    8 |
+-- | 50000107 |         12 |    8 |
+-- | 60000022 |         35 |    8 |
+-- | 60000087 |          2 |    8 |
+-- | 60000084 |          2 |    8 |
+-- | 60000023 |         34 |    8 |
+-- | 60000085 |          1 |    8 |
+-- | 60000005 |         10 |    8 |
+-- | 60000022 |         27 |    8 |
+-- | 60000085 |          3 |    8 |
+-- | 50000107 |         26 |    8 |
+-- | 50000108 |          4 |    8 |
+-- | 60000010 |          9 |    8 |
+-- | 60000104 |         26 |    8 |
+-- | 60000088 |          1 |    8 |
+-- | 60000024 |         32 |    8 |
+-- | 60000087 |          9 |    8 |
+-- | 60000011 |         22 |    8 |
+-- | 60000083 |         23 |    8 |
+-- | 60000083 |          4 |    8 |
+-- | 60000011 |         10 |    8 |
+-- | 60000087 |         21 |    8 |
+-- | 60000011 |          3 |    8 |
+-- | 60000011 |          1 |    8 |
+-- | 60000104 |         12 |    8 |
+-- | 60000010 |         22 |    8 |
+-- | 60000010 |         21 |    8 |
+-- | 60000024 |         35 |    8 |
+-- | 60000012 |          4 |    8 |
+-- | 60000105 |         35 |    8 |
+-- | 60000086 |         23 |    8 |
+-- | 60000012 |         28 |    8 |
+-- | 60000104 |         32 |    8 |
+-- | 60000012 |         23 |    8 |
+-- | 50000107 |         35 |    8 |
+-- | 60000086 |         28 |    8 |
+-- | 60000012 |         20 |    8 |
+-- | 60000024 |         12 |    8 |
+-- | 60000083 |         20 |    8 |
+-- | 50000108 |         27 |    8 |
+-- | 60000024 |         26 |    8 |
+-- | 60000067 |         34 |    7 |
+-- | 60000062 |         17 |    7 |
+-- | 60000065 |          1 |    7 |
+-- | 60000062 |          1 |    7 |
+-- | 60000101 |         34 |    7 |
+-- | 60000102 |         17 |    7 |
+-- | 60000105 |         31 |    7 |
+-- | 60000064 |         36 |    7 |
+-- | 60000102 |          1 |    7 |
+-- | 60000101 |         36 |    7 |
+-- | 60000105 |         33 |    7 |
+-- | 60000101 |         31 |    7 |
+-- | 60000064 |         34 |    7 |
+-- | 60000104 |         34 |    7 |
+-- | 60000103 |         17 |    7 |
+-- | 60000063 |         11 |    7 |
+-- | 60000064 |         11 |    7 |
+-- | 60000104 |         31 |    7 |
+-- | 60000064 |          2 |    7 |
+-- | 60000063 |         17 |    7 |
+-- | 60000103 |         26 |    7 |
+-- | 60000104 |         25 |    7 |
+-- | 60000063 |         26 |    7 |
+-- | 60000103 |         33 |    7 |
+-- | 60000104 |         11 |    7 |
+-- | 60000104 |          2 |    7 |
+-- | 60000103 |         11 |    7 |
+-- | 60000063 |          1 |    7 |
+-- | 60000062 |         25 |    7 |
+-- | 60000062 |         31 |    7 |
+-- | 60000102 |         25 |    7 |
+-- | 60000064 |         31 |    7 |
+-- | 60000105 |         25 |    7 |
+-- | 60000105 |         17 |    7 |
+-- | 60000102 |         31 |    7 |
+-- | 60000102 |         33 |    7 |
+-- | 60000062 |         33 |    7 |
+-- | 60000064 |         25 |    7 |
+-- | 60000105 |          1 |    7 |
+-- | 60000104 |         36 |    7 |
+-- | 60000103 |          1 |    7 |
+-- | 60000063 |         33 |    7 |
+-- | 60000088 |          2 |    7 |
+-- | 60000070 |         36 |    7 |
+-- | 60000087 |          1 |    7 |
+-- | 60000071 |          1 |    7 |
+-- | 60000071 |         17 |    7 |
+-- | 60000071 |         25 |    7 |
+-- | 60000071 |         31 |    7 |
+-- | 60000086 |         10 |    7 |
+-- | 60000071 |         33 |    7 |
+-- | 60000083 |          1 |    7 |
+-- | 60000087 |          4 |    7 |
+-- | 60000070 |          2 |    7 |
+-- | 60000070 |         11 |    7 |
+-- | 60000087 |         29 |    7 |
+-- | 60000070 |         25 |    7 |
+-- | 60000087 |         28 |    7 |
+-- | 60000070 |         31 |    7 |
+-- | 60000087 |         20 |    7 |
+-- | 60000070 |         34 |    7 |
+-- | 60000072 |          1 |    7 |
+-- | 60000072 |         11 |    7 |
+-- | 60000086 |          1 |    7 |
+-- | 60000081 |         20 |    7 |
+-- | 60000084 |          4 |    7 |
+-- | 60000084 |          1 |    7 |
+-- | 60000081 |         28 |    7 |
+-- | 60000081 |         29 |    7 |
+-- | 60000082 |          2 |    7 |
+-- | 60000082 |          9 |    7 |
+-- | 60000083 |         10 |    7 |
+-- | 60000084 |         20 |    7 |
+-- | 60000081 |          4 |    7 |
+-- | 60000072 |         17 |    7 |
+-- | 60000072 |         26 |    7 |
+-- | 60000085 |         21 |    7 |
+-- | 60000072 |         33 |    7 |
+-- | 60000085 |          9 |    7 |
+-- | 60000084 |         29 |    7 |
+-- | 60000081 |          1 |    7 |
+-- | 60000084 |         28 |    7 |
+-- | 60000082 |         21 |    7 |
+-- | 60000069 |         33 |    7 |
+-- | 60000065 |         17 |    7 |
+-- | 60000066 |         26 |    7 |
+-- | 60000092 |          1 |    7 |
+-- | 60000066 |         33 |    7 |
+-- | 60000091 |         21 |    7 |
+-- | 60000067 |          2 |    7 |
+-- | 60000091 |          9 |    7 |
+-- | 60000067 |         11 |    7 |
+-- | 60000091 |          2 |    7 |
+-- | 60000092 |         10 |    7 |
+-- | 60000066 |         17 |    7 |
+-- | 60000065 |         25 |    7 |
+-- | 60000101 |         25 |    7 |
+-- | 60000101 |         11 |    7 |
+-- | 60000065 |         31 |    7 |
+-- | 60000101 |          2 |    7 |
+-- | 60000065 |         33 |    7 |
+-- | 60000066 |          1 |    7 |
+-- | 60000066 |         11 |    7 |
+-- | 60000090 |         29 |    7 |
+-- | 60000067 |         25 |    7 |
+-- | 60000090 |         28 |    7 |
+-- | 60000068 |         31 |    7 |
+-- | 60000068 |         33 |    7 |
+-- | 60000069 |          1 |    7 |
+-- | 60000089 |          1 |    7 |
+-- | 60000069 |         11 |    7 |
+-- | 60000088 |         21 |    7 |
+-- | 60000069 |         17 |    7 |
+-- | 60000069 |         26 |    7 |
+-- | 60000089 |         10 |    7 |
+-- | 60000068 |         25 |    7 |
+-- | 60000085 |          2 |    7 |
+-- | 60000067 |         31 |    7 |
+-- | 60000090 |         20 |    7 |
+-- | 60000090 |          4 |    7 |
+-- | 60000067 |         36 |    7 |
+-- | 60000068 |          1 |    7 |
+-- | 60000090 |          1 |    7 |
+-- | 60000068 |         17 |    7 |
+-- | 60000088 |          9 |    7 |
+-- | 60000061 |         36 |    7 |
+-- | 60000010 |          4 |    7 |
+-- | 60000022 |         31 |    7 |
+-- | 60000022 |         33 |    7 |
+-- | 60000023 |          1 |    7 |
+-- | 60000023 |         11 |    7 |
+-- | 60000023 |         17 |    7 |
+-- | 60000023 |         26 |    7 |
+-- | 60000023 |         33 |    7 |
+-- | 60000024 |          2 |    7 |
+-- | 60000024 |         11 |    7 |
+-- | 60000024 |         25 |    7 |
+-- | 60000024 |         31 |    7 |
+-- | 60000024 |         34 |    7 |
+-- | 60000024 |         36 |    7 |
+-- | 60000022 |         25 |    7 |
+-- | 60000022 |         17 |    7 |
+-- | 60000022 |          1 |    7 |
+-- | 60000010 |         20 |    7 |
+-- | 60000010 |         28 |    7 |
+-- | 60000010 |         29 |    7 |
+-- | 60000011 |          2 |    7 |
+-- | 60000011 |          9 |    7 |
+-- | 60000011 |         21 |    7 |
+-- | 60000012 |         10 |    7 |
+-- | 60000021 |          2 |    7 |
+-- | 60000021 |         11 |    7 |
+-- | 60000021 |         25 |    7 |
+-- | 60000021 |         31 |    7 |
+-- | 60000021 |         34 |    7 |
+-- | 60000021 |         36 |    7 |
+-- | 60000025 |          1 |    7 |
+-- | 60000025 |         17 |    7 |
+-- | 60000028 |         25 |    7 |
+-- | 60000028 |         31 |    7 |
+-- | 60000028 |         33 |    7 |
+-- | 60000012 |          1 |    7 |
+-- | 60000029 |          1 |    7 |
+-- | 60000029 |         11 |    7 |
+-- | 60000029 |         17 |    7 |
+-- | 60000029 |         26 |    7 |
+-- | 60000029 |         33 |    7 |
+-- | 60000030 |          2 |    7 |
+-- | 60000030 |         11 |    7 |
+-- | 60000030 |         25 |    7 |
+-- | 60000030 |         31 |    7 |
+-- | 60000028 |         17 |    7 |
+-- | 60000028 |          1 |    7 |
+-- | 60000027 |         36 |    7 |
+-- | 60000025 |         25 |    7 |
+-- | 60000025 |         31 |    7 |
+-- | 60000025 |         33 |    7 |
+-- | 60000026 |          1 |    7 |
+-- | 60000026 |         11 |    7 |
+-- | 60000026 |         17 |    7 |
+-- | 60000026 |         26 |    7 |
+-- | 60000026 |         33 |    7 |
+-- | 60000027 |          2 |    7 |
+-- | 60000027 |         11 |    7 |
+-- | 60000027 |         25 |    7 |
+-- | 60000027 |         31 |    7 |
+-- | 60000027 |         34 |    7 |
+-- | 60000030 |         34 |    7 |
+-- | 50000106 |         33 |    7 |
+-- | 50000110 |          2 |    7 |
+-- | 50000110 |         11 |    7 |
+-- | 50000110 |         25 |    7 |
+-- | 50000110 |         31 |    7 |
+-- | 50000110 |         36 |    7 |
+-- | 50000111 |          1 |    7 |
+-- | 50000111 |         17 |    7 |
+-- | 50000111 |         25 |    7 |
+-- | 50000111 |         31 |    7 |
+-- | 50000111 |         33 |    7 |
+-- | 50000112 |          1 |    7 |
+-- | 50000112 |         11 |    7 |
+-- | 50000112 |         17 |    7 |
+-- | 50000109 |         33 |    7 |
+-- | 50000109 |         26 |    7 |
+-- | 50000109 |         17 |    7 |
+-- | 50000107 |          2 |    7 |
+-- | 50000107 |         11 |    7 |
+-- | 50000107 |         25 |    7 |
+-- | 50000107 |         31 |    7 |
+-- | 50000107 |         34 |    7 |
+-- | 50000107 |         36 |    7 |
+-- | 50000108 |          1 |    7 |
+-- | 50000108 |         17 |    7 |
+-- | 50000108 |         25 |    7 |
+-- | 50000108 |         31 |    7 |
+-- | 50000108 |         33 |    7 |
+-- | 50000109 |          1 |    7 |
+-- | 50000109 |         11 |    7 |
+-- | 50000112 |         26 |    7 |
+-- | 50000112 |         33 |    7 |
+-- | 60000005 |         21 |    7 |
+-- | 60000006 |          1 |    7 |
+-- | 60000006 |         10 |    7 |
+-- | 60000007 |          1 |    7 |
+-- | 60000007 |          4 |    7 |
+-- | 60000007 |         20 |    7 |
+-- | 60000007 |         28 |    7 |
+-- | 60000007 |         29 |    7 |
+-- | 60000008 |          2 |    7 |
+-- | 60000008 |          9 |    7 |
+-- | 60000008 |         21 |    7 |
+-- | 60000009 |          1 |    7 |
+-- | 60000009 |         10 |    7 |
+-- | 60000005 |          9 |    7 |
+-- | 60000005 |          2 |    7 |
+-- | 60000004 |         29 |    7 |
+-- | 60000001 |          1 |    7 |
+-- | 60000001 |          4 |    7 |
+-- | 60000001 |         20 |    7 |
+-- | 60000001 |         28 |    7 |
+-- | 60000001 |         29 |    7 |
+-- | 60000002 |          2 |    7 |
+-- | 60000002 |          9 |    7 |
+-- | 60000002 |         21 |    7 |
+-- | 60000003 |         10 |    7 |
+-- | 60000004 |          1 |    7 |
+-- | 60000004 |          4 |    7 |
+-- | 60000004 |         20 |    7 |
+-- | 60000004 |         28 |    7 |
+-- | 60000010 |          1 |    7 |
+-- | 60000032 |         17 |    7 |
+-- | 60000041 |         28 |    7 |
+-- | 60000041 |         29 |    7 |
+-- | 60000050 |         20 |    7 |
+-- | 60000042 |          2 |    7 |
+-- | 60000050 |          4 |    7 |
+-- | 60000042 |          9 |    7 |
+-- | 60000050 |          1 |    7 |
+-- | 60000042 |         21 |    7 |
+-- | 60000041 |         20 |    7 |
+-- | 60000041 |          4 |    7 |
+-- | 60000051 |         21 |    7 |
+-- | 60000032 |         26 |    7 |
+-- | 60000032 |         33 |    7 |
+-- | 60000051 |          9 |    7 |
+-- | 60000041 |          1 |    7 |
+-- | 60000051 |          2 |    7 |
+-- | 60000050 |         29 |    7 |
+-- | 60000050 |         28 |    7 |
+-- | 60000043 |          1 |    7 |
+-- | 60000049 |         10 |    7 |
+-- | 60000043 |         10 |    7 |
+-- | 60000047 |         28 |    7 |
+-- | 60000047 |         20 |    7 |
+-- | 50000110 |         34 |    7 |
+-- | 60000044 |         29 |    7 |
+-- | 60000045 |          2 |    7 |
+-- | 60000045 |          9 |    7 |
+-- | 60000045 |         21 |    7 |
+-- | 60000047 |          1 |    7 |
+-- | 60000047 |         29 |    7 |
+-- | 60000048 |          2 |    7 |
+-- | 60000049 |          1 |    7 |
+-- | 60000048 |         21 |    7 |
+-- | 60000044 |          1 |    7 |
+-- | 60000003 |          1 |    7 |
+-- | 60000044 |          4 |    7 |
+-- | 60000044 |         20 |    7 |
+-- | 60000044 |         28 |    7 |
+-- | 60000048 |          9 |    7 |
+-- | 60000046 |         10 |    7 |
+-- | 60000052 |          1 |    7 |
+-- | 60000031 |         25 |    7 |
+-- | 60000031 |          1 |    7 |
+-- | 60000061 |          2 |    7 |
+-- | 60000061 |         11 |    7 |
+-- | 60000031 |         17 |    7 |
+-- | 60000031 |         31 |    7 |
+-- | 60000032 |          1 |    7 |
+-- | 60000046 |          1 |    7 |
+-- | 60000061 |         25 |    7 |
+-- | 60000052 |         10 |    7 |
+-- | 60000031 |         33 |    7 |
+-- | 60000061 |         31 |    7 |
+-- | 60000047 |          4 |    7 |
+-- | 60000030 |         36 |    7 |
+-- | 60000032 |         11 |    7 |
+-- | 60000061 |         34 |    7 |
+-- | 29000110 |          2 |    7 |
+-- | 29000028 |          7 |    7 |
+-- | 29000101 |          1 |    7 |
+-- | 29000110 |         12 |    7 |
+-- | 29000042 |          2 |    7 |
+-- | 29000026 |         12 |    7 |
+-- | 29000041 |         37 |    7 |
+-- | 29000092 |         37 |    7 |
+-- | 29000112 |         37 |    7 |
+-- | 30000005 |         31 |    7 |
+-- | 29000027 |          7 |    7 |
+-- | 29000111 |         37 |    7 |
+-- | 29000042 |         12 |    7 |
+-- | 29000027 |         12 |    7 |
+-- | 29000101 |         11 |    7 |
+-- | 29000112 |          1 |    7 |
+-- | 29000027 |         37 |    7 |
+-- | 29000101 |         37 |    7 |
+-- | 29000111 |         12 |    7 |
+-- | 29000028 |          1 |    7 |
+-- | 29000109 |         37 |    7 |
+-- | 29000112 |          7 |    7 |
+-- | 29000102 |          2 |    7 |
+-- | 29000102 |         12 |    7 |
+-- | 29000104 |          1 |    7 |
+-- | 29000107 |          7 |    7 |
+-- | 29000104 |          7 |    7 |
+-- | 29000106 |         12 |    7 |
+-- | 29000108 |          7 |    7 |
+-- | 29000031 |          7 |    7 |
+-- | 29000106 |          2 |    7 |
+-- | 29000105 |         37 |    7 |
+-- | 29000031 |         12 |    7 |
+-- | 29000032 |          7 |    7 |
+-- | 29000105 |         11 |    7 |
+-- | 29000104 |         37 |    7 |
+-- | 29000105 |          1 |    7 |
+-- | 29000031 |         37 |    7 |
+-- | 29000032 |          1 |    7 |
+-- | 29000103 |         37 |    7 |
+-- | 29000030 |         12 |    7 |
+-- | 29000028 |         37 |    7 |
+-- | 29000029 |          1 |    7 |
+-- | 29000103 |          7 |    7 |
+-- | 29000109 |          1 |    7 |
+-- | 29000108 |         37 |    7 |
+-- | 29000029 |         11 |    7 |
+-- | 29000041 |         11 |    7 |
+-- | 29000103 |         12 |    7 |
+-- | 29000029 |         37 |    7 |
+-- | 29000041 |          1 |    7 |
+-- | 29000108 |          1 |    7 |
+-- | 29000107 |         37 |    7 |
+-- | 29000030 |          2 |    7 |
+-- | 29000032 |         37 |    7 |
+-- | 29000107 |         12 |    7 |
+-- | 29000012 |         37 |    7 |
+-- | 30000001 |          2 |    7 |
+-- | 29000021 |         37 |    7 |
+-- | 30000009 |         17 |    7 |
+-- | 30000009 |         26 |    7 |
+-- | 30000009 |         33 |    7 |
+-- | 30000010 |          2 |    7 |
+-- | 30000010 |         11 |    7 |
+-- | 29000012 |          7 |    7 |
+-- | 30000010 |         25 |    7 |
+-- | 29000012 |          1 |    7 |
+-- | 29000011 |         37 |    7 |
+-- | 30000009 |         11 |    7 |
+-- | 29000021 |          1 |    7 |
+-- | 30000009 |          1 |    7 |
+-- | 30000007 |         31 |    7 |
+-- | 30000007 |         34 |    7 |
+-- | 30000007 |         36 |    7 |
+-- | 30000008 |          1 |    7 |
+-- | 29000021 |         11 |    7 |
+-- | 30000008 |         17 |    7 |
+-- | 30000008 |         25 |    7 |
+-- | 30000008 |         31 |    7 |
+-- | 30000008 |         33 |    7 |
+-- | 30000010 |         31 |    7 |
+-- | 30000010 |         34 |    7 |
+-- | 30000010 |         36 |    7 |
+-- | 30000041 |          1 |    7 |
+-- | 29000010 |          2 |    7 |
+-- | 29000009 |         37 |    7 |
+-- | 30000041 |         11 |    7 |
+-- | 30000041 |         18 |    7 |
+-- | 30000041 |         19 |    7 |
+-- | 30000042 |          3 |    7 |
+-- | 30000042 |          8 |    7 |
+-- | 29000009 |         11 |    7 |
+-- | 30000012 |         33 |    7 |
+-- | 29000010 |         12 |    7 |
+-- | 30000012 |         26 |    7 |
+-- | 30000011 |          1 |    7 |
+-- | 29000011 |         12 |    7 |
+-- | 30000011 |         25 |    7 |
+-- | 29000011 |          7 |    7 |
+-- | 30000011 |         31 |    7 |
+-- | 30000011 |         33 |    7 |
+-- | 30000012 |          1 |    7 |
+-- | 30000012 |         11 |    7 |
+-- | 30000012 |         17 |    7 |
+-- | 30000042 |         15 |    7 |
+-- | 30000001 |         11 |    7 |
+-- | 30000003 |          1 |    7 |
+-- | 30000011 |         17 |    7 |
+-- | 30000003 |         11 |    7 |
+-- | 29000025 |          1 |    7 |
+-- | 30000003 |         17 |    7 |
+-- | 30000003 |         26 |    7 |
+-- | 29000024 |         37 |    7 |
+-- | 30000003 |         33 |    7 |
+-- | 30000004 |          2 |    7 |
+-- | 30000002 |         33 |    7 |
+-- | 30000002 |         31 |    7 |
+-- | 29000025 |         11 |    7 |
+-- | 30000001 |         25 |    7 |
+-- | 29000026 |          2 |    7 |
+-- | 30000001 |         31 |    7 |
+-- | 29000025 |         37 |    7 |
+-- | 30000001 |         34 |    7 |
+-- | 30000001 |         36 |    7 |
+-- | 30000002 |          1 |    7 |
+-- | 30000002 |         17 |    7 |
+-- | 30000002 |         25 |    7 |
+-- | 30000004 |         11 |    7 |
+-- | 29000024 |          7 |    7 |
+-- | 30000004 |         25 |    7 |
+-- | 29000109 |         11 |    7 |
+-- | 30000006 |         11 |    7 |
+-- | 30000006 |         17 |    7 |
+-- | 30000006 |         26 |    7 |
+-- | 30000006 |         33 |    7 |
+-- | 29000022 |         12 |    7 |
+-- | 30000007 |          2 |    7 |
+-- | 30000007 |         11 |    7 |
+-- | 29000022 |          2 |    7 |
+-- | 30000006 |          1 |    7 |
+-- | 30000005 |         33 |    7 |
+-- | 29000023 |          7 |    7 |
+-- | 29000024 |          1 |    7 |
+-- | 30000004 |         31 |    7 |
+-- | 29000023 |         37 |    7 |
+-- | 30000004 |         34 |    7 |
+-- | 30000004 |         36 |    7 |
+-- | 30000005 |          1 |    7 |
+-- | 29000023 |         12 |    7 |
+-- | 30000005 |         17 |    7 |
+-- | 30000005 |         25 |    7 |
+-- | 30000007 |         25 |    7 |
+-- | 29000068 |          1 |    7 |
+-- | 29000061 |         11 |    7 |
+-- | 29000069 |         37 |    7 |
+-- | 29000070 |          2 |    7 |
+-- | 29000087 |          7 |    7 |
+-- | 29000061 |          1 |    7 |
+-- | 29000052 |         37 |    7 |
+-- | 29000070 |         12 |    7 |
+-- | 29000047 |          7 |    7 |
+-- | 29000084 |         37 |    7 |
+-- | 29000086 |         12 |    7 |
+-- | 29000047 |         12 |    7 |
+-- | 29000071 |          7 |    7 |
+-- | 29000052 |          7 |    7 |
+-- | 29000087 |         12 |    7 |
+-- | 29000046 |         12 |    7 |
+-- | 29000089 |          1 |    7 |
+-- | 29000088 |         37 |    7 |
+-- | 29000068 |          7 |    7 |
+-- | 29000062 |          2 |    7 |
+-- | 29000045 |         37 |    7 |
+-- | 29000061 |         37 |    7 |
+-- | 29000068 |         37 |    7 |
+-- | 29000046 |          2 |    7 |
+-- | 29000069 |          1 |    7 |
+-- | 29000088 |          7 |    7 |
+-- | 29000069 |         11 |    7 |
+-- | 29000087 |         37 |    7 |
+-- | 29000084 |          7 |    7 |
+-- | 29000086 |          2 |    7 |
+-- | 29000071 |         12 |    7 |
+-- | 29000081 |          1 |    7 |
+-- | 29000081 |         11 |    7 |
+-- | 29000048 |         37 |    7 |
+-- | 29000049 |          1 |    7 |
+-- | 29000084 |          1 |    7 |
+-- | 29000083 |         37 |    7 |
+-- | 29000050 |         12 |    7 |
+-- | 29000081 |         37 |    7 |
+-- | 29000083 |         12 |    7 |
+-- | 29000082 |          2 |    7 |
+-- | 29000049 |         11 |    7 |
+-- | 29000083 |          7 |    7 |
+-- | 29000050 |          2 |    7 |
+-- | 29000072 |         37 |    7 |
+-- | 29000085 |          1 |    7 |
+-- | 29000085 |         37 |    7 |
+-- | 29000052 |          1 |    7 |
+-- | 29000051 |         37 |    7 |
+-- | 29000071 |         37 |    7 |
+-- | 29000047 |         37 |    7 |
+-- | 29000048 |          1 |    7 |
+-- | 29000072 |          1 |    7 |
+-- | 29000085 |         11 |    7 |
+-- | 29000049 |         37 |    7 |
+-- | 29000048 |          7 |    7 |
+-- | 29000072 |          7 |    7 |
+-- | 29000051 |         12 |    7 |
+-- | 29000051 |          7 |    7 |
+-- | 29000082 |         12 |    7 |
+-- | 29000067 |         37 |    7 |
+-- | 29000063 |         37 |    7 |
+-- | 29000090 |         12 |    7 |
+-- | 29000063 |          7 |    7 |
+-- | 29000065 |         11 |    7 |
+-- | 29000092 |          1 |    7 |
+-- | 29000092 |          7 |    7 |
+-- | 29000067 |          7 |    7 |
+-- | 29000090 |          2 |    7 |
+-- | 29000043 |         12 |    7 |
+-- | 29000091 |         12 |    7 |
+-- | 29000064 |          7 |    7 |
+-- | 29000063 |         12 |    7 |
+-- | 29000044 |          1 |    7 |
+-- | 29000065 |         37 |    7 |
+-- | 29000043 |         37 |    7 |
+-- | 29000066 |         12 |    7 |
+-- | 29000091 |          7 |    7 |
+-- | 29000064 |          1 |    7 |
+-- | 29000091 |         37 |    7 |
+-- | 29000111 |          7 |    7 |
+-- | 29000044 |         37 |    7 |
+-- | 29000062 |         12 |    7 |
+-- | 29000045 |          1 |    7 |
+-- | 29000088 |          1 |    7 |
+-- | 29000089 |         11 |    7 |
+-- | 29000045 |         11 |    7 |
+-- | 29000065 |          1 |    7 |
+-- | 29000066 |          2 |    7 |
+-- | 29000064 |         37 |    7 |
+-- | 29000067 |         12 |    7 |
+-- | 29000089 |         37 |    7 |
+-- | 29000043 |          7 |    7 |
+-- | 29000044 |          7 |    7 |
+-- | 60000110 |         11 |    7 |
+-- | 60000111 |         17 |    7 |
+-- | 60000108 |         31 |    7 |
+-- | 60000112 |         26 |    7 |
+-- | 60000112 |         33 |    7 |
+-- | 60000110 |          2 |    7 |
+-- | 60000110 |         25 |    7 |
+-- | 60000112 |         11 |    7 |
+-- | 60000111 |         31 |    7 |
+-- | 60000111 |         33 |    7 |
+-- | 60000111 |          1 |    7 |
+-- | 60000110 |         36 |    7 |
+-- | 60000112 |          1 |    7 |
+-- | 60000112 |         17 |    7 |
+-- | 60000110 |         34 |    7 |
+-- | 60000111 |         25 |    7 |
+-- | 60000110 |         31 |    7 |
+-- | 60000107 |         11 |    7 |
+-- | 60000106 |         33 |    7 |
+-- | 60000108 |         25 |    7 |
+-- | 60000108 |         17 |    7 |
+-- | 60000107 |          2 |    7 |
+-- | 60000108 |          1 |    7 |
+-- | 60000107 |         36 |    7 |
+-- | 60000107 |         34 |    7 |
+-- | 60000107 |         31 |    7 |
+-- | 60000107 |         25 |    7 |
+-- | 60000108 |         33 |    7 |
+-- | 60000106 |         26 |    7 |
+-- | 60000106 |         11 |    7 |
+-- | 60000109 |         17 |    7 |
+-- | 60000106 |          1 |    7 |
+-- | 60000109 |         11 |    7 |
+-- | 60000109 |         33 |    7 |
+-- | 60000109 |          1 |    7 |
+-- | 60000106 |         17 |    7 |
+-- | 60000109 |         26 |    7 |
+-- | 50000061 |          2 |    7 |
+-- | 50000071 |         33 |    7 |
+-- | 50000086 |          8 |    7 |
+-- | 50000068 |         31 |    7 |
+-- | 50000104 |         25 |    7 |
+-- | 50000087 |         21 |    7 |
+-- | 50000052 |         23 |    7 |
+-- | 50000067 |         34 |    7 |
+-- | 50000072 |          1 |    7 |
+-- | 50000104 |         11 |    7 |
+-- | 50000104 |          2 |    7 |
+-- | 50000082 |          7 |    7 |
+-- | 50000067 |         31 |    7 |
+-- | 50000067 |         25 |    7 |
+-- | 50000088 |          5 |    7 |
+-- | 50000071 |         25 |    7 |
+-- | 50000061 |         31 |    7 |
+-- | 50000103 |         11 |    7 |
+-- | 50000083 |          1 |    7 |
+-- | 50000103 |          1 |    7 |
+-- | 50000061 |         34 |    7 |
+-- | 50000088 |          7 |    7 |
+-- | 50000050 |         21 |    7 |
+-- | 50000103 |         17 |    7 |
+-- | 50000061 |         11 |    7 |
+-- | 50000103 |         33 |    7 |
+-- | 50000071 |         31 |    7 |
+-- | 50000082 |         22 |    7 |
+-- | 50000070 |         34 |    7 |
+-- | 50000103 |         26 |    7 |
+-- | 50000061 |         25 |    7 |
+-- | 50000068 |         33 |    7 |
+-- | 50000102 |         33 |    7 |
+-- | 50000087 |         11 |    7 |
+-- | 50000067 |         36 |    7 |
+-- | 50000105 |         33 |    7 |
+-- | 50000087 |          1 |    7 |
+-- | 50000106 |          1 |    7 |
+-- | 50000081 |         21 |    7 |
+-- | 50000081 |         11 |    7 |
+-- | 50000068 |          1 |    7 |
+-- | 50000068 |         17 |    7 |
+-- | 50000106 |         11 |    7 |
+-- | 50000050 |         11 |    7 |
+-- | 50000086 |         23 |    7 |
+-- | 50000106 |         17 |    7 |
+-- | 50000106 |         26 |    7 |
+-- | 50000081 |          1 |    7 |
+-- | 50000050 |          1 |    7 |
+-- | 50000068 |         25 |    7 |
+-- | 50000105 |         31 |    7 |
+-- | 50000072 |         26 |    7 |
+-- | 50000052 |          8 |    7 |
+-- | 50000104 |         31 |    7 |
+-- | 50000082 |          5 |    7 |
+-- | 50000071 |         17 |    7 |
+-- | 50000052 |          1 |    7 |
+-- | 50000104 |         34 |    7 |
+-- | 50000072 |         11 |    7 |
+-- | 50000104 |         36 |    7 |
+-- | 50000105 |          1 |    7 |
+-- | 50000051 |         22 |    7 |
+-- | 50000105 |         17 |    7 |
+-- | 50000063 |         11 |    7 |
+-- | 50000072 |         17 |    7 |
+-- | 50000051 |          7 |    7 |
+-- | 50000051 |          5 |    7 |
+-- | 50000105 |         25 |    7 |
+-- | 50000066 |         11 |    7 |
+-- | 50000091 |          5 |    7 |
+-- | 50000069 |         33 |    7 |
+-- | 50000091 |          7 |    7 |
+-- | 50000064 |         34 |    7 |
+-- | 50000066 |         26 |    7 |
+-- | 50000069 |         11 |    7 |
+-- | 50000091 |         22 |    7 |
+-- | 50000064 |         31 |    7 |
+-- | 50000092 |          1 |    7 |
+-- | 50000084 |         21 |    7 |
+-- | 50000070 |          2 |    7 |
+-- | 50000092 |          8 |    7 |
+-- | 50000064 |         25 |    7 |
+-- | 50000070 |         11 |    7 |
+-- | 50000066 |         33 |    7 |
+-- | 50000089 |          8 |    7 |
+-- | 50000064 |         36 |    7 |
+-- | 50000066 |         17 |    7 |
+-- | 50000072 |         33 |    7 |
+-- | 50000066 |          1 |    7 |
+-- | 50000090 |          1 |    7 |
+-- | 50000069 |         17 |    7 |
+-- | 50000069 |         26 |    7 |
+-- | 50000065 |         33 |    7 |
+-- | 50000085 |          7 |    7 |
+-- | 50000065 |         31 |    7 |
+-- | 50000090 |         11 |    7 |
+-- | 50000090 |         21 |    7 |
+-- | 50000065 |         25 |    7 |
+-- | 50000065 |         17 |    7 |
+-- | 50000089 |         23 |    7 |
+-- | 50000085 |         22 |    7 |
+-- | 50000085 |          5 |    7 |
+-- | 50000065 |          1 |    7 |
+-- | 50000084 |         11 |    7 |
+-- | 50000064 |         11 |    7 |
+-- | 50000083 |         23 |    7 |
+-- | 50000101 |         34 |    7 |
+-- | 50000062 |         31 |    7 |
+-- | 50000067 |          2 |    7 |
+-- | 50000101 |         36 |    7 |
+-- | 50000062 |         25 |    7 |
+-- | 50000062 |         17 |    7 |
+-- | 50000070 |         36 |    7 |
+-- | 50000102 |          1 |    7 |
+-- | 50000071 |          1 |    7 |
+-- | 50000067 |         11 |    7 |
+-- | 50000102 |         17 |    7 |
+-- | 50000062 |          1 |    7 |
+-- | 50000061 |         36 |    7 |
+-- | 50000102 |         25 |    7 |
+-- | 50000086 |          1 |    7 |
+-- | 50000062 |         33 |    7 |
+-- | 50000101 |         31 |    7 |
+-- | 50000064 |          2 |    7 |
+-- | 50000092 |         23 |    7 |
+-- | 50000070 |         25 |    7 |
+-- | 50000089 |          1 |    7 |
+-- | 50000101 |          2 |    7 |
+-- | 50000063 |         33 |    7 |
+-- | 50000101 |         11 |    7 |
+-- | 50000069 |          1 |    7 |
+-- | 40000068 |          1 |    7 |
+-- | 50000063 |         26 |    7 |
+-- | 50000063 |         17 |    7 |
+-- | 50000070 |         31 |    7 |
+-- | 50000101 |         25 |    7 |
+-- | 50000088 |         22 |    7 |
+-- | 50000084 |          1 |    7 |
+-- | 50000063 |          1 |    7 |
+-- | 50000083 |          8 |    7 |
+-- | 50000021 |         11 |    7 |
+-- | 40000068 |         33 |    7 |
+-- | 50000023 |          1 |    7 |
+-- | 40000068 |         31 |    7 |
+-- | 50000023 |         11 |    7 |
+-- | 50000023 |         17 |    7 |
+-- | 40000068 |         25 |    7 |
+-- | 50000023 |         26 |    7 |
+-- | 40000068 |         17 |    7 |
+-- | 50000023 |         33 |    7 |
+-- | 50000024 |          2 |    7 |
+-- | 40000067 |         36 |    7 |
+-- | 40000067 |         34 |    7 |
+-- | 40000064 |         31 |    7 |
+-- | 50000022 |         33 |    7 |
+-- | 50000021 |         25 |    7 |
+-- | 50000021 |         31 |    7 |
+-- | 50000021 |         34 |    7 |
+-- | 40000069 |         26 |    7 |
+-- | 50000021 |         36 |    7 |
+-- | 40000069 |         17 |    7 |
+-- | 50000022 |          1 |    7 |
+-- | 40000069 |         11 |    7 |
+-- | 50000022 |         17 |    7 |
+-- | 40000069 |          1 |    7 |
+-- | 50000022 |         25 |    7 |
+-- | 50000022 |         31 |    7 |
+-- | 50000024 |         11 |    7 |
+-- | 50000024 |         25 |    7 |
+-- | 40000066 |         17 |    7 |
+-- | 40000066 |         11 |    7 |
+-- | 50000026 |         11 |    7 |
+-- | 50000026 |         17 |    7 |
+-- | 50000026 |         26 |    7 |
+-- | 50000026 |         33 |    7 |
+-- | 40000066 |          1 |    7 |
+-- | 50000027 |          2 |    7 |
+-- | 50000027 |         11 |    7 |
+-- | 50000027 |         25 |    7 |
+-- | 50000027 |         31 |    7 |
+-- | 40000065 |         33 |    7 |
+-- | 50000026 |          1 |    7 |
+-- | 40000066 |         26 |    7 |
+-- | 50000024 |         31 |    7 |
+-- | 40000067 |         31 |    7 |
+-- | 50000024 |         36 |    7 |
+-- | 40000067 |         25 |    7 |
+-- | 50000025 |          1 |    7 |
+-- | 40000067 |         11 |    7 |
+-- | 50000025 |         17 |    7 |
+-- | 50000025 |         25 |    7 |
+-- | 40000067 |          2 |    7 |
+-- | 50000025 |         31 |    7 |
+-- | 50000025 |         33 |    7 |
+-- | 40000066 |         33 |    7 |
+-- | 50000027 |         34 |    7 |
+-- | 40000102 |         31 |    7 |
+-- | 50000004 |         11 |    7 |
+-- | 50000004 |         21 |    7 |
+-- | 50000005 |          5 |    7 |
+-- | 50000005 |          7 |    7 |
+-- | 50000005 |         22 |    7 |
+-- | 40000051 |         14 |    7 |
+-- | 50000006 |          1 |    7 |
+-- | 40000071 |         33 |    7 |
+-- | 40000071 |         31 |    7 |
+-- | 50000006 |          8 |    7 |
+-- | 50000006 |         23 |    7 |
+-- | 50000007 |          1 |    7 |
+-- | 40000072 |          1 |    7 |
+-- | 50000004 |          1 |    7 |
+-- | 50000001 |          1 |    7 |
+-- | 50000001 |         11 |    7 |
+-- | 50000001 |         21 |    7 |
+-- | 50000002 |          5 |    7 |
+-- | 40000072 |         26 |    7 |
+-- | 50000002 |          7 |    7 |
+-- | 40000072 |         17 |    7 |
+-- | 50000002 |         22 |    7 |
+-- | 50000003 |          1 |    7 |
+-- | 40000072 |         11 |    7 |
+-- | 50000003 |          8 |    7 |
+-- | 50000003 |         23 |    7 |
+-- | 40000071 |         25 |    7 |
+-- | 40000071 |         17 |    7 |
+-- | 50000011 |          5 |    7 |
+-- | 50000011 |          7 |    7 |
+-- | 40000070 |         31 |    7 |
+-- | 40000070 |         25 |    7 |
+-- | 50000011 |         22 |    7 |
+-- | 50000012 |          1 |    7 |
+-- | 40000070 |         11 |    7 |
+-- | 50000012 |          8 |    7 |
+-- | 40000072 |         33 |    7 |
+-- | 40000070 |          2 |    7 |
+-- | 50000012 |         23 |    7 |
+-- | 50000021 |          2 |    7 |
+-- | 50000010 |         21 |    7 |
+-- | 50000010 |         11 |    7 |
+-- | 50000007 |         11 |    7 |
+-- | 50000007 |         21 |    7 |
+-- | 50000008 |          5 |    7 |
+-- | 50000008 |          7 |    7 |
+-- | 50000008 |         22 |    7 |
+-- | 50000009 |          1 |    7 |
+-- | 50000009 |          8 |    7 |
+-- | 40000071 |          1 |    7 |
+-- | 40000070 |         36 |    7 |
+-- | 50000009 |         23 |    7 |
+-- | 50000010 |          1 |    7 |
+-- | 40000070 |         34 |    7 |
+-- | 40000069 |         33 |    7 |
+-- | 50000030 |         31 |    7 |
+-- | 50000031 |         31 |    7 |
+-- | 50000045 |          7 |    7 |
+-- | 40000061 |         11 |    7 |
+-- | 40000063 |          1 |    7 |
+-- | 50000032 |          1 |    7 |
+-- | 50000045 |          5 |    7 |
+-- | 50000044 |         21 |    7 |
+-- | 40000062 |         33 |    7 |
+-- | 50000044 |         11 |    7 |
+-- | 40000063 |         11 |    7 |
+-- | 40000063 |         17 |    7 |
+-- | 50000045 |         22 |    7 |
+-- | 40000063 |         33 |    7 |
+-- | 50000030 |         34 |    7 |
+-- | 50000030 |         36 |    7 |
+-- | 50000031 |          1 |    7 |
+-- | 40000062 |          1 |    7 |
+-- | 40000063 |         26 |    7 |
+-- | 50000046 |          1 |    7 |
+-- | 50000031 |         17 |    7 |
+-- | 50000031 |         25 |    7 |
+-- | 50000032 |         11 |    7 |
+-- | 40000062 |         31 |    7 |
+-- | 50000031 |         33 |    7 |
+-- | 50000043 |          8 |    7 |
+-- | 50000041 |         11 |    7 |
+-- | 50000041 |         21 |    7 |
+-- | 50000042 |          5 |    7 |
+-- | 50000042 |          7 |    7 |
+-- | 40000061 |         36 |    7 |
+-- | 40000061 |         34 |    7 |
+-- | 50000042 |         22 |    7 |
+-- | 50000041 |          1 |    7 |
+-- | 40000062 |         17 |    7 |
+-- | 50000024 |         34 |    7 |
+-- | 50000032 |         17 |    7 |
+-- | 40000061 |         25 |    7 |
+-- | 40000061 |         31 |    7 |
+-- | 50000044 |          1 |    7 |
+-- | 50000032 |         26 |    7 |
+-- | 40000062 |         25 |    7 |
+-- | 50000032 |         33 |    7 |
+-- | 50000043 |         23 |    7 |
+-- | 50000028 |         33 |    7 |
+-- | 50000043 |          1 |    7 |
+-- | 50000027 |         36 |    7 |
+-- | 40000064 |         36 |    7 |
+-- | 50000048 |         22 |    7 |
+-- | 40000064 |         34 |    7 |
+-- | 50000029 |          1 |    7 |
+-- | 40000052 |         12 |    7 |
+-- | 50000048 |          7 |    7 |
+-- | 50000048 |          5 |    7 |
+-- | 50000029 |         11 |    7 |
+-- | 50000047 |         21 |    7 |
+-- | 50000029 |         33 |    7 |
+-- | 50000028 |         31 |    7 |
+-- | 50000028 |          1 |    7 |
+-- | 50000049 |         23 |    7 |
+-- | 40000065 |         25 |    7 |
+-- | 50000028 |         17 |    7 |
+-- | 40000065 |         17 |    7 |
+-- | 50000049 |          8 |    7 |
+-- | 50000028 |         25 |    7 |
+-- | 40000052 |          1 |    7 |
+-- | 50000049 |          1 |    7 |
+-- | 50000029 |         17 |    7 |
+-- | 40000065 |          1 |    7 |
+-- | 50000046 |         23 |    7 |
+-- | 40000064 |          2 |    7 |
+-- | 50000030 |          2 |    7 |
+-- | 40000061 |          2 |    7 |
+-- | 40000065 |         31 |    7 |
+-- | 50000030 |         11 |    7 |
+-- | 50000046 |          8 |    7 |
+-- | 50000030 |         25 |    7 |
+-- | 40000052 |         17 |    7 |
+-- | 40000064 |         11 |    7 |
+-- | 50000047 |         11 |    7 |
+-- | 50000047 |          1 |    7 |
+-- | 50000029 |         26 |    7 |
+-- | 40000064 |         25 |    7 |
+-- | 40000010 |         30 |    7 |
+-- | 40000010 |         25 |    7 |
+-- | 30000068 |          1 |    7 |
+-- | 30000065 |         33 |    7 |
+-- | 40000010 |         13 |    7 |
+-- | 40000010 |          2 |    7 |
+-- | 40000004 |         25 |    7 |
+-- | 30000050 |          1 |    7 |
+-- | 30000067 |         36 |    7 |
+-- | 30000068 |         17 |    7 |
+-- | 40000010 |         14 |    7 |
+-- | 40000006 |         17 |    7 |
+-- | 40000005 |          3 |    7 |
+-- | 30000067 |         11 |    7 |
+-- | 40000007 |         25 |    7 |
+-- | 30000065 |         17 |    7 |
+-- | 30000065 |         25 |    7 |
+-- | 40000041 |         30 |    7 |
+-- | 40000011 |         14 |    7 |
+-- | 40000032 |         33 |    7 |
+-- | 40000004 |          2 |    7 |
+-- | 40000004 |         14 |    7 |
+-- | 40000007 |          2 |    7 |
+-- | 40000004 |          1 |    7 |
+-- | 40000011 |          3 |    7 |
+-- | 30000067 |          2 |    7 |
+-- | 40000042 |         14 |    7 |
+-- | 40000004 |         13 |    7 |
+-- | 30000065 |         31 |    7 |
+-- | 40000012 |          1 |    7 |
+-- | 40000010 |          1 |    7 |
+-- | 40000005 |         14 |    7 |
+-- | 40000006 |         12 |    7 |
+-- | 40000007 |          1 |    7 |
+-- | 30000066 |         26 |    7 |
+-- | 40000007 |         30 |    7 |
+-- | 40000042 |          3 |    7 |
+-- | 40000041 |         13 |    7 |
+-- | 30000068 |         25 |    7 |
+-- | 40000041 |         14 |    7 |
+-- | 40000008 |         14 |    7 |
+-- | 30000049 |         11 |    7 |
+-- | 30000066 |         33 |    7 |
+-- | 40000008 |          3 |    7 |
+-- | 40000006 |          1 |    7 |
+-- | 30000049 |         18 |    7 |
+-- | 30000067 |         34 |    7 |
+-- | 40000041 |          2 |    7 |
+-- | 40000007 |         13 |    7 |
+-- | 30000066 |          1 |    7 |
+-- | 40000041 |          1 |    7 |
+-- | 40000007 |         14 |    7 |
+-- | 40000004 |         30 |    7 |
+-- | 30000066 |         11 |    7 |
+-- | 30000067 |         25 |    7 |
+-- | 40000009 |         17 |    7 |
+-- | 40000009 |          1 |    7 |
+-- | 30000066 |         17 |    7 |
+-- | 30000049 |          1 |    7 |
+-- | 40000009 |         12 |    7 |
+-- | 30000091 |          3 |    7 |
+-- | 40000041 |         25 |    7 |
+-- | 30000067 |         31 |    7 |
+-- | 30000050 |         11 |    7 |
+-- | 40000025 |          1 |    7 |
+-- | 30000062 |         25 |    7 |
+-- | 40000026 |         17 |    7 |
+-- | 30000052 |          1 |    7 |
+-- | 40000026 |         26 |    7 |
+-- | 30000062 |         17 |    7 |
+-- | 40000030 |         11 |    7 |
+-- | 40000026 |         33 |    7 |
+-- | 40000030 |          2 |    7 |
+-- | 30000062 |          1 |    7 |
+-- | 40000027 |          2 |    7 |
+-- | 40000026 |         11 |    7 |
+-- | 40000030 |         25 |    7 |
+-- | 40000030 |         34 |    7 |
+-- | 40000025 |         17 |    7 |
+-- | 40000025 |         25 |    7 |
+-- | 30000051 |         15 |    7 |
+-- | 30000062 |         33 |    7 |
+-- | 40000025 |         31 |    7 |
+-- | 30000062 |         31 |    7 |
+-- | 40000025 |         33 |    7 |
+-- | 40000030 |         31 |    7 |
+-- | 40000026 |          1 |    7 |
+-- | 40000027 |         11 |    7 |
+-- | 30000061 |         36 |    7 |
+-- | 30000052 |         18 |    7 |
+-- | 40000028 |         31 |    7 |
+-- | 30000061 |         11 |    7 |
+-- | 40000028 |         33 |    7 |
+-- | 40000029 |         26 |    7 |
+-- | 30000048 |          8 |    7 |
+-- | 40000029 |          1 |    7 |
+-- | 30000061 |          2 |    7 |
+-- | 40000029 |         17 |    7 |
+-- | 40000029 |         11 |    7 |
+-- | 40000028 |         25 |    7 |
+-- | 40000028 |         17 |    7 |
+-- | 40000027 |         25 |    7 |
+-- | 30000061 |         34 |    7 |
+-- | 40000027 |         31 |    7 |
+-- | 40000027 |         34 |    7 |
+-- | 30000061 |         31 |    7 |
+-- | 40000027 |         36 |    7 |
+-- | 40000028 |          1 |    7 |
+-- | 30000052 |         11 |    7 |
+-- | 40000029 |         33 |    7 |
+-- | 30000061 |         25 |    7 |
+-- | 40000021 |         25 |    7 |
+-- | 40000024 |         36 |    7 |
+-- | 40000032 |         26 |    7 |
+-- | 40000021 |         34 |    7 |
+-- | 40000021 |         36 |    7 |
+-- | 40000022 |          1 |    7 |
+-- | 30000050 |         18 |    7 |
+-- | 30000064 |         11 |    7 |
+-- | 40000032 |          1 |    7 |
+-- | 30000063 |          1 |    7 |
+-- | 40000022 |         17 |    7 |
+-- | 40000022 |         25 |    7 |
+-- | 30000050 |         19 |    7 |
+-- | 30000064 |         25 |    7 |
+-- | 40000021 |         31 |    7 |
+-- | 40000012 |         12 |    7 |
+-- | 40000032 |         17 |    7 |
+-- | 40000012 |         17 |    7 |
+-- | 30000065 |          1 |    7 |
+-- | 30000064 |         36 |    7 |
+-- | 30000064 |         34 |    7 |
+-- | 40000021 |          2 |    7 |
+-- | 40000021 |         11 |    7 |
+-- | 40000032 |         11 |    7 |
+-- | 30000064 |         31 |    7 |
+-- | 30000064 |          2 |    7 |
+-- | 40000022 |         31 |    7 |
+-- | 30000063 |         26 |    7 |
+-- | 40000024 |          2 |    7 |
+-- | 30000051 |          8 |    7 |
+-- | 40000024 |         11 |    7 |
+-- | 30000063 |         17 |    7 |
+-- | 40000024 |         25 |    7 |
+-- | 30000063 |         11 |    7 |
+-- | 40000024 |         31 |    7 |
+-- | 40000031 |          1 |    7 |
+-- | 40000024 |         34 |    7 |
+-- | 40000031 |         17 |    7 |
+-- | 40000023 |         33 |    7 |
+-- | 40000022 |         33 |    7 |
+-- | 40000031 |         33 |    7 |
+-- | 40000023 |          1 |    7 |
+-- | 40000031 |         31 |    7 |
+-- | 40000023 |         11 |    7 |
+-- | 40000023 |         17 |    7 |
+-- | 30000051 |          3 |    7 |
+-- | 40000023 |         26 |    7 |
+-- | 30000063 |         33 |    7 |
+-- | 40000031 |         25 |    7 |
+-- | 40000030 |         36 |    7 |
+-- | 40000003 |         17 |    7 |
+-- | 30000102 |         17 |    7 |
+-- | 30000082 |          8 |    7 |
+-- | 30000044 |         19 |    7 |
+-- | 30000103 |         33 |    7 |
+-- | 30000082 |          3 |    7 |
+-- | 40000048 |         14 |    7 |
+-- | 30000081 |         19 |    7 |
+-- | 30000104 |          2 |    7 |
+-- | 30000104 |         11 |    7 |
+-- | 30000081 |         18 |    7 |
+-- | 30000104 |         25 |    7 |
+-- | 30000103 |         26 |    7 |
+-- | 30000044 |         18 |    7 |
+-- | 30000103 |         17 |    7 |
+-- | 30000102 |         25 |    7 |
+-- | 30000044 |         11 |    7 |
+-- | 30000083 |          1 |    7 |
+-- | 30000102 |         31 |    7 |
+-- | 30000102 |         33 |    7 |
+-- | 40000049 |         12 |    7 |
+-- | 30000103 |          1 |    7 |
+-- | 30000082 |         15 |    7 |
+-- | 40000049 |          1 |    7 |
+-- | 30000103 |         11 |    7 |
+-- | 30000081 |         11 |    7 |
+-- | 30000104 |         31 |    7 |
+-- | 30000045 |          8 |    7 |
+-- | 30000106 |          1 |    7 |
+-- | 40000047 |         14 |    7 |
+-- | 30000106 |         11 |    7 |
+-- | 30000072 |         26 |    7 |
+-- | 30000106 |         17 |    7 |
+-- | 40000047 |         13 |    7 |
+-- | 30000106 |         26 |    7 |
+-- | 30000045 |         15 |    7 |
+-- | 30000072 |         17 |    7 |
+-- | 40000047 |         25 |    7 |
+-- | 30000105 |         33 |    7 |
+-- | 30000072 |         33 |    7 |
+-- | 30000045 |          3 |    7 |
+-- | 30000104 |         34 |    7 |
+-- | 30000081 |          1 |    7 |
+-- | 30000104 |         36 |    7 |
+-- | 30000105 |          1 |    7 |
+-- | 40000048 |          3 |    7 |
+-- | 30000105 |         17 |    7 |
+-- | 30000105 |         25 |    7 |
+-- | 40000047 |         30 |    7 |
+-- | 30000105 |         31 |    7 |
+-- | 30000106 |         33 |    7 |
+-- | 30000087 |         18 |    7 |
+-- | 40000050 |         25 |    7 |
+-- | 30000090 |          1 |    7 |
+-- | 30000086 |          1 |    7 |
+-- | 30000090 |         11 |    7 |
+-- | 30000085 |         15 |    7 |
+-- | 30000090 |         18 |    7 |
+-- | 30000090 |         19 |    7 |
+-- | 30000085 |          8 |    7 |
+-- | 30000087 |         11 |    7 |
+-- | 40000050 |         14 |    7 |
+-- | 30000089 |         18 |    7 |
+-- | 30000089 |         11 |    7 |
+-- | 40000050 |         30 |    7 |
+-- | 30000087 |         19 |    7 |
+-- | 30000088 |          3 |    7 |
+-- | 30000043 |          1 |    7 |
+-- | 30000088 |          8 |    7 |
+-- | 30000087 |          1 |    7 |
+-- | 30000088 |         15 |    7 |
+-- | 40000051 |          3 |    7 |
+-- | 30000089 |          1 |    7 |
+-- | 30000086 |         18 |    7 |
+-- | 30000086 |         11 |    7 |
+-- | 30000091 |          8 |    7 |
+-- | 30000085 |          3 |    7 |
+-- | 30000084 |          1 |    7 |
+-- | 30000101 |         25 |    7 |
+-- | 40000050 |          1 |    7 |
+-- | 30000083 |         18 |    7 |
+-- | 30000101 |         31 |    7 |
+-- | 30000083 |         11 |    7 |
+-- | 30000044 |          1 |    7 |
+-- | 30000101 |         34 |    7 |
+-- | 30000101 |         36 |    7 |
+-- | 30000102 |          1 |    7 |
+-- | 30000101 |         11 |    7 |
+-- | 40000050 |          2 |    7 |
+-- | 30000101 |          2 |    7 |
+-- | 30000091 |         15 |    7 |
+-- | 40000050 |         13 |    7 |
+-- | 30000092 |          1 |    7 |
+-- | 30000084 |         19 |    7 |
+-- | 30000084 |         18 |    7 |
+-- | 30000043 |         11 |    7 |
+-- | 30000092 |         11 |    7 |
+-- | 30000084 |         11 |    7 |
+-- | 30000092 |         18 |    7 |
+-- | 30000043 |         18 |    7 |
+-- | 40000049 |         17 |    7 |
+-- | 30000110 |          2 |    7 |
+-- | 30000111 |         25 |    7 |
+-- | 40000044 |         14 |    7 |
+-- | 30000111 |         31 |    7 |
+-- | 30000111 |         33 |    7 |
+-- | 40000044 |         13 |    7 |
+-- | 30000047 |         18 |    7 |
+-- | 30000047 |         19 |    7 |
+-- | 30000112 |          1 |    7 |
+-- | 40000044 |          2 |    7 |
+-- | 30000112 |         11 |    7 |
+-- | 30000111 |         17 |    7 |
+-- | 30000070 |          2 |    7 |
+-- | 30000047 |         11 |    7 |
+-- | 30000110 |         11 |    7 |
+-- | 30000070 |         31 |    7 |
+-- | 30000070 |         25 |    7 |
+-- | 30000110 |         31 |    7 |
+-- | 40000044 |         30 |    7 |
+-- | 30000110 |         34 |    7 |
+-- | 30000070 |         11 |    7 |
+-- | 30000110 |         36 |    7 |
+-- | 30000111 |          1 |    7 |
+-- | 40000044 |         25 |    7 |
+-- | 30000069 |         33 |    7 |
+-- | 30000112 |         17 |    7 |
+-- | 40000044 |          1 |    7 |
+-- | 30000069 |          1 |    7 |
+-- | 40000002 |          3 |    7 |
+-- | 40000043 |         12 |    7 |
+-- | 40000002 |         14 |    7 |
+-- | 30000048 |         15 |    7 |
+-- | 40000043 |          1 |    7 |
+-- | 30000068 |         33 |    7 |
+-- | 40000003 |          1 |    7 |
+-- | 30000068 |         31 |    7 |
+-- | 40000003 |         12 |    7 |
+-- | 40000001 |         30 |    7 |
+-- | 40000001 |         25 |    7 |
+-- | 30000069 |         11 |    7 |
+-- | 30000112 |         26 |    7 |
+-- | 30000048 |          3 |    7 |
+-- | 30000112 |         33 |    7 |
+-- | 30000069 |         26 |    7 |
+-- | 40000043 |         17 |    7 |
+-- | 40000001 |          1 |    7 |
+-- | 40000001 |          2 |    7 |
+-- | 30000069 |         17 |    7 |
+-- | 40000001 |         13 |    7 |
+-- | 40000001 |         14 |    7 |
+-- | 30000110 |         25 |    7 |
+-- | 30000108 |          1 |    7 |
+-- | 30000108 |         25 |    7 |
+-- | 30000072 |          1 |    7 |
+-- | 30000071 |         25 |    7 |
+-- | 30000108 |         31 |    7 |
+-- | 30000108 |         33 |    7 |
+-- | 30000046 |         11 |    7 |
+-- | 40000046 |          1 |    7 |
+-- | 30000046 |         18 |    7 |
+-- | 30000046 |          1 |    7 |
+-- | 30000107 |         25 |    7 |
+-- | 30000107 |         36 |    7 |
+-- | 30000071 |         31 |    7 |
+-- | 30000107 |         34 |    7 |
+-- | 40000046 |         12 |    7 |
+-- | 30000108 |         17 |    7 |
+-- | 40000046 |         17 |    7 |
+-- | 30000071 |         33 |    7 |
+-- | 30000107 |         31 |    7 |
+-- | 30000109 |          1 |    7 |
+-- | 30000107 |         11 |    7 |
+-- | 30000070 |         36 |    7 |
+-- | 30000109 |         26 |    7 |
+-- | 30000071 |          1 |    7 |
+-- | 30000107 |          2 |    7 |
+-- | 30000072 |         11 |    7 |
+-- | 30000109 |         33 |    7 |
+-- | 40000047 |          2 |    7 |
+-- | 40000045 |          3 |    7 |
+-- | 30000070 |         34 |    7 |
+-- | 30000047 |          1 |    7 |
+-- | 30000109 |         17 |    7 |
+-- | 40000045 |         14 |    7 |
+-- | 30000109 |         11 |    7 |
+-- | 40000047 |          1 |    7 |
+-- | 30000071 |         17 |    7 |
+-- | 29000005 |         11 |    7 |
+-- | 28000011 |         37 |    7 |
+-- | 28000002 |          2 |    7 |
+-- | 28000084 |          7 |    7 |
+-- | 28000081 |         11 |    7 |
+-- | 29000008 |         37 |    7 |
+-- | 28000022 |         12 |    7 |
+-- | 28000029 |          1 |    7 |
+-- | 28000085 |          1 |    7 |
+-- | 28000084 |         37 |    7 |
+-- | 28000105 |         37 |    7 |
+-- | 28000103 |         12 |    7 |
+-- | 28000011 |          7 |    7 |
+-- | 28000021 |          1 |    7 |
+-- | 28000011 |         12 |    7 |
+-- | 29000006 |          2 |    7 |
+-- | 28000022 |          2 |    7 |
+-- | 28000103 |          7 |    7 |
+-- | 28000021 |         37 |    7 |
+-- | 29000005 |         37 |    7 |
+-- | 28000088 |          7 |    7 |
+-- | 28000083 |          7 |    7 |
+-- | 28000082 |          2 |    7 |
+-- | 28000012 |         37 |    7 |
+-- | 28000102 |         12 |    7 |
+-- | 28000001 |         11 |    7 |
+-- | 28000021 |         11 |    7 |
+-- | 29000009 |          1 |    7 |
+-- | 28000102 |          2 |    7 |
+-- | 28000001 |         37 |    7 |
+-- | 28000106 |         12 |    7 |
+-- | 28000106 |          2 |    7 |
+-- | 28000084 |          1 |    7 |
+-- | 28000081 |         37 |    7 |
+-- | 28000083 |         37 |    7 |
+-- | 28000012 |          1 |    7 |
+-- | 28000012 |          7 |    7 |
+-- | 28000083 |         12 |    7 |
+-- | 28000101 |         37 |    7 |
+-- | 28000082 |         12 |    7 |
+-- | 28000002 |         12 |    7 |
+-- | 28000005 |         11 |    7 |
+-- | 28000089 |          1 |    7 |
+-- | 28000088 |         37 |    7 |
+-- | 28000007 |          7 |    7 |
+-- | 28000091 |         12 |    7 |
+-- | 28000007 |         12 |    7 |
+-- | 28000007 |         37 |    7 |
+-- | 28000008 |          1 |    7 |
+-- | 28000101 |         11 |    7 |
+-- | 28000090 |         12 |    7 |
+-- | 28000004 |          7 |    7 |
+-- | 28000104 |         37 |    7 |
+-- | 28000088 |          1 |    7 |
+-- | 29000007 |         12 |    7 |
+-- | 29000008 |          7 |    7 |
+-- | 29000008 |          1 |    7 |
+-- | 28000005 |          1 |    7 |
+-- | 28000004 |         37 |    7 |
+-- | 28000104 |          7 |    7 |
+-- | 29000007 |         37 |    7 |
+-- | 28000089 |         37 |    7 |
+-- | 28000005 |         37 |    7 |
+-- | 28000104 |          1 |    7 |
+-- | 28000006 |          2 |    7 |
+-- | 28000089 |         11 |    7 |
+-- | 28000006 |         12 |    7 |
+-- | 28000091 |          7 |    7 |
+-- | 28000087 |         37 |    7 |
+-- | 28000105 |          1 |    7 |
+-- | 29000007 |          7 |    7 |
+-- | 28000090 |          2 |    7 |
+-- | 28000009 |         11 |    7 |
+-- | 28000086 |          2 |    7 |
+-- | 28000009 |         37 |    7 |
+-- | 28000003 |          7 |    7 |
+-- | 28000085 |         37 |    7 |
+-- | 28000092 |         37 |    7 |
+-- | 28000010 |          2 |    7 |
+-- | 28000101 |          1 |    7 |
+-- | 29000006 |         12 |    7 |
+-- | 28000085 |         11 |    7 |
+-- | 28000010 |         12 |    7 |
+-- | 28000003 |         12 |    7 |
+-- | 28000105 |         11 |    7 |
+-- | 28000008 |          7 |    7 |
+-- | 28000103 |         37 |    7 |
+-- | 28000091 |         37 |    7 |
+-- | 28000087 |         12 |    7 |
+-- | 28000092 |          1 |    7 |
+-- | 28000004 |          1 |    7 |
+-- | 28000092 |          7 |    7 |
+-- | 28000087 |          7 |    7 |
+-- | 28000008 |         37 |    7 |
+-- | 28000009 |          1 |    7 |
+-- | 28000003 |         37 |    7 |
+-- | 28000086 |         12 |    7 |
+-- | 28000111 |          7 |    7 |
+-- | 28000029 |         37 |    7 |
+-- | 28000063 |         12 |    7 |
+-- | 28000032 |          7 |    7 |
+-- | 28000063 |          7 |    7 |
+-- | 28000109 |         37 |    7 |
+-- | 28000110 |          2 |    7 |
+-- | 28000032 |         37 |    7 |
+-- | 28000062 |         12 |    7 |
+-- | 29000002 |          2 |    7 |
+-- | 28000041 |         11 |    7 |
+-- | 28000062 |          2 |    7 |
+-- | 28000061 |         37 |    7 |
+-- | 28000110 |         12 |    7 |
+-- | 29000001 |         37 |    7 |
+-- | 28000041 |         37 |    7 |
+-- | 28000061 |         11 |    7 |
+-- | 28000047 |         37 |    7 |
+-- | 28000032 |          1 |    7 |
+-- | 28000030 |          2 |    7 |
+-- | 28000065 |         11 |    7 |
+-- | 28000030 |         12 |    7 |
+-- | 28000109 |         11 |    7 |
+-- | 28000065 |          1 |    7 |
+-- | 28000064 |         37 |    7 |
+-- | 28000041 |          1 |    7 |
+-- | 28000031 |          7 |    7 |
+-- | 28000031 |         12 |    7 |
+-- | 28000064 |          7 |    7 |
+-- | 29000002 |         12 |    7 |
+-- | 28000064 |          1 |    7 |
+-- | 28000063 |         37 |    7 |
+-- | 28000031 |         37 |    7 |
+-- | 28000048 |          1 |    7 |
+-- | 28000042 |          2 |    7 |
+-- | 28000042 |         12 |    7 |
+-- | 28000061 |          1 |    7 |
+-- | 28000112 |         37 |    7 |
+-- | 28000045 |         11 |    7 |
+-- | 28000050 |          2 |    7 |
+-- | 28000049 |         37 |    7 |
+-- | 28000045 |         37 |    7 |
+-- | 28000046 |          2 |    7 |
+-- | 28000049 |         11 |    7 |
+-- | 28000046 |         12 |    7 |
+-- | 28000111 |         37 |    7 |
+-- | 28000049 |          1 |    7 |
+-- | 28000048 |         37 |    7 |
+-- | 28000112 |          1 |    7 |
+-- | 28000047 |          7 |    7 |
+-- | 28000047 |         12 |    7 |
+-- | 28000048 |          7 |    7 |
+-- | 28000111 |         12 |    7 |
+-- | 28000050 |         12 |    7 |
+-- | 28000052 |         37 |    7 |
+-- | 29000001 |         11 |    7 |
+-- | 28000043 |          7 |    7 |
+-- | 28000043 |         12 |    7 |
+-- | 28000052 |          7 |    7 |
+-- | 28000052 |          1 |    7 |
+-- | 28000051 |         37 |    7 |
+-- | 28000043 |         37 |    7 |
+-- | 28000044 |          1 |    7 |
+-- | 28000051 |         12 |    7 |
+-- | 28000044 |          7 |    7 |
+-- | 28000051 |          7 |    7 |
+-- | 29000001 |          1 |    7 |
+-- | 28000044 |         37 |    7 |
+-- | 28000045 |          1 |    7 |
+-- | 28000112 |          7 |    7 |
+-- | 28000069 |          1 |    7 |
+-- | 28000024 |         37 |    7 |
+-- | 28000025 |          1 |    7 |
+-- | 28000070 |         12 |    7 |
+-- | 28000107 |         37 |    7 |
+-- | 28000025 |         11 |    7 |
+-- | 28000108 |          1 |    7 |
+-- | 28000070 |          2 |    7 |
+-- | 28000069 |         37 |    7 |
+-- | 28000023 |         12 |    7 |
+-- | 28000025 |         37 |    7 |
+-- | 28000108 |          7 |    7 |
+-- | 28000069 |         11 |    7 |
+-- | 28000026 |          2 |    7 |
+-- | 28000026 |         12 |    7 |
+-- | 28000068 |         37 |    7 |
+-- | 28000107 |         12 |    7 |
+-- | 28000071 |          7 |    7 |
+-- | 28000081 |          1 |    7 |
+-- | 28000072 |         37 |    7 |
+-- | 28000107 |          7 |    7 |
+-- | 29000005 |          1 |    7 |
+-- | 28000023 |          7 |    7 |
+-- | 28000072 |          7 |    7 |
+-- | 29000004 |         37 |    7 |
+-- | 28000072 |          1 |    7 |
+-- | 28000071 |         37 |    7 |
+-- | 28000023 |         37 |    7 |
+-- | 28000024 |          1 |    7 |
+-- | 28000024 |          7 |    7 |
+-- | 28000071 |         12 |    7 |
+-- | 28000028 |          7 |    7 |
+-- | 28000001 |          1 |    7 |
+-- | 29000004 |          7 |    7 |
+-- | 29000003 |         37 |    7 |
+-- | 29000003 |          7 |    7 |
+-- | 28000108 |         37 |    7 |
+-- | 28000066 |          2 |    7 |
+-- | 28000027 |         37 |    7 |
+-- | 28000028 |          1 |    7 |
+-- | 28000067 |         12 |    7 |
+-- | 28000067 |          7 |    7 |
+-- | 28000029 |         11 |    7 |
+-- | 29000003 |         12 |    7 |
+-- | 28000109 |          1 |    7 |
+-- | 28000066 |         12 |    7 |
+-- | 28000028 |         37 |    7 |
+-- | 28000068 |          1 |    7 |
+-- | 28000027 |          7 |    7 |
+-- | 29000004 |          1 |    7 |
+-- | 28000068 |          7 |    7 |
+-- | 28000065 |         37 |    7 |
+-- | 28000027 |         12 |    7 |
+-- | 28000067 |         37 |    7 |
+-- | 29000007 |          1 |    6 |
+-- | 29000008 |         25 |    6 |
+-- | 29000009 |          7 |    6 |
+-- | 29000005 |          7 |    6 |
+-- | 28000106 |         14 |    6 |
+-- | 29000004 |         25 |    6 |
+-- | 28000103 |          2 |    6 |
+-- | 28000112 |         25 |    6 |
+-- | 28000109 |          7 |    6 |
+-- | 29000007 |          2 |    6 |
+-- | 28000112 |         12 |    6 |
+-- | 28000104 |         12 |    6 |
+-- | 29000003 |          2 |    6 |
+-- | 28000112 |          2 |    6 |
+-- | 29000005 |         12 |    6 |
+-- | 28000107 |          1 |    6 |
+-- | 29000003 |          1 |    6 |
+-- | 28000104 |          2 |    6 |
+-- | 29000008 |         12 |    6 |
+-- | 28000105 |          7 |    6 |
+-- | 28000108 |          2 |    6 |
+-- | 28000108 |         12 |    6 |
+-- | 28000110 |         14 |    6 |
+-- | 29000008 |          2 |    6 |
+-- | 29000002 |          7 |    6 |
+-- | 28000107 |          2 |    6 |
+-- | 29000006 |          7 |    6 |
+-- | 28000109 |         12 |    6 |
+-- | 29000004 |          2 |    6 |
+-- | 29000001 |         12 |    6 |
+-- | 28000106 |          7 |    6 |
+-- | 29000002 |         14 |    6 |
+-- | 28000101 |          7 |    6 |
+-- | 28000108 |         25 |    6 |
+-- | 28000105 |         12 |    6 |
+-- | 29000001 |          7 |    6 |
+-- | 28000104 |         25 |    6 |
+-- | 28000111 |          2 |    6 |
+-- | 28000111 |          1 |    6 |
+-- | 29000004 |         12 |    6 |
+-- | 29000006 |         14 |    6 |
+-- | 28000110 |          7 |    6 |
+-- | 28000103 |          1 |    6 |
+-- | 28000028 |         12 |    6 |
+-- | 28000041 |          7 |    6 |
+-- | 28000041 |         12 |    6 |
+-- | 28000042 |          7 |    6 |
+-- | 28000042 |         14 |    6 |
+-- | 28000043 |          1 |    6 |
+-- | 28000043 |          2 |    6 |
+-- | 28000044 |          2 |    6 |
+-- | 28000044 |         12 |    6 |
+-- | 28000032 |         25 |    6 |
+-- | 28000032 |         12 |    6 |
+-- | 28000032 |          2 |    6 |
+-- | 28000028 |         25 |    6 |
+-- | 28000011 |          1 |    6 |
+-- | 28000029 |          7 |    6 |
+-- | 28000029 |         12 |    6 |
+-- | 28000030 |          7 |    6 |
+-- | 28000030 |         14 |    6 |
+-- | 28000031 |          1 |    6 |
+-- | 28000031 |          2 |    6 |
+-- | 28000044 |         25 |    6 |
+-- | 28000045 |          7 |    6 |
+-- | 28000051 |          1 |    6 |
+-- | 28000051 |          2 |    6 |
+-- | 28000052 |          2 |    6 |
+-- | 28000052 |         12 |    6 |
+-- | 28000052 |         25 |    6 |
+-- | 28000061 |          7 |    6 |
+-- | 28000061 |         12 |    6 |
+-- | 28000062 |          7 |    6 |
+-- | 28000050 |         14 |    6 |
+-- | 28000050 |          7 |    6 |
+-- | 28000049 |         12 |    6 |
+-- | 28000045 |         12 |    6 |
+-- | 28000046 |          7 |    6 |
+-- | 28000046 |         14 |    6 |
+-- | 28000047 |          1 |    6 |
+-- | 28000048 |          2 |    6 |
+-- | 28000048 |         12 |    6 |
+-- | 28000048 |         25 |    6 |
+-- | 28000049 |          7 |    6 |
+-- | 28000062 |         14 |    6 |
+-- | 28000001 |         12 |    6 |
+-- | 28000007 |          1 |    6 |
+-- | 28000007 |          2 |    6 |
+-- | 28000008 |          2 |    6 |
+-- | 28000008 |         12 |    6 |
+-- | 28000008 |         25 |    6 |
+-- | 28000001 |          7 |    6 |
+-- | 28000009 |          7 |    6 |
+-- | 28000009 |         12 |    6 |
+-- | 28000006 |         14 |    6 |
+-- | 28000006 |          7 |    6 |
+-- | 28000005 |         12 |    6 |
+-- | 28000002 |          7 |    6 |
+-- | 28000002 |         14 |    6 |
+-- | 28000003 |          1 |    6 |
+-- | 28000003 |          2 |    6 |
+-- | 28000004 |          2 |    6 |
+-- | 28000004 |         12 |    6 |
+-- | 28000004 |         25 |    6 |
+-- | 28000005 |          7 |    6 |
+-- | 28000010 |          7 |    6 |
+-- | 28000010 |         14 |    6 |
+-- | 28000024 |         12 |    6 |
+-- | 28000024 |         25 |    6 |
+-- | 28000025 |          7 |    6 |
+-- | 28000025 |         12 |    6 |
+-- | 28000026 |          7 |    6 |
+-- | 28000026 |         14 |    6 |
+-- | 28000027 |          1 |    6 |
+-- | 28000027 |          2 |    6 |
+-- | 28000024 |          2 |    6 |
+-- | 28000023 |          2 |    6 |
+-- | 28000023 |          1 |    6 |
+-- | 28000011 |          2 |    6 |
+-- | 28000012 |          2 |    6 |
+-- | 28000012 |         12 |    6 |
+-- | 28000012 |         25 |    6 |
+-- | 28000021 |          7 |    6 |
+-- | 28000021 |         12 |    6 |
+-- | 28000022 |          7 |    6 |
+-- | 28000022 |         14 |    6 |
+-- | 28000028 |          2 |    6 |
+-- | 28000088 |          2 |    6 |
+-- | 28000070 |         14 |    6 |
+-- | 28000090 |         14 |    6 |
+-- | 28000087 |          1 |    6 |
+-- | 28000091 |          1 |    6 |
+-- | 28000070 |          7 |    6 |
+-- | 28000083 |          1 |    6 |
+-- | 28000091 |          2 |    6 |
+-- | 28000069 |         12 |    6 |
+-- | 28000069 |          7 |    6 |
+-- | 28000068 |         25 |    6 |
+-- | 28000068 |         12 |    6 |
+-- | 28000086 |         14 |    6 |
+-- | 28000090 |          7 |    6 |
+-- | 28000087 |          2 |    6 |
+-- | 28000089 |         12 |    6 |
+-- | 28000083 |          2 |    6 |
+-- | 28000081 |         12 |    6 |
+-- | 28000088 |         12 |    6 |
+-- | 28000082 |          7 |    6 |
+-- | 28000081 |          7 |    6 |
+-- | 28000072 |         25 |    6 |
+-- | 28000072 |         12 |    6 |
+-- | 28000088 |         25 |    6 |
+-- | 28000082 |         14 |    6 |
+-- | 28000072 |          2 |    6 |
+-- | 28000089 |          7 |    6 |
+-- | 28000071 |          2 |    6 |
+-- | 28000068 |          2 |    6 |
+-- | 28000065 |         12 |    6 |
+-- | 28000102 |          7 |    6 |
+-- | 28000065 |          7 |    6 |
+-- | 28000047 |          2 |    6 |
+-- | 28000086 |          7 |    6 |
+-- | 28000064 |         25 |    6 |
+-- | 28000066 |          7 |    6 |
+-- | 28000064 |         12 |    6 |
+-- | 28000064 |          2 |    6 |
+-- | 28000085 |          7 |    6 |
+-- | 28000102 |         14 |    6 |
+-- | 28000071 |          1 |    6 |
+-- | 28000063 |          2 |    6 |
+-- | 28000063 |          1 |    6 |
+-- | 28000085 |         12 |    6 |
+-- | 28000084 |         25 |    6 |
+-- | 28000067 |          2 |    6 |
+-- | 28000067 |          1 |    6 |
+-- | 28000092 |          2 |    6 |
+-- | 28000066 |         14 |    6 |
+-- | 28000092 |         12 |    6 |
+-- | 28000092 |         25 |    6 |
+-- | 28000084 |          2 |    6 |
+-- | 28000101 |         12 |    6 |
+-- | 28000084 |         12 |    6 |
+-- | 60000107 |          4 |    6 |
+-- | 60000111 |         36 |    6 |
+-- | 60000106 |          4 |    6 |
+-- | 60000106 |         31 |    6 |
+-- | 60000106 |         35 |    6 |
+-- | 60000112 |          4 |    6 |
+-- | 60000112 |         31 |    6 |
+-- | 60000112 |         35 |    6 |
+-- | 60000108 |         36 |    6 |
+-- | 60000109 |          4 |    6 |
+-- | 60000110 |          4 |    6 |
+-- | 60000109 |         31 |    6 |
+-- | 60000109 |         35 |    6 |
+-- | 60000108 |         34 |    6 |
+-- | 60000110 |         33 |    6 |
+-- | 60000108 |         26 |    6 |
+-- | 60000111 |          2 |    6 |
+-- | 60000111 |         34 |    6 |
+-- | 60000108 |          2 |    6 |
+-- | 60000111 |         26 |    6 |
+-- | 60000107 |         33 |    6 |
+-- | 60000091 |         20 |    6 |
+-- | 50000107 |         33 |    6 |
+-- | 60000062 |          2 |    6 |
+-- | 60000048 |         28 |    6 |
+-- | 60000004 |          3 |    6 |
+-- | 60000092 |          3 |    6 |
+-- | 60000064 |         33 |    6 |
+-- | 60000002 |         20 |    6 |
+-- | 60000048 |         20 |    6 |
+-- | 60000002 |         28 |    6 |
+-- | 60000105 |          2 |    6 |
+-- | 60000091 |         28 |    6 |
+-- | 60000062 |         26 |    6 |
+-- | 60000003 |          3 |    6 |
+-- | 60000105 |         26 |    6 |
+-- | 60000006 |         21 |    6 |
+-- | 60000007 |          3 |    6 |
+-- | 60000065 |         26 |    6 |
+-- | 60000089 |         21 |    6 |
+-- | 60000046 |         21 |    6 |
+-- | 60000046 |          3 |    6 |
+-- | 60000089 |          3 |    6 |
+-- | 60000065 |         34 |    6 |
+-- | 60000090 |          3 |    6 |
+-- | 60000105 |         34 |    6 |
+-- | 60000047 |          3 |    6 |
+-- | 60000065 |          2 |    6 |
+-- | 60000061 |         33 |    6 |
+-- | 60000005 |         20 |    6 |
+-- | 50000107 |          4 |    6 |
+-- | 60000005 |         28 |    6 |
+-- | 50000108 |          2 |    6 |
+-- | 50000106 |         35 |    6 |
+-- | 60000006 |          3 |    6 |
+-- | 60000003 |         21 |    6 |
+-- | 50000109 |         35 |    6 |
+-- | 60000052 |          3 |    6 |
+-- | 50000111 |          2 |    6 |
+-- | 60000105 |         36 |    6 |
+-- | 60000102 |         26 |    6 |
+-- | 60000103 |         35 |    6 |
+-- | 60000063 |         31 |    6 |
+-- | 50000111 |         26 |    6 |
+-- | 60000102 |          2 |    6 |
+-- | 60000062 |         36 |    6 |
+-- | 60000032 |         35 |    6 |
+-- | 60000102 |         34 |    6 |
+-- | 60000063 |          4 |    6 |
+-- | 50000110 |          4 |    6 |
+-- | 60000051 |         28 |    6 |
+-- | 60000103 |          4 |    6 |
+-- | 60000103 |         31 |    6 |
+-- | 60000051 |         20 |    6 |
+-- | 60000102 |         36 |    6 |
+-- | 50000109 |         31 |    6 |
+-- | 50000110 |         33 |    6 |
+-- | 50000111 |         34 |    6 |
+-- | 50000111 |         36 |    6 |
+-- | 60000101 |          4 |    6 |
+-- | 50000112 |         35 |    6 |
+-- | 60000064 |          4 |    6 |
+-- | 60000001 |          3 |    6 |
+-- | 60000049 |         21 |    6 |
+-- | 60000092 |         21 |    6 |
+-- | 60000050 |          3 |    6 |
+-- | 60000061 |          4 |    6 |
+-- | 60000049 |          3 |    6 |
+-- | 50000108 |         26 |    6 |
+-- | 50000112 |         31 |    6 |
+-- | 60000101 |         33 |    6 |
+-- | 50000109 |          4 |    6 |
+-- | 60000104 |          4 |    6 |
+-- | 60000062 |         34 |    6 |
+-- | 50000108 |         36 |    6 |
+-- | 50000112 |          4 |    6 |
+-- | 60000063 |         35 |    6 |
+-- | 50000108 |         34 |    6 |
+-- | 60000052 |         21 |    6 |
+-- | 60000104 |         33 |    6 |
+-- | 60000008 |         20 |    6 |
+-- | 60000023 |         31 |    6 |
+-- | 60000025 |         26 |    6 |
+-- | 60000025 |         34 |    6 |
+-- | 60000025 |         36 |    6 |
+-- | 60000068 |         26 |    6 |
+-- | 60000026 |          4 |    6 |
+-- | 60000026 |         31 |    6 |
+-- | 60000026 |         35 |    6 |
+-- | 60000068 |         34 |    6 |
+-- | 60000081 |          3 |    6 |
+-- | 60000027 |          4 |    6 |
+-- | 60000082 |         20 |    6 |
+-- | 60000041 |          3 |    6 |
+-- | 60000084 |          3 |    6 |
+-- | 60000023 |         35 |    6 |
+-- | 60000067 |         33 |    6 |
+-- | 60000024 |          4 |    6 |
+-- | 60000083 |         21 |    6 |
+-- | 60000024 |         33 |    6 |
+-- | 60000083 |          3 |    6 |
+-- | 60000068 |          2 |    6 |
+-- | 60000031 |         26 |    6 |
+-- | 60000082 |         28 |    6 |
+-- | 60000068 |         36 |    6 |
+-- | 60000072 |         35 |    6 |
+-- | 60000027 |         33 |    6 |
+-- | 60000071 |         26 |    6 |
+-- | 60000029 |          4 |    6 |
+-- | 60000071 |          2 |    6 |
+-- | 60000029 |         31 |    6 |
+-- | 60000069 |         35 |    6 |
+-- | 60000029 |         35 |    6 |
+-- | 60000070 |         33 |    6 |
+-- | 60000030 |          4 |    6 |
+-- | 60000031 |          2 |    6 |
+-- | 60000070 |          4 |    6 |
+-- | 60000069 |         31 |    6 |
+-- | 60000028 |         34 |    6 |
+-- | 60000032 |          4 |    6 |
+-- | 60000072 |         31 |    6 |
+-- | 60000069 |          4 |    6 |
+-- | 60000028 |          2 |    6 |
+-- | 60000031 |         36 |    6 |
+-- | 60000072 |          4 |    6 |
+-- | 60000031 |         34 |    6 |
+-- | 60000028 |         26 |    6 |
+-- | 60000071 |         36 |    6 |
+-- | 60000071 |         34 |    6 |
+-- | 60000030 |         33 |    6 |
+-- | 60000042 |         20 |    6 |
+-- | 60000045 |         20 |    6 |
+-- | 50000106 |         31 |    6 |
+-- | 60000086 |         21 |    6 |
+-- | 60000045 |         28 |    6 |
+-- | 60000021 |          4 |    6 |
+-- | 60000011 |         20 |    6 |
+-- | 60000021 |         33 |    6 |
+-- | 60000044 |          3 |    6 |
+-- | 60000085 |         28 |    6 |
+-- | 60000066 |          4 |    6 |
+-- | 60000012 |         21 |    6 |
+-- | 60000066 |         35 |    6 |
+-- | 60000010 |          3 |    6 |
+-- | 60000011 |         28 |    6 |
+-- | 60000028 |         36 |    6 |
+-- | 60000087 |          3 |    6 |
+-- | 60000012 |          3 |    6 |
+-- | 60000066 |         31 |    6 |
+-- | 60000025 |          2 |    6 |
+-- | 60000009 |         21 |    6 |
+-- | 60000067 |          4 |    6 |
+-- | 60000065 |         36 |    6 |
+-- | 60000022 |         26 |    6 |
+-- | 60000043 |         21 |    6 |
+-- | 60000022 |         36 |    6 |
+-- | 60000009 |          3 |    6 |
+-- | 60000008 |         28 |    6 |
+-- | 60000023 |          4 |    6 |
+-- | 60000088 |         28 |    6 |
+-- | 60000022 |         34 |    6 |
+-- | 60000022 |          2 |    6 |
+-- | 60000043 |          3 |    6 |
+-- | 60000086 |          3 |    6 |
+-- | 60000085 |         20 |    6 |
+-- | 60000042 |         28 |    6 |
+-- | 60000032 |         31 |    6 |
+-- | 60000088 |         20 |    6 |
+-- | 30000042 |         18 |    6 |
+-- | 30000003 |         31 |    6 |
+-- | 29000072 |         12 |    6 |
+-- | 29000064 |          2 |    6 |
+-- | 29000072 |          2 |    6 |
+-- | 30000005 |         34 |    6 |
+-- | 29000023 |          2 |    6 |
+-- | 29000010 |          7 |    6 |
+-- | 29000050 |          7 |    6 |
+-- | 30000007 |         33 |    6 |
+-- | 29000082 |         14 |    6 |
+-- | 30000003 |          4 |    6 |
+-- | 29000023 |          1 |    6 |
+-- | 29000051 |          2 |    6 |
+-- | 29000072 |         25 |    6 |
+-- | 29000069 |         12 |    6 |
+-- | 29000081 |         12 |    6 |
+-- | 30000005 |         36 |    6 |
+-- | 29000050 |         14 |    6 |
+-- | 29000009 |         12 |    6 |
+-- | 30000003 |         35 |    6 |
+-- | 30000042 |          7 |    6 |
+-- | 30000004 |          4 |    6 |
+-- | 29000064 |         12 |    6 |
+-- | 29000082 |          7 |    6 |
+-- | 29000024 |          2 |    6 |
+-- | 29000064 |         25 |    6 |
+-- | 30000005 |          2 |    6 |
+-- | 29000065 |         12 |    6 |
+-- | 29000065 |          7 |    6 |
+-- | 29000051 |          1 |    6 |
+-- | 30000004 |         33 |    6 |
+-- | 29000024 |         25 |    6 |
+-- | 29000081 |          7 |    6 |
+-- | 29000024 |         12 |    6 |
+-- | 30000012 |         35 |    6 |
+-- | 30000010 |         33 |    6 |
+-- | 30000009 |          4 |    6 |
+-- | 29000069 |          7 |    6 |
+-- | 29000061 |         12 |    6 |
+-- | 30000008 |         36 |    6 |
+-- | 29000063 |          2 |    6 |
+-- | 30000008 |         34 |    6 |
+-- | 29000021 |          7 |    6 |
+-- | 29000067 |          2 |    6 |
+-- | 30000011 |         26 |    6 |
+-- | 29000067 |          1 |    6 |
+-- | 29000032 |          2 |    6 |
+-- | 29000063 |          1 |    6 |
+-- | 30000011 |          2 |    6 |
+-- | 29000068 |          2 |    6 |
+-- | 29000012 |          2 |    6 |
+-- | 30000010 |          4 |    6 |
+-- | 29000062 |          7 |    6 |
+-- | 29000068 |         12 |    6 |
+-- | 29000062 |         14 |    6 |
+-- | 30000009 |         35 |    6 |
+-- | 29000012 |         12 |    6 |
+-- | 30000009 |         31 |    6 |
+-- | 29000012 |         25 |    6 |
+-- | 29000061 |          7 |    6 |
+-- | 30000008 |         26 |    6 |
+-- | 30000007 |          4 |    6 |
+-- | 29000071 |          2 |    6 |
+-- | 29000066 |         14 |    6 |
+-- | 30000006 |         35 |    6 |
+-- | 29000068 |         25 |    6 |
+-- | 29000010 |         14 |    6 |
+-- | 30000012 |         31 |    6 |
+-- | 29000022 |         14 |    6 |
+-- | 30000006 |         31 |    6 |
+-- | 29000052 |          2 |    6 |
+-- | 30000012 |          4 |    6 |
+-- | 29000071 |          1 |    6 |
+-- | 29000022 |          7 |    6 |
+-- | 30000006 |          4 |    6 |
+-- | 29000011 |          2 |    6 |
+-- | 29000021 |         12 |    6 |
+-- | 30000008 |          2 |    6 |
+-- | 29000070 |          7 |    6 |
+-- | 30000011 |         34 |    6 |
+-- | 29000011 |          1 |    6 |
+-- | 30000011 |         36 |    6 |
+-- | 29000070 |         14 |    6 |
+-- | 29000052 |         25 |    6 |
+-- | 29000066 |          7 |    6 |
+-- | 29000111 |          1 |    6 |
+-- | 29000091 |          2 |    6 |
+-- | 29000041 |          7 |    6 |
+-- | 29000029 |          7 |    6 |
+-- | 29000109 |          7 |    6 |
+-- | 29000087 |          1 |    6 |
+-- | 29000087 |          2 |    6 |
+-- | 29000108 |         25 |    6 |
+-- | 29000029 |         12 |    6 |
+-- | 29000046 |         14 |    6 |
+-- | 29000108 |         12 |    6 |
+-- | 29000044 |         12 |    6 |
+-- | 29000047 |          1 |    6 |
+-- | 29000103 |          2 |    6 |
+-- | 29000041 |         12 |    6 |
+-- | 29000028 |          2 |    6 |
+-- | 29000110 |         14 |    6 |
+-- | 29000086 |          7 |    6 |
+-- | 29000103 |          1 |    6 |
+-- | 29000110 |          7 |    6 |
+-- | 29000028 |         12 |    6 |
+-- | 29000086 |         14 |    6 |
+-- | 29000028 |         25 |    6 |
+-- | 29000047 |          2 |    6 |
+-- | 29000109 |         12 |    6 |
+-- | 29000090 |         14 |    6 |
+-- | 29000108 |          2 |    6 |
+-- | 29000043 |          2 |    6 |
+-- | 29000032 |         12 |    6 |
+-- | 29000031 |          2 |    6 |
+-- | 29000104 |         12 |    6 |
+-- | 29000106 |          7 |    6 |
+-- | 29000088 |         25 |    6 |
+-- | 29000104 |         25 |    6 |
+-- | 29000045 |         12 |    6 |
+-- | 29000089 |          7 |    6 |
+-- | 29000045 |          7 |    6 |
+-- | 29000105 |         12 |    6 |
+-- | 29000089 |         12 |    6 |
+-- | 29000106 |         14 |    6 |
+-- | 29000031 |          1 |    6 |
+-- | 29000030 |          7 |    6 |
+-- | 29000088 |          2 |    6 |
+-- | 29000104 |          2 |    6 |
+-- | 29000046 |          7 |    6 |
+-- | 29000030 |         14 |    6 |
+-- | 29000044 |         25 |    6 |
+-- | 29000107 |          2 |    6 |
+-- | 29000107 |          1 |    6 |
+-- | 29000032 |         25 |    6 |
+-- | 29000088 |         12 |    6 |
+-- | 29000090 |          7 |    6 |
+-- | 29000105 |          7 |    6 |
+-- | 30000002 |         36 |    6 |
+-- | 29000092 |          2 |    6 |
+-- | 30000001 |         33 |    6 |
+-- | 29000084 |          2 |    6 |
+-- | 29000048 |         25 |    6 |
+-- | 29000101 |         12 |    6 |
+-- | 29000084 |         12 |    6 |
+-- | 30000001 |          4 |    6 |
+-- | 29000048 |         12 |    6 |
+-- | 29000042 |          7 |    6 |
+-- | 29000084 |         25 |    6 |
+-- | 29000112 |         25 |    6 |
+-- | 29000042 |         14 |    6 |
+-- | 29000101 |          7 |    6 |
+-- | 29000092 |         12 |    6 |
+-- | 29000025 |          7 |    6 |
+-- | 30000002 |         34 |    6 |
+-- | 29000043 |          1 |    6 |
+-- | 29000083 |          1 |    6 |
+-- | 29000083 |          2 |    6 |
+-- | 30000002 |         26 |    6 |
+-- | 29000049 |         12 |    6 |
+-- | 29000025 |         12 |    6 |
+-- | 29000092 |         25 |    6 |
+-- | 30000002 |          2 |    6 |
+-- | 29000049 |          7 |    6 |
+-- | 29000052 |         12 |    6 |
+-- | 29000085 |          7 |    6 |
+-- | 29000027 |          2 |    6 |
+-- | 29000048 |          2 |    6 |
+-- | 29000102 |          7 |    6 |
+-- | 29000027 |          1 |    6 |
+-- | 29000102 |         14 |    6 |
+-- | 29000085 |         12 |    6 |
+-- | 30000005 |         26 |    6 |
+-- | 29000044 |          2 |    6 |
+-- | 29000112 |         12 |    6 |
+-- | 29000091 |          1 |    6 |
+-- | 29000026 |         14 |    6 |
+-- | 29000026 |          7 |    6 |
+-- | 29000111 |          2 |    6 |
+-- | 29000112 |          2 |    6 |
+-- | 40000043 |          3 |    6 |
+-- | 30000043 |          8 |    6 |
+-- | 40000051 |          2 |    6 |
+-- | 40000031 |         36 |    6 |
+-- | 40000032 |          4 |    6 |
+-- | 30000048 |         18 |    6 |
+-- | 40000029 |         31 |    6 |
+-- | 30000045 |         18 |    6 |
+-- | 40000045 |          2 |    6 |
+-- | 40000029 |         35 |    6 |
+-- | 40000045 |         25 |    6 |
+-- | 40000032 |         35 |    6 |
+-- | 30000051 |          7 |    6 |
+-- | 30000051 |         18 |    6 |
+-- | 30000049 |          8 |    6 |
+-- | 40000048 |         25 |    6 |
+-- | 40000031 |          2 |    6 |
+-- | 40000030 |         33 |    6 |
+-- | 40000042 |         25 |    6 |
+-- | 40000031 |         26 |    6 |
+-- | 40000030 |          4 |    6 |
+-- | 30000046 |          8 |    6 |
+-- | 40000042 |          2 |    6 |
+-- | 30000052 |          8 |    6 |
+-- | 30000048 |          7 |    6 |
+-- | 40000031 |         34 |    6 |
+-- | 30000045 |          7 |    6 |
+-- | 40000048 |          2 |    6 |
+-- | 40000032 |         31 |    6 |
+-- | 40000046 |          3 |    6 |
+-- | 40000049 |          3 |    6 |
+-- | 40000005 |          2 |    6 |
+-- | 30000111 |          2 |    6 |
+-- | 30000110 |         33 |    6 |
+-- | 30000110 |          4 |    6 |
+-- | 30000070 |         33 |    6 |
+-- | 30000109 |         35 |    6 |
+-- | 30000109 |         31 |    6 |
+-- | 30000109 |          4 |    6 |
+-- | 30000108 |         36 |    6 |
+-- | 30000108 |         34 |    6 |
+-- | 30000108 |         26 |    6 |
+-- | 30000071 |         26 |    6 |
+-- | 30000108 |          2 |    6 |
+-- | 30000107 |         33 |    6 |
+-- | 30000071 |         34 |    6 |
+-- | 30000070 |          4 |    6 |
+-- | 30000111 |         26 |    6 |
+-- | 30000111 |         34 |    6 |
+-- | 30000068 |          2 |    6 |
+-- | 30000068 |         26 |    6 |
+-- | 40000003 |          3 |    6 |
+-- | 40000002 |         25 |    6 |
+-- | 30000068 |         34 |    6 |
+-- | 30000068 |         36 |    6 |
+-- | 40000002 |          2 |    6 |
+-- | 30000069 |          4 |    6 |
+-- | 30000112 |         35 |    6 |
+-- | 30000112 |         31 |    6 |
+-- | 30000069 |         31 |    6 |
+-- | 30000112 |          4 |    6 |
+-- | 30000111 |         36 |    6 |
+-- | 30000069 |         35 |    6 |
+-- | 30000071 |         36 |    6 |
+-- | 30000107 |          4 |    6 |
+-- | 30000072 |          4 |    6 |
+-- | 30000082 |         18 |    6 |
+-- | 30000102 |         34 |    6 |
+-- | 30000102 |          2 |    6 |
+-- | 30000083 |          8 |    6 |
+-- | 30000101 |         33 |    6 |
+-- | 30000101 |          4 |    6 |
+-- | 30000092 |          8 |    6 |
+-- | 30000091 |         18 |    6 |
+-- | 30000091 |          7 |    6 |
+-- | 30000085 |          7 |    6 |
+-- | 30000085 |         18 |    6 |
+-- | 30000089 |          8 |    6 |
+-- | 30000086 |          8 |    6 |
+-- | 30000088 |         18 |    6 |
+-- | 30000102 |         36 |    6 |
+-- | 30000103 |          4 |    6 |
+-- | 30000103 |         31 |    6 |
+-- | 30000106 |         35 |    6 |
+-- | 30000106 |         31 |    6 |
+-- | 30000102 |         26 |    6 |
+-- | 30000106 |          4 |    6 |
+-- | 30000105 |         36 |    6 |
+-- | 30000072 |         31 |    6 |
+-- | 30000105 |         34 |    6 |
+-- | 30000105 |         26 |    6 |
+-- | 30000072 |         35 |    6 |
+-- | 30000105 |          2 |    6 |
+-- | 30000104 |         33 |    6 |
+-- | 30000104 |          4 |    6 |
+-- | 30000103 |         35 |    6 |
+-- | 30000082 |          7 |    6 |
+-- | 30000088 |          7 |    6 |
+-- | 30000067 |         33 |    6 |
+-- | 40000029 |          4 |    6 |
+-- | 40000024 |         33 |    6 |
+-- | 30000063 |          4 |    6 |
+-- | 40000024 |          4 |    6 |
+-- | 40000023 |         35 |    6 |
+-- | 30000063 |         31 |    6 |
+-- | 40000023 |         31 |    6 |
+-- | 40000025 |          2 |    6 |
+-- | 40000023 |          4 |    6 |
+-- | 30000063 |         35 |    6 |
+-- | 40000022 |         36 |    6 |
+-- | 40000022 |         34 |    6 |
+-- | 40000022 |         26 |    6 |
+-- | 30000064 |          4 |    6 |
+-- | 40000022 |          2 |    6 |
+-- | 30000062 |         36 |    6 |
+-- | 30000062 |         34 |    6 |
+-- | 40000025 |         26 |    6 |
+-- | 40000028 |         36 |    6 |
+-- | 30000061 |          4 |    6 |
+-- | 40000028 |         34 |    6 |
+-- | 40000028 |         26 |    6 |
+-- | 40000028 |          2 |    6 |
+-- | 30000061 |         33 |    6 |
+-- | 40000027 |          4 |    6 |
+-- | 30000062 |          2 |    6 |
+-- | 40000026 |         35 |    6 |
+-- | 40000026 |         31 |    6 |
+-- | 40000026 |          4 |    6 |
+-- | 30000062 |         26 |    6 |
+-- | 40000025 |         36 |    6 |
+-- | 40000025 |         34 |    6 |
+-- | 40000021 |         33 |    6 |
+-- | 40000021 |          4 |    6 |
+-- | 40000012 |          3 |    6 |
+-- | 40000011 |          2 |    6 |
+-- | 40000011 |         25 |    6 |
+-- | 30000066 |         31 |    6 |
+-- | 40000009 |          3 |    6 |
+-- | 30000065 |         26 |    6 |
+-- | 30000067 |          4 |    6 |
+-- | 30000066 |          4 |    6 |
+-- | 30000065 |         34 |    6 |
+-- | 30000065 |          2 |    6 |
+-- | 40000027 |         33 |    6 |
+-- | 40000008 |         25 |    6 |
+-- | 40000005 |         25 |    6 |
+-- | 30000066 |         35 |    6 |
+-- | 40000006 |          3 |    6 |
+-- | 30000064 |         33 |    6 |
+-- | 30000071 |          2 |    6 |
+-- | 30000065 |         36 |    6 |
+-- | 40000008 |          2 |    6 |
+-- | 40000051 |         25 |    6 |
+-- | 40000061 |          4 |    6 |
+-- | 40000071 |         36 |    6 |
+-- | 50000087 |          8 |    6 |
+-- | 40000072 |          4 |    6 |
+-- | 40000070 |          4 |    6 |
+-- | 50000105 |         36 |    6 |
+-- | 50000086 |         22 |    6 |
+-- | 50000105 |         26 |    6 |
+-- | 40000072 |         31 |    6 |
+-- | 50000088 |         21 |    6 |
+-- | 40000071 |         34 |    6 |
+-- | 50000105 |         34 |    6 |
+-- | 40000052 |          3 |    6 |
+-- | 50000106 |          4 |    6 |
+-- | 40000071 |         26 |    6 |
+-- | 40000071 |          2 |    6 |
+-- | 50000102 |          2 |    6 |
+-- | 40000064 |         33 |    6 |
+-- | 50000101 |          4 |    6 |
+-- | 40000067 |          4 |    6 |
+-- | 40000068 |         34 |    6 |
+-- | 40000064 |          4 |    6 |
+-- | 50000092 |         22 |    6 |
+-- | 50000102 |         36 |    6 |
+-- | 40000067 |         33 |    6 |
+-- | 50000103 |         31 |    6 |
+-- | 50000103 |          4 |    6 |
+-- | 40000066 |         35 |    6 |
+-- | 40000065 |         26 |    6 |
+-- | 40000065 |         34 |    6 |
+-- | 40000065 |         36 |    6 |
+-- | 50000102 |         26 |    6 |
+-- | 40000066 |          4 |    6 |
+-- | 50000101 |         33 |    6 |
+-- | 40000065 |          2 |    6 |
+-- | 50000102 |         34 |    6 |
+-- | 40000066 |         31 |    6 |
+-- | 40000063 |         35 |    6 |
+-- | 40000068 |          2 |    6 |
+-- | 50000092 |          5 |    6 |
+-- | 40000069 |         31 |    6 |
+-- | 50000104 |         33 |    6 |
+-- | 40000069 |         35 |    6 |
+-- | 40000062 |         26 |    6 |
+-- | 50000089 |         22 |    6 |
+-- | 50000105 |          2 |    6 |
+-- | 40000062 |          2 |    6 |
+-- | 40000070 |         33 |    6 |
+-- | 40000063 |         31 |    6 |
+-- | 50000090 |          8 |    6 |
+-- | 40000062 |         34 |    6 |
+-- | 40000068 |         26 |    6 |
+-- | 50000103 |         35 |    6 |
+-- | 50000091 |         21 |    6 |
+-- | 50000104 |          4 |    6 |
+-- | 40000068 |         36 |    6 |
+-- | 40000069 |          4 |    6 |
+-- | 40000061 |         33 |    6 |
+-- | 40000063 |          4 |    6 |
+-- | 40000062 |         36 |    6 |
+-- | 50000089 |          5 |    6 |
+-- | 50000025 |         26 |    6 |
+-- | 50000065 |         36 |    6 |
+-- | 50000065 |         34 |    6 |
+-- | 50000062 |         26 |    6 |
+-- | 50000028 |         34 |    6 |
+-- | 50000028 |         36 |    6 |
+-- | 50000065 |         26 |    6 |
+-- | 50000029 |          4 |    6 |
+-- | 50000065 |          2 |    6 |
+-- | 50000029 |         31 |    6 |
+-- | 50000029 |         35 |    6 |
+-- | 50000064 |         33 |    6 |
+-- | 50000030 |          4 |    6 |
+-- | 50000030 |         33 |    6 |
+-- | 50000028 |         26 |    6 |
+-- | 50000066 |          4 |    6 |
+-- | 50000068 |          2 |    6 |
+-- | 50000025 |         34 |    6 |
+-- | 50000025 |         36 |    6 |
+-- | 50000026 |          4 |    6 |
+-- | 50000067 |         33 |    6 |
+-- | 50000026 |         31 |    6 |
+-- | 50000026 |         35 |    6 |
+-- | 50000067 |          4 |    6 |
+-- | 50000027 |          4 |    6 |
+-- | 50000066 |         35 |    6 |
+-- | 50000027 |         33 |    6 |
+-- | 50000066 |         31 |    6 |
+-- | 50000028 |          2 |    6 |
+-- | 50000064 |          4 |    6 |
+-- | 50000031 |          2 |    6 |
+-- | 50000063 |         35 |    6 |
+-- | 50000043 |         22 |    6 |
+-- | 50000061 |          4 |    6 |
+-- | 50000044 |          8 |    6 |
+-- | 50000052 |         22 |    6 |
+-- | 50000045 |         21 |    6 |
+-- | 50000052 |          5 |    6 |
+-- | 50000046 |          5 |    6 |
+-- | 50000046 |         22 |    6 |
+-- | 50000051 |         21 |    6 |
+-- | 50000047 |          8 |    6 |
+-- | 50000048 |         21 |    6 |
+-- | 50000049 |          5 |    6 |
+-- | 50000050 |          8 |    6 |
+-- | 50000043 |          5 |    6 |
+-- | 50000042 |         21 |    6 |
+-- | 50000031 |         26 |    6 |
+-- | 50000063 |         31 |    6 |
+-- | 50000031 |         34 |    6 |
+-- | 50000031 |         36 |    6 |
+-- | 50000063 |          4 |    6 |
+-- | 50000032 |          4 |    6 |
+-- | 50000062 |         36 |    6 |
+-- | 50000062 |         34 |    6 |
+-- | 50000032 |         31 |    6 |
+-- | 50000032 |         35 |    6 |
+-- | 50000041 |          8 |    6 |
+-- | 50000062 |          2 |    6 |
+-- | 50000061 |         33 |    6 |
+-- | 50000049 |         22 |    6 |
+-- | 40000072 |         35 |    6 |
+-- | 50000008 |         21 |    6 |
+-- | 50000009 |          5 |    6 |
+-- | 50000081 |          8 |    6 |
+-- | 50000009 |         22 |    6 |
+-- | 50000010 |          8 |    6 |
+-- | 50000072 |         31 |    6 |
+-- | 50000011 |         21 |    6 |
+-- | 50000012 |          5 |    6 |
+-- | 50000072 |          4 |    6 |
+-- | 50000012 |         22 |    6 |
+-- | 50000071 |         36 |    6 |
+-- | 50000071 |         34 |    6 |
+-- | 50000021 |          4 |    6 |
+-- | 50000071 |         26 |    6 |
+-- | 50000004 |          8 |    6 |
+-- | 50000021 |         33 |    6 |
+-- | 50000086 |          5 |    6 |
+-- | 50000001 |          8 |    6 |
+-- | 50000085 |         21 |    6 |
+-- | 50000002 |         21 |    6 |
+-- | 50000003 |          5 |    6 |
+-- | 50000003 |         22 |    6 |
+-- | 50000084 |          8 |    6 |
+-- | 50000005 |         21 |    6 |
+-- | 50000083 |         22 |    6 |
+-- | 50000006 |          5 |    6 |
+-- | 50000083 |          5 |    6 |
+-- | 50000006 |         22 |    6 |
+-- | 50000082 |         21 |    6 |
+-- | 50000007 |          8 |    6 |
+-- | 50000071 |          2 |    6 |
+-- | 50000022 |         34 |    6 |
+-- | 50000022 |         26 |    6 |
+-- | 50000068 |         34 |    6 |
+-- | 50000022 |         36 |    6 |
+-- | 50000069 |          4 |    6 |
+-- | 50000068 |         36 |    6 |
+-- | 50000023 |          4 |    6 |
+-- | 50000070 |          4 |    6 |
+-- | 50000069 |         31 |    6 |
+-- | 50000069 |         35 |    6 |
+-- | 50000025 |          2 |    6 |
+-- | 50000023 |         31 |    6 |
+-- | 50000068 |         26 |    6 |
+-- | 50000023 |         35 |    6 |
+-- | 50000024 |         33 |    6 |
+-- | 50000072 |         35 |    6 |
+-- | 50000022 |          2 |    6 |
+-- | 50000024 |          4 |    6 |
+-- | 50000070 |         33 |    6 |
+-- | 50000026 |         25 |    5 |
+-- | 50000069 |         25 |    5 |
+-- | 50000105 |         11 |    5 |
+-- | 40000066 |         25 |    5 |
+-- | 40000072 |         25 |    5 |
+-- | 50000025 |         11 |    5 |
+-- | 50000068 |         11 |    5 |
+-- | 50000106 |         25 |    5 |
+-- | 40000051 |         17 |    5 |
+-- | 50000065 |         11 |    5 |
+-- | 40000068 |         11 |    5 |
+-- | 50000102 |         11 |    5 |
+-- | 40000069 |         25 |    5 |
+-- | 50000071 |         11 |    5 |
+-- | 40000071 |         11 |    5 |
+-- | 50000022 |         11 |    5 |
+-- | 50000031 |         11 |    5 |
+-- | 40000063 |         25 |    5 |
+-- | 50000103 |         25 |    5 |
+-- | 50000063 |         25 |    5 |
+-- | 50000072 |         25 |    5 |
+-- | 40000065 |         11 |    5 |
+-- | 50000023 |         25 |    5 |
+-- | 50000032 |         25 |    5 |
+-- | 50000028 |         11 |    5 |
+-- | 40000062 |         11 |    5 |
+-- | 50000062 |         11 |    5 |
+-- | 50000066 |         25 |    5 |
+-- | 50000029 |         25 |    5 |
+-- | 29000102 |         37 |    5 |
+-- | 30000011 |         11 |    5 |
+-- | 29000041 |         25 |    5 |
+-- | 29000102 |         11 |    5 |
+-- | 29000010 |         11 |    5 |
+-- | 29000069 |         25 |    5 |
+-- | 29000089 |         25 |    5 |
+-- | 29000062 |         37 |    5 |
+-- | 29000090 |         37 |    5 |
+-- | 29000063 |         25 |    5 |
+-- | 30000012 |         25 |    5 |
+-- | 29000009 |         25 |    5 |
+-- | 29000042 |         11 |    5 |
+-- | 29000103 |         25 |    5 |
+-- | 29000090 |         11 |    5 |
+-- | 29000101 |         25 |    5 |
+-- | 29000091 |         25 |    5 |
+-- | 29000043 |         25 |    5 |
+-- | 29000066 |         37 |    5 |
+-- | 29000010 |         37 |    5 |
+-- | 29000065 |         25 |    5 |
+-- | 29000066 |         11 |    5 |
+-- | 29000042 |         37 |    5 |
+-- | 29000082 |         11 |    5 |
+-- | 29000047 |         25 |    5 |
+-- | 29000051 |         25 |    5 |
+-- | 29000049 |         25 |    5 |
+-- | 29000111 |         25 |    5 |
+-- | 29000027 |         25 |    5 |
+-- | 29000071 |         25 |    5 |
+-- | 29000022 |         37 |    5 |
+-- | 29000085 |         25 |    5 |
+-- | 30000006 |         25 |    5 |
+-- | 29000110 |         37 |    5 |
+-- | 29000026 |         37 |    5 |
+-- | 30000005 |         11 |    5 |
+-- | 30000003 |         25 |    5 |
+-- | 29000082 |         37 |    5 |
+-- | 30000002 |         11 |    5 |
+-- | 29000081 |         25 |    5 |
+-- | 29000083 |         25 |    5 |
+-- | 29000050 |         11 |    5 |
+-- | 29000025 |         25 |    5 |
+-- | 29000050 |         37 |    5 |
+-- | 29000023 |         25 |    5 |
+-- | 29000026 |         11 |    5 |
+-- | 29000022 |         11 |    5 |
+-- | 29000110 |         11 |    5 |
+-- | 29000086 |         11 |    5 |
+-- | 29000061 |         25 |    5 |
+-- | 30000009 |         25 |    5 |
+-- | 29000106 |         37 |    5 |
+-- | 29000030 |         37 |    5 |
+-- | 29000106 |         11 |    5 |
+-- | 29000045 |         25 |    5 |
+-- | 29000062 |         11 |    5 |
+-- | 29000105 |         25 |    5 |
+-- | 29000031 |         25 |    5 |
+-- | 29000067 |         25 |    5 |
+-- | 29000030 |         11 |    5 |
+-- | 29000107 |         25 |    5 |
+-- | 29000070 |         37 |    5 |
+-- | 29000109 |         25 |    5 |
+-- | 29000021 |         25 |    5 |
+-- | 29000070 |         11 |    5 |
+-- | 29000086 |         37 |    5 |
+-- | 30000008 |         11 |    5 |
+-- | 29000046 |         37 |    5 |
+-- | 29000029 |         25 |    5 |
+-- | 29000046 |         11 |    5 |
+-- | 29000087 |         25 |    5 |
+-- | 29000011 |         25 |    5 |
+-- | 60000108 |         11 |    5 |
+-- | 60000109 |         25 |    5 |
+-- | 60000106 |         25 |    5 |
+-- | 60000112 |         25 |    5 |
+-- | 60000111 |         11 |    5 |
+-- | 28000011 |         25 |    5 |
+-- | 28000085 |         25 |    5 |
+-- | 28000086 |         11 |    5 |
+-- | 29000005 |         25 |    5 |
+-- | 28000022 |         37 |    5 |
+-- | 28000087 |         25 |    5 |
+-- | 28000022 |         11 |    5 |
+-- | 28000086 |         37 |    5 |
+-- | 28000021 |         25 |    5 |
+-- | 28000010 |         37 |    5 |
+-- | 28000005 |         25 |    5 |
+-- | 28000103 |         25 |    5 |
+-- | 28000102 |         11 |    5 |
+-- | 28000003 |         25 |    5 |
+-- | 28000101 |         25 |    5 |
+-- | 28000002 |         37 |    5 |
+-- | 28000002 |         11 |    5 |
+-- | 28000001 |         25 |    5 |
+-- | 29000007 |         25 |    5 |
+-- | 28000091 |         25 |    5 |
+-- | 28000006 |         11 |    5 |
+-- | 29000006 |         11 |    5 |
+-- | 28000010 |         11 |    5 |
+-- | 28000009 |         25 |    5 |
+-- | 28000089 |         25 |    5 |
+-- | 28000090 |         11 |    5 |
+-- | 28000007 |         25 |    5 |
+-- | 28000090 |         37 |    5 |
+-- | 28000006 |         37 |    5 |
+-- | 29000006 |         37 |    5 |
+-- | 28000062 |         11 |    5 |
+-- | 28000047 |         25 |    5 |
+-- | 28000046 |         37 |    5 |
+-- | 28000067 |         25 |    5 |
+-- | 28000046 |         11 |    5 |
+-- | 28000045 |         25 |    5 |
+-- | 28000069 |         25 |    5 |
+-- | 28000043 |         25 |    5 |
+-- | 28000070 |         11 |    5 |
+-- | 28000042 |         37 |    5 |
+-- | 28000107 |         25 |    5 |
+-- | 28000066 |         37 |    5 |
+-- | 28000066 |         11 |    5 |
+-- | 28000111 |         25 |    5 |
+-- | 28000110 |         11 |    5 |
+-- | 28000061 |         25 |    5 |
+-- | 28000109 |         25 |    5 |
+-- | 28000063 |         25 |    5 |
+-- | 28000110 |         37 |    5 |
+-- | 28000051 |         25 |    5 |
+-- | 28000050 |         37 |    5 |
+-- | 28000050 |         11 |    5 |
+-- | 28000065 |         25 |    5 |
+-- | 28000049 |         25 |    5 |
+-- | 28000042 |         11 |    5 |
+-- | 29000001 |         25 |    5 |
+-- | 28000062 |         37 |    5 |
+-- | 28000027 |         25 |    5 |
+-- | 29000003 |         25 |    5 |
+-- | 28000106 |         11 |    5 |
+-- | 28000026 |         37 |    5 |
+-- | 28000026 |         11 |    5 |
+-- | 28000083 |         25 |    5 |
+-- | 28000025 |         25 |    5 |
+-- | 28000105 |         25 |    5 |
+-- | 28000023 |         25 |    5 |
+-- | 28000082 |         11 |    5 |
+-- | 28000081 |         25 |    5 |
+-- | 28000106 |         37 |    5 |
+-- | 28000041 |         25 |    5 |
+-- | 28000070 |         37 |    5 |
+-- | 28000102 |         37 |    5 |
+-- | 28000071 |         25 |    5 |
+-- | 29000002 |         11 |    5 |
+-- | 28000031 |         25 |    5 |
+-- | 28000030 |         37 |    5 |
+-- | 29000002 |         37 |    5 |
+-- | 28000030 |         11 |    5 |
+-- | 28000029 |         25 |    5 |
+-- | 28000082 |         37 |    5 |
+-- | 40000002 |         17 |    5 |
+-- | 30000102 |         11 |    5 |
+-- | 30000106 |         25 |    5 |
+-- | 30000062 |         11 |    5 |
+-- | 30000043 |         19 |    5 |
+-- | 30000083 |         19 |    5 |
+-- | 40000029 |         25 |    5 |
+-- | 30000086 |         19 |    5 |
+-- | 30000052 |         19 |    5 |
+-- | 30000089 |         19 |    5 |
+-- | 40000042 |         17 |    5 |
+-- | 30000068 |         11 |    5 |
+-- | 40000028 |         11 |    5 |
+-- | 40000005 |         17 |    5 |
+-- | 30000092 |         19 |    5 |
+-- | 30000049 |         19 |    5 |
+-- | 40000026 |         25 |    5 |
+-- | 40000011 |         17 |    5 |
+-- | 30000111 |         11 |    5 |
+-- | 30000065 |         11 |    5 |
+-- | 40000032 |         25 |    5 |
+-- | 30000108 |         11 |    5 |
+-- | 40000022 |         11 |    5 |
+-- | 30000071 |         11 |    5 |
+-- | 30000109 |         25 |    5 |
+-- | 40000008 |         17 |    5 |
+-- | 30000072 |         25 |    5 |
+-- | 30000063 |         25 |    5 |
+-- | 40000031 |         11 |    5 |
+-- | 30000103 |         25 |    5 |
+-- | 30000066 |         25 |    5 |
+-- | 30000069 |         25 |    5 |
+-- | 40000048 |         17 |    5 |
+-- | 40000045 |         17 |    5 |
+-- | 40000025 |         11 |    5 |
+-- | 30000105 |         11 |    5 |
+-- | 40000023 |         25 |    5 |
+-- | 30000112 |         25 |    5 |
+-- | 30000046 |         19 |    5 |
+-- | 60000006 |         29 |    5 |
+-- | 50000109 |         25 |    5 |
+-- | 60000089 |         29 |    5 |
+-- | 60000105 |         11 |    5 |
+-- | 60000046 |         29 |    5 |
+-- | 60000009 |         29 |    5 |
+-- | 60000029 |         25 |    5 |
+-- | 60000071 |         11 |    5 |
+-- | 60000062 |         11 |    5 |
+-- | 60000072 |         25 |    5 |
+-- | 60000031 |         11 |    5 |
+-- | 50000108 |         11 |    5 |
+-- | 60000052 |         29 |    5 |
+-- | 60000069 |         25 |    5 |
+-- | 60000065 |         11 |    5 |
+-- | 50000111 |         11 |    5 |
+-- | 60000022 |         11 |    5 |
+-- | 60000102 |         11 |    5 |
+-- | 60000068 |         11 |    5 |
+-- | 60000025 |         11 |    5 |
+-- | 60000023 |         25 |    5 |
+-- | 60000049 |         29 |    5 |
+-- | 60000083 |         29 |    5 |
+-- | 60000043 |         29 |    5 |
+-- | 60000063 |         25 |    5 |
+-- | 60000026 |         25 |    5 |
+-- | 60000028 |         11 |    5 |
+-- | 60000086 |         29 |    5 |
+-- | 60000012 |         29 |    5 |
+-- | 60000103 |         25 |    5 |
+-- | 60000003 |         29 |    5 |
+-- | 60000032 |         25 |    5 |
+-- | 60000066 |         25 |    5 |
+-- | 60000092 |         29 |    5 |
+-- | 50000112 |         25 |    5 |
+-- +----------+------------+------+
+
+-- 5
+
+-- Cantidad de alumnos en la escuela
+/*Esta consulta se utiliza para obtener la cantidad total de alumnos que hay registrados en la escuela. 
+La función COUNT(*) cuenta todos los registros de la tabla Alumnos sin necesidad de especificar ninguna condición adicional.
+Es útil para tener un dato rápido sobre el tamaño del colegio, hacer comparaciones entre años sobre cuantos alumos mas o menos hay, 
+planificar recursos y/o acttividades, y generar estadísticas generales de la institución.*/
+
+SELECT COUNT(*) AS Cantidad_Alumnos 
+FROM Alumnos;
+-- +------------------+
+-- | Cantidad_Alumnos |
+-- +------------------+
+-- |              432 |
+-- +------------------+
+
+
+-- Nota máxima y mínima por materia
+/*Esta consulta se utiliza para obtener rápidamente la nota más alta y la más baja de cada materia. 
+Agrupa las calificaciones por ID_Materia con GROUP BY y luego aplica las funciones agregadas MAX y MIN 
+para obtener los extremos de cada grupo.
+Es útil porque permite identificar de manera inmediata el rango de desempeño de los alumnos en cada materia, 
+detectar posibles dificultades o destacar los logros más altos, y generar reportes que ayuden a tomar decisiones pedagógicas 
+o de seguimiento académico.*/
+
+SELECT ID_Materia, MAX(Nota) AS Nota_Max, MIN(Nota) AS Nota_Min
+FROM Calificaciones
+GROUP BY ID_Materia;
+-- +------------+----------+----------+
+-- | ID_Materia | Nota_Max | Nota_Min |
+-- +------------+----------+----------+
+-- |          1 |        8 |        5 |
+-- |          2 |        8 |        6 |
+-- |          7 |        9 |        5 |
+-- |          9 |        9 |        5 |
+-- |         10 |        9 |        6 |
+-- |         11 |        8 |        5 |
+-- |         12 |        9 |        5 |
+-- |         14 |        8 |        6 |
+-- |         16 |       10 |        7 |
+-- |         17 |       10 |        9 |
+-- |         25 |        9 |        4 |
+-- |         37 |        7 |        5 |
+-- +------------+----------+----------+
+
+
+
+-- 6
+
+-- Listar alumnos con su curso
+/*Esta consulta se utiliza para listar a los alumnos junto con la información de su curso. Se hace un INNER JOIN 
+entre las tablas de Alumnos y Cursos usando Anio_Division como vínculo, lo que permite combinar
+los datos de los estudiantes con la división y especialidad a la que pertenecen.
+Es útil porque permite ver de manera completa y organizada qué alumnos están en cada curso y cuál es su especialidad,
+lo que facilita la planificación de clases, la organización de actividades y el seguimiento académico de cada grupo.*/
+
+SELECT A.Nombre, A.Apellido, C.Anio_Division, C.Especialidad
+FROM Alumnos A
+INNER JOIN Cursos C ON A.Anio_Division = C.Anio_Division;
+-- +-------------+---------------+---------------+--------------+
+-- | Nombre      | Apellido      | Anio_Division | Especialidad |
+-- +-------------+---------------+---------------+--------------+
+-- | Sofía       | García        | 1A            | NULL         |
+-- | Mateo       | Fernández     | 1A            | NULL         |
+-- | Valentina   | López         | 1A            | NULL         |
+-- | Benjamín    | Martínez      | 1A            | NULL         |
+-- | Emma        | Gómez         | 1A            | NULL         |
+-- | Thiago      | Díaz          | 1A            | NULL         |
+-- | Isabella    | Silva         | 1A            | NULL         |
+-- | Lucas       | Torres        | 1A            | NULL         |
+-- | Camila      | Rojas         | 1A            | NULL         |
+-- | Matías      | Morales       | 1A            | NULL         |
+-- | Luna        | Castro        | 1A            | NULL         |
+-- | Santiago    | Pérez         | 1A            | NULL         |
+-- | Emma        | Alvarez       | 1B            | NULL         |
+-- | Juan        | Vargas        | 1B            | NULL         |
+-- | Agustina    | Cabrera       | 1B            | NULL         |
+-- | Tomás       | Campos        | 1B            | NULL         |
+-- | Sofía       | Ibarra        | 1B            | NULL         |
+-- | Lucas       | Pineda        | 1B            | NULL         |
+-- | Valeria     | Fuentes       | 1B            | NULL         |
+-- | Diego       | Valdez        | 1B            | NULL         |
+-- | María       | Miranda       | 1B            | NULL         |
+-- | Bruno       | Luna          | 1B            | NULL         |
+-- | Isabel      | Mendoza       | 1B            | NULL         |
+-- | Martín      | Ramos         | 1B            | NULL         |
+-- | Catalina    | Moreno        | 1C            | NULL         |
+-- | Juan        | Bravo         | 1C            | NULL         |
+-- | Florencia   | Salinas       | 1C            | NULL         |
+-- | Santiago    | Mora          | 1C            | NULL         |
+-- | Agustina    | Santana       | 1C            | NULL         |
+-- | Lucas       | Ibáñez        | 1C            | NULL         |
+-- | María       | Camacho       | 1C            | NULL         |
+-- | Tomás       | Estrada       | 1C            | NULL         |
+-- | Isabella    | Valle         | 1C            | NULL         |
+-- | Matías      | Rey           | 1C            | NULL         |
+-- | Mía         | Crespo        | 1C            | NULL         |
+-- | Bruno       | Flores        | 1C            | NULL         |
+-- | Isabella    | Romero        | 1D            | NULL         |
+-- | Mateo       | Santos        | 1D            | NULL         |
+-- | Sofía       | Rojas         | 1D            | NULL         |
+-- | Benjamín    | Ortiz         | 1D            | NULL         |
+-- | Emma        | Castillo      | 1D            | NULL         |
+-- | Thiago      | Herrera       | 1D            | NULL         |
+-- | Camila      | Morales       | 1D            | NULL         |
+-- | Matías      | Molina        | 1D            | NULL         |
+-- | Luna        | Fuentes       | 1D            | NULL         |
+-- | Santiago    | Miranda       | 1D            | NULL         |
+-- | Mía         | Salazar       | 1D            | NULL         |
+-- | Agustín     | Reyes         | 1D            | NULL         |
+-- | Isabel      | Paz           | 1E            | NULL         |
+-- | Bruno       | Núñez         | 1E            | NULL         |
+-- | Lucía       | Salinas       | 1E            | NULL         |
+-- | Facundo     | Santana       | 1E            | NULL         |
+-- | Micaela     | Ibáñez        | 1E            | NULL         |
+-- | Julián      | Camacho       | 1E            | NULL         |
+-- | Emilia      | Estrada       | 1E            | NULL         |
+-- | Matías      | Valle         | 1E            | NULL         |
+-- | Lucía       | Rey           | 1E            | NULL         |
+-- | Gabriel     | Crespo        | 1E            | NULL         |
+-- | Catalina    | Flores        | 1E            | NULL         |
+-- | Martín      | Ortiz         | 1E            | NULL         |
+-- | Luna        | Ortiz         | 1F            | NULL         |
+-- | Santiago    | Castillo      | 1F            | NULL         |
+-- | Mía         | Herrera       | 1F            | NULL         |
+-- | Agustín     | Morales       | 1F            | NULL         |
+-- | Emma        | Molina        | 1F            | NULL         |
+-- | Martín      | Fuentes       | 1F            | NULL         |
+-- | Catalina    | Valdez        | 1F            | NULL         |
+-- | Diego       | Miranda       | 1F            | NULL         |
+-- | Julia       | Luna          | 1F            | NULL         |
+-- | Julián      | Mendoza       | 1F            | NULL         |
+-- | Emma        | Ramos         | 1F            | NULL         |
+-- | Lucas       | Paz           | 1F            | NULL         |
+-- | Ana         | Vargas        | 2A            | NULL         |
+-- | Martín      | Salinas       | 2A            | NULL         |
+-- | Carla       | Mendoza       | 2A            | NULL         |
+-- | Lucas       | Cabrera       | 2A            | NULL         |
+-- | Laura       | Campos        | 2A            | NULL         |
+-- | Sergio      | Fernández     | 2A            | NULL         |
+-- | Mariana     | Pineda        | 2A            | NULL         |
+-- | Diego       | Herrera       | 2A            | NULL         |
+-- | Verónica    | Reyes         | 2A            | NULL         |
+-- | Facundo     | Ortiz         | 2A            | NULL         |
+-- | Gabriela    | Castro        | 2A            | NULL         |
+-- | Pablo       | Paz           | 2A            | NULL         |
+-- | Agustina    | Pacheco       | 2B            | NULL         |
+-- | Martín      | Bravo         | 2B            | NULL         |
+-- | Julieta     | Vargas        | 2B            | NULL         |
+-- | Leandro     | Miranda       | 2B            | NULL         |
+-- | Valentina   | Luna          | 2B            | NULL         |
+-- | Santiago    | Campos        | 2B            | NULL         |
+-- | Camila      | Castillo      | 2B            | NULL         |
+-- | Bruno       | Romero        | 2B            | NULL         |
+-- | Florencia   | Mora          | 2B            | NULL         |
+-- | Lucas       | Salinas       | 2B            | NULL         |
+-- | Emilia      | Ibarra        | 2B            | NULL         |
+-- | Tomás       | Reyes         | 2B            | NULL         |
+-- | Carla       | Domínguez     | 2C            | NULL         |
+-- | Pablo       | Herrera       | 2C            | NULL         |
+-- | Lucía       | Morales       | 2C            | NULL         |
+-- | Matías      | Molina        | 2C            | NULL         |
+-- | Emilia      | Fuentes       | 2C            | NULL         |
+-- | Ramiro      | Valdez        | 2C            | NULL         |
+-- | Paula       | Miranda       | 2C            | NULL         |
+-- | Diego       | Luna          | 2C            | NULL         |
+-- | María       | Vega          | 2C            | NULL         |
+-- | Javier      | Salinas       | 2C            | NULL         |
+-- | Florencia   | Ramos         | 2C            | NULL         |
+-- | Sergio      | Ortiz         | 2C            | NULL         |
+-- | Gabriela    | Flores        | 2D            | NULL         |
+-- | Ramiro      | Ortiz         | 2D            | NULL         |
+-- | Natalia     | Sosa          | 2D            | NULL         |
+-- | Javier      | León          | 2D            | NULL         |
+-- | Lucía       | Rivas         | 2D            | NULL         |
+-- | Tomás       | Campos        | 2D            | NULL         |
+-- | María       | Navarro       | 2D            | NULL         |
+-- | Diego       | Romero        | 2D            | NULL         |
+-- | Paula       | Santos        | 2D            | NULL         |
+-- | Lucas       | Rojas         | 2D            | NULL         |
+-- | Emilio      | Ortiz         | 2D            | NULL         |
+-- | Florencia   | Castillo      | 2D            | NULL         |
+-- | Sergio      | Cabrera       | 2E            | NULL         |
+-- | Natalia     | Campos        | 2E            | NULL         |
+-- | Pablo       | Suárez        | 2E            | NULL         |
+-- | Camila      | Ramos         | 2E            | NULL         |
+-- | Bruno       | Ortiz         | 2E            | NULL         |
+-- | Isabel      | Castillo      | 2E            | NULL         |
+-- | Lucas       | Herrera       | 2E            | NULL         |
+-- | Emilia      | Morales       | 2E            | NULL         |
+-- | Martín      | Molina        | 2E            | NULL         |
+-- | Sofía       | Fuentes       | 2E            | NULL         |
+-- | Diego       | Valdez        | 2E            | NULL         |
+-- | Lucía       | Miranda       | 2E            | NULL         |
+-- | Matías      | Salazar       | 2F            | NULL         |
+-- | Florencia   | Ramos         | 2F            | NULL         |
+-- | Emilio      | Ortiz         | 2F            | NULL         |
+-- | Paula       | Castillo      | 2F            | NULL         |
+-- | Lucas       | Romero        | 2F            | NULL         |
+-- | Isabel      | Mora          | 2F            | NULL         |
+-- | Javier      | Salinas       | 2F            | NULL         |
+-- | Micaela     | Ibarra        | 2F            | NULL         |
+-- | Ramiro      | Reyes         | 2F            | NULL         |
+-- | Natalia     | Pacheco       | 2F            | NULL         |
+-- | Bruno       | Vargas        | 2F            | NULL         |
+-- | Sofía       | Salinas       | 2F            | NULL         |
+-- | Lautaro     | Benítez       | 3A            | Computación  |
+-- | Abril       | Coronel       | 3A            | Computación  |
+-- | Santino     | Montenegro    | 3A            | Computación  |
+-- | Juana       | Perdomo       | 3A            | Computación  |
+-- | Bautista    | Almada        | 3A            | Computación  |
+-- | Victoria    | Quiroga       | 3A            | Computación  |
+-- | Franco      | Figueroa      | 3A            | Computación  |
+-- | Clara       | Medrano       | 3A            | Computación  |
+-- | Tomás       | Bermúdez      | 3A            | Computación  |
+-- | Renata      | Chávez        | 3A            | Computación  |
+-- | Iván        | Olmedo        | 3A            | Computación  |
+-- | Bianca      | Correa        | 3A            | Computación  |
+-- | Alan        | Ojeda         | 3B            | Automotor    |
+-- | Sol         | Alfaro        | 3B            | Automotor    |
+-- | Pablo       | Téllez        | 3B            | Automotor    |
+-- | Magdalena   | Cardozo       | 3B            | Automotor    |
+-- | Elías       | Villagra      | 3B            | Automotor    |
+-- | Lola        | Peña          | 3B            | Automotor    |
+-- | Matheo      | Ferreyra      | 3B            | Automotor    |
+-- | Candelaria  | Maldonado     | 3B            | Automotor    |
+-- | Axel        | Reina         | 3B            | Automotor    |
+-- | Alma        | Vera          | 3B            | Automotor    |
+-- | Thiago      | Aguirre       | 3B            | Automotor    |
+-- | Marina      | Barrios       | 3B            | Automotor    |
+-- | Ignacio     | Galván        | 3C            | Computación  |
+-- | Valentina   | Arévalo       | 3C            | Computación  |
+-- | Dante       | Vivas         | 3C            | Computación  |
+-- | Milagros    | Sánchez       | 3C            | Computación  |
+-- | Emilio      | Carrizo       | 3C            | Computación  |
+-- | Paula       | Tejada        | 3C            | Computación  |
+-- | Simón       | Cabral        | 3C            | Computación  |
+-- | Camila      | Villafañe     | 3C            | Computación  |
+-- | Mauricio    | Riveros       | 3C            | Computación  |
+-- | Aitana      | Fonseca       | 3C            | Computación  |
+-- | Esteban     | Lagos         | 3C            | Computación  |
+-- | Martina     | Esquivel      | 3C            | Computación  |
+-- | Lucas       | Navarro       | 3D            | Automotor    |
+-- | Emilia      | Ocampo        | 3D            | Automotor    |
+-- | Matías      | Silva         | 3D            | Automotor    |
+-- | Lucía       | Morán         | 3D            | Automotor    |
+-- | Gonzalo     | Salcedo       | 3D            | Automotor    |
+-- | Sofía       | Durán         | 3D            | Automotor    |
+-- | Martín      | Calvo         | 3D            | Automotor    |
+-- | Josefina    | Villavicencio | 3D            | Automotor    |
+-- | Sebastián   | Acosta        | 3D            | Automotor    |
+-- | Isabel      | Ríos          | 3D            | Automotor    |
+-- | Felipe      | Montes        | 3D            | Automotor    |
+-- | Micaela     | Romero        | 3D            | Automotor    |
+-- | Agustín     | Toha          | 3E            | Computación  |
+-- | Tamara      | Frías         | 3E            | Computación  |
+-- | Maximiliano | Saiz          | 3E            | Computación  |
+-- | Candela     | Lucero        | 3E            | Computación  |
+-- | Nicolás     | Patiño        | 3E            | Computación  |
+-- | Rocío       | Alonso        | 3E            | Computación  |
+-- | Fabián      | Vega          | 3E            | Computación  |
+-- | Mariela     | Bravo         | 3E            | Computación  |
+-- | Oscar       | Tello         | 3E            | Computación  |
+-- | Adriana     | Castillo      | 3E            | Computación  |
+-- | Benjamín    | Oliva         | 3E            | Computación  |
+-- | Daniela     | Campos        | 3E            | Computación  |
+-- | Mauricio    | Carranza      | 3F            | Automotor    |
+-- | Milena      | Araya         | 3F            | Automotor    |
+-- | Gustavo     | Villaflor     | 3F            | Automotor    |
+-- | Zoe         | Peñaloza      | 3F            | Automotor    |
+-- | Ramón       | Quiñones      | 3F            | Automotor    |
+-- | Miranda     | Godoy         | 3F            | Automotor    |
+-- | Damián      | Valdés        | 3F            | Automotor    |
+-- | Verónica    | Mejía         | 3F            | Automotor    |
+-- | Renzo       | Barcena       | 3F            | Automotor    |
+-- | Margarita   | Estévez       | 3F            | Automotor    |
+-- | Elian       | Silvestre     | 3F            | Automotor    |
+-- | Ainhoa      | Santana       | 3F            | Automotor    |
+-- | Ezequiel    | Corvalán      | 4A            | Computación  |
+-- | Pamela      | Ferreyra      | 4A            | Computación  |
+-- | Agustina    | Ojeda         | 4A            | Computación  |
+-- | Leandro     | Funes         | 4A            | Computación  |
+-- | Cintia      | Vázquez       | 4A            | Computación  |
+-- | Joaquín     | Domínguez     | 4A            | Computación  |
+-- | Nerea       | Camposano     | 4A            | Computación  |
+-- | Franco      | Yáñez         | 4A            | Computación  |
+-- | Bianca      | Ortega        | 4A            | Computación  |
+-- | Axel        | Ibarra        | 4A            | Computación  |
+-- | Tobías      | Quiroga       | 4A            | Computación  |
+-- | Camila      | Barrios       | 4A            | Computación  |
+-- | Jonás       | Correa        | 4B            | Automotor    |
+-- | Mónica      | Ferrari       | 4B            | Automotor    |
+-- | Mauricio    | Godoy         | 4B            | Automotor    |
+-- | Bárbara     | Salvatierra   | 4B            | Automotor    |
+-- | Pablo       | Sierra        | 4B            | Automotor    |
+-- | Tamara      | Bustos        | 4B            | Automotor    |
+-- | Federico    | Vallejos      | 4B            | Automotor    |
+-- | Mariela     | Santoro       | 4B            | Automotor    |
+-- | Iván        | Báez          | 4B            | Automotor    |
+-- | Antonella   | Coronel       | 4B            | Automotor    |
+-- | Rodrigo     | Aguilar       | 4B            | Automotor    |
+-- | Carla       | Duré          | 4B            | Automotor    |
+-- | Enzo        | Recalde       | 4C            | Computación  |
+-- | Gabriela    | Morales       | 4C            | Computación  |
+-- | Luciano     | Pizarro       | 4C            | Computación  |
+-- | Mariela     | Tello         | 4C            | Computación  |
+-- | Facundo     | Herrera       | 4C            | Computación  |
+-- | Romina      | Fariña        | 4C            | Computación  |
+-- | Gustavo     | Santana       | 4C            | Computación  |
+-- | Daniela     | Morel         | 4C            | Computación  |
+-- | Kevin       | Aguirre       | 4C            | Computación  |
+-- | Magalí      | Navarro       | 4C            | Computación  |
+-- | Nicolás     | Santibáñez    | 4C            | Computación  |
+-- | Lara        | Cabrera       | 4C            | Computación  |
+-- | Tomás       | Serrano       | 4D            | Automotor    |
+-- | Fiorella    | Bustamante    | 4D            | Automotor    |
+-- | Mateo       | Cardozo       | 4D            | Automotor    |
+-- | Camila      | Figueroa      | 4D            | Automotor    |
+-- | Benjamín    | Espinoza      | 4D            | Automotor    |
+-- | Marina      | Galarza       | 4D            | Automotor    |
+-- | Franco      | Palacios      | 4D            | Automotor    |
+-- | Agustina    | Ortigoza      | 4D            | Automotor    |
+-- | Lucas       | Quintana      | 4D            | Automotor    |
+-- | Florencia   | Sánchez       | 4D            | Automotor    |
+-- | Alejandro   | Bravo         | 4D            | Automotor    |
+-- | Tamara      | Caballero     | 4D            | Automotor    |
+-- | Sebastian   | Signorello    | 4E            | Computación  |
+-- | Eliana      | Cedeño        | 4E            | Computación  |
+-- | Marcos      | Fiorini       | 4E            | Computación  |
+-- | Daniela     | Montes        | 4E            | Computación  |
+-- | Lucio       | Salmerón      | 4E            | Computación  |
+-- | Micaela     | Ojeda         | 4E            | Computación  |
+-- | Diego       | Paz           | 4E            | Computación  |
+-- | Paula       | Tobares       | 4E            | Computación  |
+-- | Alan        | Serra         | 4E            | Computación  |
+-- | Valeria     | Andrada       | 4E            | Computación  |
+-- | Cristian    | Melgarejo     | 4E            | Computación  |
+-- | Julieta     | Cornejo       | 4E            | Computación  |
+-- | Mauricio    | Ahumada       | 4F            | Automotor    |
+-- | Verónica    | Aragón        | 4F            | Automotor    |
+-- | Iván        | Barroso       | 4F            | Automotor    |
+-- | Camila      | Cardenas      | 4F            | Automotor    |
+-- | Emanuel     | Zárate        | 4F            | Automotor    |
+-- | Andrea      | Gudiño        | 4F            | Automotor    |
+-- | Oscar       | Mena          | 4F            | Automotor    |
+-- | Rocío       | Olivera       | 4F            | Automotor    |
+-- | Pedro       | Villarreal    | 4F            | Automotor    |
+-- | Valentina   | Ravelo        | 4F            | Automotor    |
+-- | Gonzalo     | Medina        | 4F            | Automotor    |
+-- | Melisa      | Torres        | 4F            | Automotor    |
+-- | Damián      | Rosales       | 5A            | Computación  |
+-- | Gisela      | Ferraresi     | 5A            | Computación  |
+-- | Marcos      | Cordero       | 5A            | Computación  |
+-- | Rocío       | Acosta        | 5A            | Computación  |
+-- | Santiago    | Bermúdez      | 5A            | Computación  |
+-- | Miriam      | Garrido       | 5A            | Computación  |
+-- | Adrián      | Villalba      | 5A            | Computación  |
+-- | Sabrina     | Espinoza      | 5A            | Computación  |
+-- | Kevin       | Mercado       | 5A            | Computación  |
+-- | Natalia     | Bravo         | 5A            | Computación  |
+-- | Ariel       | Paz           | 5A            | Computación  |
+-- | Mariela     | Sepúlveda     | 5A            | Computación  |
+-- | Julián      | Bustos        | 5B            | Automotor    |
+-- | Daniela     | Rojas         | 5B            | Automotor    |
+-- | Maximiliano | Zárate        | 5B            | Automotor    |
+-- | Ailén       | Domínguez     | 5B            | Automotor    |
+-- | Hernán      | Moya          | 5B            | Automotor    |
+-- | Verónica    | Pizarro       | 5B            | Automotor    |
+-- | Rodrigo     | Cáceres       | 5B            | Automotor    |
+-- | Patricia    | Vidal         | 5B            | Automotor    |
+-- | Sergio      | Coronel       | 5B            | Automotor    |
+-- | Vanesa      | Silva         | 5B            | Automotor    |
+-- | Martín      | Agüero        | 5B            | Automotor    |
+-- | Florencia   | Lagos         | 5B            | Automotor    |
+-- | Franco      | Quinteros     | 5C            | Computación  |
+-- | Carolina    | Paredes       | 5C            | Computación  |
+-- | Leandro     | Salvatierra   | 5C            | Computación  |
+-- | Noelia      | Montenegro    | 5C            | Computación  |
+-- | Mauricio    | Olivera       | 5C            | Computación  |
+-- | Romina      | Villarreal    | 5C            | Computación  |
+-- | Federico    | Cruz          | 5C            | Computación  |
+-- | Julieta     | Ponce         | 5C            | Computación  |
+-- | Iván        | Alcaraz       | 5C            | Computación  |
+-- | Gabriela    | Medina        | 5C            | Computación  |
+-- | Pablo       | Serrano       | 5C            | Computación  |
+-- | Daiana      | Torres        | 5C            | Computación  |
+-- | Felipe      | Lemus         | 5D            | Automotor    |
+-- | Micaela     | Godoy         | 5D            | Automotor    |
+-- | Sergio      | Moreno        | 5D            | Automotor    |
+-- | Bianca      | Acosta        | 5D            | Automotor    |
+-- | Cristian    | Delgado       | 5D            | Automotor    |
+-- | Valeria     | Aguirre       | 5D            | Automotor    |
+-- | Ariel       | Gómez         | 5D            | Automotor    |
+-- | Lorena      | Paz           | 5D            | Automotor    |
+-- | Gastón      | Caballero     | 5D            | Automotor    |
+-- | Mariela     | Funes         | 5D            | Automotor    |
+-- | Jorge       | Ramos         | 5D            | Automotor    |
+-- | Alejandra   | Salas         | 5D            | Automotor    |
+-- | Fabián      | Rosendo       | 5E            | Computación  |
+-- | Eliana      | Prieto        | 5E            | Computación  |
+-- | Mariano     | Ojeda         | 5E            | Computación  |
+-- | Natalia     | Sarmiento     | 5E            | Computación  |
+-- | Iván        | Benítez       | 5E            | Computación  |
+-- | Patricia    | Guerrero      | 5E            | Computación  |
+-- | Alejandro   | Fleitas       | 5E            | Computación  |
+-- | Vanina      | Ayala         | 5E            | Computación  |
+-- | Javier      | Galarza       | 5E            | Computación  |
+-- | Sabrina     | Meza          | 5E            | Computación  |
+-- | Nahuel      | Espínola      | 5E            | Computación  |
+-- | Florencia   | Barrios       | 5E            | Computación  |
+-- | Cristian    | Cáceres       | 5F            | Automotor    |
+-- | Laura       | Morales       | 5F            | Automotor    |
+-- | Agustín     | Zúñiga        | 5F            | Automotor    |
+-- | Sofía       | Aguilar       | 5F            | Automotor    |
+-- | Brian       | Ledesma       | 5F            | Automotor    |
+-- | Luciana     | Funes         | 5F            | Automotor    |
+-- | Héctor      | Márquez       | 5F            | Automotor    |
+-- | Rocío       | Montes        | 5F            | Automotor    |
+-- | Emanuel     | Villanueva    | 5F            | Automotor    |
+-- | Brenda      | Arce          | 5F            | Automotor    |
+-- | Fernando    | Ojeda         | 5F            | Automotor    |
+-- | Jimena      | Britez        | 5F            | Automotor    |
+-- | Ignacio     | Maldini       | 6A            | Computación  |
+-- | Valeria     | Ortega        | 6A            | Computación  |
+-- | Mauricio    | Santoro       | 6A            | Computación  |
+-- | Pamela      | Téllez        | 6A            | Computación  |
+-- | Leandro     | Fiorito       | 6A            | Computación  |
+-- | Romina      | Mancini       | 6A            | Computación  |
+-- | Facundo     | Alarcón       | 6A            | Computación  |
+-- | Tamara      | Quintana      | 6A            | Computación  |
+-- | Esteban     | Toledo        | 6A            | Computación  |
+-- | Laura       | Pellegrini    | 6A            | Computación  |
+-- | Pablo       | Centurión     | 6A            | Computación  |
+-- | Silvina     | Marelli       | 6A            | Computación  |
+-- | Franco      | Silvestre     | 6B            | Automotor    |
+-- | Micaela     | Durán         | 6B            | Automotor    |
+-- | Jorge       | Pintos        | 6B            | Automotor    |
+-- | Patricia    | Almada        | 6B            | Automotor    |
+-- | Oscar       | Figueroa      | 6B            | Automotor    |
+-- | Adriana     | Salas         | 6B            | Automotor    |
+-- | Damián      | Ferreyra      | 6B            | Automotor    |
+-- | Florencia   | Palacios      | 6B            | Automotor    |
+-- | Emanuel     | Ojeda         | 6B            | Automotor    |
+-- | Karina      | Benítez       | 6B            | Automotor    |
+-- | Luis        | Miranda       | 6B            | Automotor    |
+-- | Gloria      | Chávez        | 6B            | Automotor    |
+-- | Hernán      | Villalba      | 6C            | Computación  |
+-- | Carolina    | Marino        | 6C            | Computación  |
+-- | Rodrigo     | Arancibia     | 6C            | Computación  |
+-- | Sandra      | Escobar       | 6C            | Computación  |
+-- | Iván        | Varela        | 6C            | Computación  |
+-- | Rocío       | Toja          | 6C            | Computación  |
+-- | Gonzalo     | Lozano        | 6C            | Computación  |
+-- | Julieta     | Páez          | 6C            | Computación  |
+-- | Ezequiel    | Vallejos      | 6C            | Computación  |
+-- | Marcela     | Pizarro       | 6C            | Computación  |
+-- | Sebastián   | Bravo         | 6C            | Computación  |
+-- | Adela       | Zapata        | 6C            | Computación  |
+-- | Alejandro   | Falcón        | 6D            | Automotor    |
+-- | Mónica      | Corvalán      | 6D            | Automotor    |
+-- | Cristian    | Santillán     | 6D            | Automotor    |
+-- | Viviana     | Pereira       | 6D            | Automotor    |
+-- | Pablo       | Cáceres       | 6D            | Automotor    |
+-- | Gabriela    | Márquez       | 6D            | Automotor    |
+-- | Hugo        | Bustos        | 6D            | Automotor    |
+-- | Teresa      | Roldán        | 6D            | Automotor    |
+-- | Martín      | Saavedra      | 6D            | Automotor    |
+-- | Graciela    | Valverde      | 6D            | Automotor    |
+-- | Claudio     | Ocampo        | 6D            | Automotor    |
+-- | Nadia       | Ramírez       | 6D            | Automotor    |
+-- | Ignacio     | Quiroga       | 6E            | Computación  |
+-- | Mariela     | Téllez        | 6E            | Computación  |
+-- | Oscar       | Carrizo       | 6E            | Computación  |
+-- | Patricia    | Valdez        | 6E            | Computación  |
+-- | Adrián      | Serrano       | 6E            | Computación  |
+-- | Rosa        | Meza          | 6E            | Computación  |
+-- | Federico    | Olivera       | 6E            | Computación  |
+-- | Cecilia     | Prieto        | 6E            | Computación  |
+-- | Matías      | Barrera       | 6E            | Computación  |
+-- | Daniela     | Lagos         | 6E            | Computación  |
+-- | Tomás       | Zárate        | 6E            | Computación  |
+-- | Elena       | Ojeda         | 6E            | Computación  |
+-- | Héctor      | Vega          | 6F            | Automotor    |
+-- | Luciana     | Peñaloza      | 6F            | Automotor    |
+-- | Nicolás     | Moyano        | 6F            | Automotor    |
+-- | Beatriz     | Riquelme      | 6F            | Automotor    |
+-- | Andrés      | Barrios       | 6F            | Automotor    |
+-- | Liliana     | Giménez       | 6F            | Automotor    |
+-- | Esteban     | Toledo        | 6F            | Automotor    |
+-- | Ruth        | Calderón      | 6F            | Automotor    |
+-- | Germán      | Roldán        | 6F            | Automotor    |
+-- | Adriana     | Silva         | 6F            | Automotor    |
+-- | Cristian    | Montenegro    | 6F            | Automotor    |
+-- | Griselda    | Aguirre       | 6F            | Automotor    |
+-- +-------------+---------------+---------------+--------------+
+
+
+-- Calificaciones de matematica
+/*Esta consulta se utiliza para obtener las calificaciones de la materia Matemática, 
+ya que suele ser una de las materias más exigentes. Hace un INNER JOIN entre las tablas de Calificaciones, 
+Alumnos y Materias para combinar los datos del estudiante con la materia y la nota correspondiente.
+El filtro WHERE M.Nombre = 'Matematica' asegura que solo se muestren las calificaciones de esa materia específica. 
+Esto es útil para analizar el desempeño de los alumnos en Matemática, identificar quiénes podrían necesitar apoyo adicional 
+y generar reportes específicos por materia.*/
+
+SELECT A.Nombre, A.Apellido, M.Nombre AS Materia, C.Nota
+FROM Calificaciones C
+INNER JOIN Alumnos A ON C.DNI_A = A.DNI
+INNER JOIN Materias M ON C.ID_Materia = M.ID_Materia where M.nombre='Matematica';
+
+-- +-------------+---------------+-------------+------+
+-- | Nombre      | Apellido      | Materia     | Nota |
+-- +-------------+---------------+-------------+------+
+-- | Sofía       | García        | Matemática  |    6 |
+-- | Sofía       | García        | Matemática  |    7 |
+-- | Mateo       | Fernández     | Matemática  |    7 |
+-- | Mateo       | Fernández     | Matemática  |    8 |
+-- | Valentina   | López         | Matemática  |    8 |
+-- | Valentina   | López         | Matemática  |    6 |
+-- | Benjamín    | Martínez      | Matemática  |    5 |
+-- | Benjamín    | Martínez      | Matemática  |    7 |
+-- | Emma        | Gómez         | Matemática  |    6 |
+-- | Emma        | Gómez         | Matemática  |    7 |
+-- | Thiago      | Díaz          | Matemática  |    7 |
+-- | Thiago      | Díaz          | Matemática  |    8 |
+-- | Isabella    | Silva         | Matemática  |    8 |
+-- | Isabella    | Silva         | Matemática  |    6 |
+-- | Lucas       | Torres        | Matemática  |    5 |
+-- | Lucas       | Torres        | Matemática  |    7 |
+-- | Camila      | Rojas         | Matemática  |    6 |
+-- | Camila      | Rojas         | Matemática  |    7 |
+-- | Matías      | Morales       | Matemática  |    7 |
+-- | Matías      | Morales       | Matemática  |    8 |
+-- | Luna        | Castro        | Matemática  |    8 |
+-- | Luna        | Castro        | Matemática  |    6 |
+-- | Santiago    | Pérez         | Matemática  |    5 |
+-- | Santiago    | Pérez         | Matemática  |    7 |
+-- | Emma        | Alvarez       | Matemática  |    6 |
+-- | Emma        | Alvarez       | Matemática  |    7 |
+-- | Juan        | Vargas        | Matemática  |    7 |
+-- | Juan        | Vargas        | Matemática  |    8 |
+-- | Agustina    | Cabrera       | Matemática  |    8 |
+-- | Agustina    | Cabrera       | Matemática  |    6 |
+-- | Tomás       | Campos        | Matemática  |    5 |
+-- | Tomás       | Campos        | Matemática  |    7 |
+-- | Sofía       | Ibarra        | Matemática  |    6 |
+-- | Sofía       | Ibarra        | Matemática  |    7 |
+-- | Lucas       | Pineda        | Matemática  |    7 |
+-- | Lucas       | Pineda        | Matemática  |    8 |
+-- | Valeria     | Fuentes       | Matemática  |    8 |
+-- | Valeria     | Fuentes       | Matemática  |    6 |
+-- | Diego       | Valdez        | Matemática  |    5 |
+-- | Diego       | Valdez        | Matemática  |    7 |
+-- | María       | Miranda       | Matemática  |    6 |
+-- | María       | Miranda       | Matemática  |    7 |
+-- | Bruno       | Luna          | Matemática  |    7 |
+-- | Bruno       | Luna          | Matemática  |    8 |
+-- | Isabel      | Mendoza       | Matemática  |    8 |
+-- | Isabel      | Mendoza       | Matemática  |    6 |
+-- | Martín      | Ramos         | Matemática  |    5 |
+-- | Martín      | Ramos         | Matemática  |    7 |
+-- | Catalina    | Moreno        | Matemática  |    6 |
+-- | Catalina    | Moreno        | Matemática  |    7 |
+-- | Juan        | Bravo         | Matemática  |    7 |
+-- | Juan        | Bravo         | Matemática  |    8 |
+-- | Florencia   | Salinas       | Matemática  |    8 |
+-- | Florencia   | Salinas       | Matemática  |    6 |
+-- | Santiago    | Mora          | Matemática  |    5 |
+-- | Santiago    | Mora          | Matemática  |    7 |
+-- | Agustina    | Santana       | Matemática  |    6 |
+-- | Agustina    | Santana       | Matemática  |    7 |
+-- | Lucas       | Ibáñez        | Matemática  |    7 |
+-- | Lucas       | Ibáñez        | Matemática  |    8 |
+-- | María       | Camacho       | Matemática  |    8 |
+-- | María       | Camacho       | Matemática  |    6 |
+-- | Tomás       | Estrada       | Matemática  |    5 |
+-- | Tomás       | Estrada       | Matemática  |    7 |
+-- | Isabella    | Valle         | Matemática  |    6 |
+-- | Isabella    | Valle         | Matemática  |    7 |
+-- | Matías      | Rey           | Matemática  |    7 |
+-- | Matías      | Rey           | Matemática  |    8 |
+-- | Mía         | Crespo        | Matemática  |    8 |
+-- | Mía         | Crespo        | Matemática  |    6 |
+-- | Bruno       | Flores        | Matemática  |    5 |
+-- | Bruno       | Flores        | Matemática  |    7 |
+-- | Isabella    | Romero        | Matemática  |    6 |
+-- | Isabella    | Romero        | Matemática  |    7 |
+-- | Mateo       | Santos        | Matemática  |    7 |
+-- | Mateo       | Santos        | Matemática  |    8 |
+-- | Sofía       | Rojas         | Matemática  |    8 |
+-- | Sofía       | Rojas         | Matemática  |    6 |
+-- | Benjamín    | Ortiz         | Matemática  |    5 |
+-- | Benjamín    | Ortiz         | Matemática  |    7 |
+-- | Emma        | Castillo      | Matemática  |    6 |
+-- | Emma        | Castillo      | Matemática  |    7 |
+-- | Thiago      | Herrera       | Matemática  |    7 |
+-- | Thiago      | Herrera       | Matemática  |    8 |
+-- | Camila      | Morales       | Matemática  |    8 |
+-- | Camila      | Morales       | Matemática  |    6 |
+-- | Matías      | Molina        | Matemática  |    5 |
+-- | Matías      | Molina        | Matemática  |    7 |
+-- | Luna        | Fuentes       | Matemática  |    6 |
+-- | Luna        | Fuentes       | Matemática  |    7 |
+-- | Santiago    | Miranda       | Matemática  |    7 |
+-- | Santiago    | Miranda       | Matemática  |    8 |
+-- | Mía         | Salazar       | Matemática  |    8 |
+-- | Mía         | Salazar       | Matemática  |    6 |
+-- | Agustín     | Reyes         | Matemática  |    5 |
+-- | Agustín     | Reyes         | Matemática  |    7 |
+-- | Isabel      | Paz           | Matemática  |    6 |
+-- | Isabel      | Paz           | Matemática  |    7 |
+-- | Bruno       | Núñez         | Matemática  |    7 |
+-- | Bruno       | Núñez         | Matemática  |    8 |
+-- | Lucía       | Salinas       | Matemática  |    8 |
+-- | Lucía       | Salinas       | Matemática  |    6 |
+-- | Facundo     | Santana       | Matemática  |    5 |
+-- | Facundo     | Santana       | Matemática  |    7 |
+-- | Micaela     | Ibáñez        | Matemática  |    6 |
+-- | Micaela     | Ibáñez        | Matemática  |    7 |
+-- | Julián      | Camacho       | Matemática  |    7 |
+-- | Julián      | Camacho       | Matemática  |    8 |
+-- | Emilia      | Estrada       | Matemática  |    8 |
+-- | Emilia      | Estrada       | Matemática  |    6 |
+-- | Matías      | Valle         | Matemática  |    5 |
+-- | Matías      | Valle         | Matemática  |    7 |
+-- | Lucía       | Rey           | Matemática  |    6 |
+-- | Lucía       | Rey           | Matemática  |    7 |
+-- | Gabriel     | Crespo        | Matemática  |    7 |
+-- | Gabriel     | Crespo        | Matemática  |    8 |
+-- | Catalina    | Flores        | Matemática  |    8 |
+-- | Catalina    | Flores        | Matemática  |    6 |
+-- | Martín      | Ortiz         | Matemática  |    5 |
+-- | Martín      | Ortiz         | Matemática  |    7 |
+-- | Luna        | Ortiz         | Matemática  |    6 |
+-- | Luna        | Ortiz         | Matemática  |    7 |
+-- | Santiago    | Castillo      | Matemática  |    7 |
+-- | Santiago    | Castillo      | Matemática  |    8 |
+-- | Mía         | Herrera       | Matemática  |    8 |
+-- | Mía         | Herrera       | Matemática  |    6 |
+-- | Agustín     | Morales       | Matemática  |    5 |
+-- | Agustín     | Morales       | Matemática  |    7 |
+-- | Emma        | Molina        | Matemática  |    6 |
+-- | Emma        | Molina        | Matemática  |    7 |
+-- | Martín      | Fuentes       | Matemática  |    7 |
+-- | Martín      | Fuentes       | Matemática  |    8 |
+-- | Catalina    | Valdez        | Matemática  |    8 |
+-- | Catalina    | Valdez        | Matemática  |    6 |
+-- | Diego       | Miranda       | Matemática  |    5 |
+-- | Diego       | Miranda       | Matemática  |    7 |
+-- | Julia       | Luna          | Matemática  |    6 |
+-- | Julia       | Luna          | Matemática  |    7 |
+-- | Julián      | Mendoza       | Matemática  |    7 |
+-- | Julián      | Mendoza       | Matemática  |    8 |
+-- | Emma        | Ramos         | Matemática  |    8 |
+-- | Emma        | Ramos         | Matemática  |    6 |
+-- | Lucas       | Paz           | Matemática  |    5 |
+-- | Lucas       | Paz           | Matemática  |    7 |
+-- | Ana         | Vargas        | Matemática  |    6 |
+-- | Ana         | Vargas        | Matemática  |    7 |
+-- | Martín      | Salinas       | Matemática  |    7 |
+-- | Martín      | Salinas       | Matemática  |    8 |
+-- | Carla       | Mendoza       | Matemática  |    8 |
+-- | Carla       | Mendoza       | Matemática  |    6 |
+-- | Lucas       | Cabrera       | Matemática  |    5 |
+-- | Lucas       | Cabrera       | Matemática  |    7 |
+-- | Laura       | Campos        | Matemática  |    6 |
+-- | Laura       | Campos        | Matemática  |    7 |
+-- | Sergio      | Fernández     | Matemática  |    7 |
+-- | Sergio      | Fernández     | Matemática  |    8 |
+-- | Mariana     | Pineda        | Matemática  |    8 |
+-- | Mariana     | Pineda        | Matemática  |    6 |
+-- | Diego       | Herrera       | Matemática  |    5 |
+-- | Diego       | Herrera       | Matemática  |    7 |
+-- | Verónica    | Reyes         | Matemática  |    6 |
+-- | Verónica    | Reyes         | Matemática  |    7 |
+-- | Facundo     | Ortiz         | Matemática  |    7 |
+-- | Facundo     | Ortiz         | Matemática  |    8 |
+-- | Gabriela    | Castro        | Matemática  |    8 |
+-- | Gabriela    | Castro        | Matemática  |    6 |
+-- | Pablo       | Paz           | Matemática  |    5 |
+-- | Pablo       | Paz           | Matemática  |    7 |
+-- | Agustina    | Pacheco       | Matemática  |    6 |
+-- | Agustina    | Pacheco       | Matemática  |    7 |
+-- | Martín      | Bravo         | Matemática  |    7 |
+-- | Martín      | Bravo         | Matemática  |    8 |
+-- | Julieta     | Vargas        | Matemática  |    8 |
+-- | Julieta     | Vargas        | Matemática  |    6 |
+-- | Leandro     | Miranda       | Matemática  |    5 |
+-- | Leandro     | Miranda       | Matemática  |    7 |
+-- | Valentina   | Luna          | Matemática  |    6 |
+-- | Valentina   | Luna          | Matemática  |    7 |
+-- | Santiago    | Campos        | Matemática  |    7 |
+-- | Santiago    | Campos        | Matemática  |    8 |
+-- | Camila      | Castillo      | Matemática  |    8 |
+-- | Camila      | Castillo      | Matemática  |    6 |
+-- | Bruno       | Romero        | Matemática  |    5 |
+-- | Bruno       | Romero        | Matemática  |    7 |
+-- | Florencia   | Mora          | Matemática  |    6 |
+-- | Florencia   | Mora          | Matemática  |    7 |
+-- | Lucas       | Salinas       | Matemática  |    7 |
+-- | Lucas       | Salinas       | Matemática  |    8 |
+-- | Emilia      | Ibarra        | Matemática  |    8 |
+-- | Emilia      | Ibarra        | Matemática  |    6 |
+-- | Tomás       | Reyes         | Matemática  |    5 |
+-- | Tomás       | Reyes         | Matemática  |    7 |
+-- | Carla       | Domínguez     | Matemática  |    6 |
+-- | Carla       | Domínguez     | Matemática  |    7 |
+-- | Pablo       | Herrera       | Matemática  |    7 |
+-- | Pablo       | Herrera       | Matemática  |    8 |
+-- | Lucía       | Morales       | Matemática  |    8 |
+-- | Lucía       | Morales       | Matemática  |    6 |
+-- | Matías      | Molina        | Matemática  |    5 |
+-- | Matías      | Molina        | Matemática  |    7 |
+-- | Emilia      | Fuentes       | Matemática  |    6 |
+-- | Emilia      | Fuentes       | Matemática  |    7 |
+-- | Ramiro      | Valdez        | Matemática  |    7 |
+-- | Ramiro      | Valdez        | Matemática  |    8 |
+-- | Paula       | Miranda       | Matemática  |    8 |
+-- | Paula       | Miranda       | Matemática  |    6 |
+-- | Diego       | Luna          | Matemática  |    5 |
+-- | Diego       | Luna          | Matemática  |    7 |
+-- | María       | Vega          | Matemática  |    6 |
+-- | María       | Vega          | Matemática  |    7 |
+-- | Javier      | Salinas       | Matemática  |    7 |
+-- | Javier      | Salinas       | Matemática  |    8 |
+-- | Florencia   | Ramos         | Matemática  |    8 |
+-- | Florencia   | Ramos         | Matemática  |    6 |
+-- | Sergio      | Ortiz         | Matemática  |    5 |
+-- | Sergio      | Ortiz         | Matemática  |    7 |
+-- | Gabriela    | Flores        | Matemática  |    6 |
+-- | Gabriela    | Flores        | Matemática  |    7 |
+-- | Ramiro      | Ortiz         | Matemática  |    7 |
+-- | Ramiro      | Ortiz         | Matemática  |    8 |
+-- | Natalia     | Sosa          | Matemática  |    8 |
+-- | Natalia     | Sosa          | Matemática  |    6 |
+-- | Javier      | León          | Matemática  |    5 |
+-- | Javier      | León          | Matemática  |    7 |
+-- | Lucía       | Rivas         | Matemática  |    6 |
+-- | Lucía       | Rivas         | Matemática  |    7 |
+-- | Tomás       | Campos        | Matemática  |    7 |
+-- | Tomás       | Campos        | Matemática  |    8 |
+-- | María       | Navarro       | Matemática  |    8 |
+-- | María       | Navarro       | Matemática  |    6 |
+-- | Diego       | Romero        | Matemática  |    5 |
+-- | Diego       | Romero        | Matemática  |    7 |
+-- | Paula       | Santos        | Matemática  |    6 |
+-- | Paula       | Santos        | Matemática  |    7 |
+-- | Lucas       | Rojas         | Matemática  |    7 |
+-- | Lucas       | Rojas         | Matemática  |    8 |
+-- | Emilio      | Ortiz         | Matemática  |    8 |
+-- | Emilio      | Ortiz         | Matemática  |    6 |
+-- | Florencia   | Castillo      | Matemática  |    5 |
+-- | Florencia   | Castillo      | Matemática  |    7 |
+-- | Sergio      | Cabrera       | Matemática  |    6 |
+-- | Sergio      | Cabrera       | Matemática  |    7 |
+-- | Natalia     | Campos        | Matemática  |    7 |
+-- | Natalia     | Campos        | Matemática  |    8 |
+-- | Pablo       | Suárez        | Matemática  |    8 |
+-- | Pablo       | Suárez        | Matemática  |    6 |
+-- | Camila      | Ramos         | Matemática  |    5 |
+-- | Camila      | Ramos         | Matemática  |    7 |
+-- | Bruno       | Ortiz         | Matemática  |    6 |
+-- | Bruno       | Ortiz         | Matemática  |    7 |
+-- | Isabel      | Castillo      | Matemática  |    7 |
+-- | Isabel      | Castillo      | Matemática  |    8 |
+-- | Lucas       | Herrera       | Matemática  |    8 |
+-- | Lucas       | Herrera       | Matemática  |    6 |
+-- | Emilia      | Morales       | Matemática  |    5 |
+-- | Emilia      | Morales       | Matemática  |    7 |
+-- | Martín      | Molina        | Matemática  |    6 |
+-- | Martín      | Molina        | Matemática  |    7 |
+-- | Sofía       | Fuentes       | Matemática  |    7 |
+-- | Sofía       | Fuentes       | Matemática  |    8 |
+-- | Diego       | Valdez        | Matemática  |    8 |
+-- | Diego       | Valdez        | Matemática  |    6 |
+-- | Lucía       | Miranda       | Matemática  |    5 |
+-- | Lucía       | Miranda       | Matemática  |    7 |
+-- | Matías      | Salazar       | Matemática  |    6 |
+-- | Matías      | Salazar       | Matemática  |    7 |
+-- | Florencia   | Ramos         | Matemática  |    7 |
+-- | Florencia   | Ramos         | Matemática  |    8 |
+-- | Emilio      | Ortiz         | Matemática  |    8 |
+-- | Emilio      | Ortiz         | Matemática  |    6 |
+-- | Paula       | Castillo      | Matemática  |    5 |
+-- | Paula       | Castillo      | Matemática  |    7 |
+-- | Lucas       | Romero        | Matemática  |    6 |
+-- | Lucas       | Romero        | Matemática  |    7 |
+-- | Isabel      | Mora          | Matemática  |    7 |
+-- | Isabel      | Mora          | Matemática  |    8 |
+-- | Javier      | Salinas       | Matemática  |    8 |
+-- | Javier      | Salinas       | Matemática  |    6 |
+-- | Micaela     | Ibarra        | Matemática  |    5 |
+-- | Micaela     | Ibarra        | Matemática  |    7 |
+-- | Ramiro      | Reyes         | Matemática  |    6 |
+-- | Ramiro      | Reyes         | Matemática  |    7 |
+-- | Natalia     | Pacheco       | Matemática  |    7 |
+-- | Natalia     | Pacheco       | Matemática  |    8 |
+-- | Bruno       | Vargas        | Matemática  |    8 |
+-- | Bruno       | Vargas        | Matemática  |    6 |
+-- | Sofía       | Salinas       | Matemática  |    5 |
+-- | Sofía       | Salinas       | Matemática  |    7 |
+-- | Lautaro     | Benítez       | Matemática  |    7 |
+-- | Lautaro     | Benítez       | Matemática  |    8 |
+-- | Abril       | Coronel       | Matemática  |    8 |
+-- | Abril       | Coronel       | Matemática  |    7 |
+-- | Santino     | Montenegro    | Matemática  |    6 |
+-- | Santino     | Montenegro    | Matemática  |    7 |
+-- | Juana       | Perdomo       | Matemática  |    7 |
+-- | Juana       | Perdomo       | Matemática  |    8 |
+-- | Bautista    | Almada        | Matemática  |    8 |
+-- | Bautista    | Almada        | Matemática  |    7 |
+-- | Victoria    | Quiroga       | Matemática  |    6 |
+-- | Victoria    | Quiroga       | Matemática  |    7 |
+-- | Franco      | Figueroa      | Matemática  |    7 |
+-- | Franco      | Figueroa      | Matemática  |    8 |
+-- | Clara       | Medrano       | Matemática  |    8 |
+-- | Clara       | Medrano       | Matemática  |    7 |
+-- | Tomás       | Bermúdez      | Matemática  |    6 |
+-- | Tomás       | Bermúdez      | Matemática  |    7 |
+-- | Renata      | Chávez        | Matemática  |    7 |
+-- | Renata      | Chávez        | Matemática  |    8 |
+-- | Iván        | Olmedo        | Matemática  |    8 |
+-- | Iván        | Olmedo        | Matemática  |    7 |
+-- | Bianca      | Correa        | Matemática  |    6 |
+-- | Bianca      | Correa        | Matemática  |    7 |
+-- | Ignacio     | Galván        | Matemática  |    8 |
+-- | Ignacio     | Galván        | Matemática  |    7 |
+-- | Valentina   | Arévalo       | Matemática  |    7 |
+-- | Valentina   | Arévalo       | Matemática  |    8 |
+-- | Dante       | Vivas         | Matemática  |    6 |
+-- | Dante       | Vivas         | Matemática  |    7 |
+-- | Milagros    | Sánchez       | Matemática  |    8 |
+-- | Milagros    | Sánchez       | Matemática  |    7 |
+-- | Emilio      | Carrizo       | Matemática  |    7 |
+-- | Emilio      | Carrizo       | Matemática  |    8 |
+-- | Paula       | Tejada        | Matemática  |    6 |
+-- | Paula       | Tejada        | Matemática  |    7 |
+-- | Simón       | Cabral        | Matemática  |    8 |
+-- | Simón       | Cabral        | Matemática  |    7 |
+-- | Camila      | Villafañe     | Matemática  |    7 |
+-- | Camila      | Villafañe     | Matemática  |    8 |
+-- | Mauricio    | Riveros       | Matemática  |    6 |
+-- | Mauricio    | Riveros       | Matemática  |    7 |
+-- | Aitana      | Fonseca       | Matemática  |    8 |
+-- | Aitana      | Fonseca       | Matemática  |    7 |
+-- | Esteban     | Lagos         | Matemática  |    7 |
+-- | Esteban     | Lagos         | Matemática  |    8 |
+-- | Martina     | Esquivel      | Matemática  |    6 |
+-- | Martina     | Esquivel      | Matemática  |    7 |
+-- | Lucas       | Navarro       | Matemática  |    7 |
+-- | Lucas       | Navarro       | Matemática  |    8 |
+-- | Emilia      | Ocampo        | Matemática  |    8 |
+-- | Emilia      | Ocampo        | Matemática  |    7 |
+-- | Matías      | Silva         | Matemática  |    6 |
+-- | Matías      | Silva         | Matemática  |    7 |
+-- | Lucía       | Morán         | Matemática  |    7 |
+-- | Lucía       | Morán         | Matemática  |    8 |
+-- | Gonzalo     | Salcedo       | Matemática  |    8 |
+-- | Gonzalo     | Salcedo       | Matemática  |    7 |
+-- | Sofía       | Durán         | Matemática  |    6 |
+-- | Sofía       | Durán         | Matemática  |    7 |
+-- | Martín      | Calvo         | Matemática  |    7 |
+-- | Martín      | Calvo         | Matemática  |    8 |
+-- | Josefina    | Villavicencio | Matemática  |    8 |
+-- | Josefina    | Villavicencio | Matemática  |    7 |
+-- | Sebastián   | Acosta        | Matemática  |    6 |
+-- | Sebastián   | Acosta        | Matemática  |    7 |
+-- | Isabel      | Ríos          | Matemática  |    7 |
+-- | Isabel      | Ríos          | Matemática  |    8 |
+-- | Felipe      | Montes        | Matemática  |    8 |
+-- | Felipe      | Montes        | Matemática  |    7 |
+-- | Micaela     | Romero        | Matemática  |    6 |
+-- | Micaela     | Romero        | Matemática  |    7 |
+-- | Agustín     | Toha          | Matemática  |    8 |
+-- | Agustín     | Toha          | Matemática  |    7 |
+-- | Tamara      | Frías         | Matemática  |    7 |
+-- | Tamara      | Frías         | Matemática  |    8 |
+-- | Maximiliano | Saiz          | Matemática  |    6 |
+-- | Maximiliano | Saiz          | Matemática  |    7 |
+-- | Candela     | Lucero        | Matemática  |    8 |
+-- | Candela     | Lucero        | Matemática  |    7 |
+-- | Nicolás     | Patiño        | Matemática  |    7 |
+-- | Nicolás     | Patiño        | Matemática  |    8 |
+-- | Rocío       | Alonso        | Matemática  |    6 |
+-- | Rocío       | Alonso        | Matemática  |    7 |
+-- | Fabián      | Vega          | Matemática  |    8 |
+-- | Fabián      | Vega          | Matemática  |    7 |
+-- | Mariela     | Bravo         | Matemática  |    7 |
+-- | Mariela     | Bravo         | Matemática  |    8 |
+-- | Oscar       | Tello         | Matemática  |    6 |
+-- | Oscar       | Tello         | Matemática  |    7 |
+-- | Adriana     | Castillo      | Matemática  |    8 |
+-- | Adriana     | Castillo      | Matemática  |    7 |
+-- | Benjamín    | Oliva         | Matemática  |    7 |
+-- | Benjamín    | Oliva         | Matemática  |    8 |
+-- | Daniela     | Campos        | Matemática  |    6 |
+-- | Daniela     | Campos        | Matemática  |    7 |
+-- | Mauricio    | Carranza      | Matemática  |    7 |
+-- | Mauricio    | Carranza      | Matemática  |    8 |
+-- | Milena      | Araya         | Matemática  |    8 |
+-- | Milena      | Araya         | Matemática  |    7 |
+-- | Gustavo     | Villaflor     | Matemática  |    6 |
+-- | Gustavo     | Villaflor     | Matemática  |    7 |
+-- | Zoe         | Peñaloza      | Matemática  |    7 |
+-- | Zoe         | Peñaloza      | Matemática  |    8 |
+-- | Ramón       | Quiñones      | Matemática  |    8 |
+-- | Ramón       | Quiñones      | Matemática  |    7 |
+-- | Miranda     | Godoy         | Matemática  |    6 |
+-- | Miranda     | Godoy         | Matemática  |    7 |
+-- | Damián      | Valdés        | Matemática  |    7 |
+-- | Damián      | Valdés        | Matemática  |    8 |
+-- | Verónica    | Mejía         | Matemática  |    8 |
+-- | Verónica    | Mejía         | Matemática  |    7 |
+-- | Renzo       | Barcena       | Matemática  |    6 |
+-- | Renzo       | Barcena       | Matemática  |    7 |
+-- | Margarita   | Estévez       | Matemática  |    7 |
+-- | Margarita   | Estévez       | Matemática  |    8 |
+-- | Elian       | Silvestre     | Matemática  |    8 |
+-- | Elian       | Silvestre     | Matemática  |    7 |
+-- | Ainhoa      | Santana       | Matemática  |    6 |
+-- | Ainhoa      | Santana       | Matemática  |    7 |
+-- | Ezequiel    | Corvalán      | Matemática  |    8 |
+-- | Ezequiel    | Corvalán      | Matemática  |    7 |
+-- | Pamela      | Ferreyra      | Matemática  |    7 |
+-- | Pamela      | Ferreyra      | Matemática  |    8 |
+-- | Agustina    | Ojeda         | Matemática  |    6 |
+-- | Agustina    | Ojeda         | Matemática  |    7 |
+-- | Leandro     | Funes         | Matemática  |    8 |
+-- | Leandro     | Funes         | Matemática  |    7 |
+-- | Cintia      | Vázquez       | Matemática  |    7 |
+-- | Cintia      | Vázquez       | Matemática  |    8 |
+-- | Joaquín     | Domínguez     | Matemática  |    6 |
+-- | Joaquín     | Domínguez     | Matemática  |    7 |
+-- | Nerea       | Camposano     | Matemática  |    8 |
+-- | Nerea       | Camposano     | Matemática  |    7 |
+-- | Franco      | Yáñez         | Matemática  |    7 |
+-- | Franco      | Yáñez         | Matemática  |    8 |
+-- | Bianca      | Ortega        | Matemática  |    6 |
+-- | Bianca      | Ortega        | Matemática  |    7 |
+-- | Axel        | Ibarra        | Matemática  |    8 |
+-- | Axel        | Ibarra        | Matemática  |    7 |
+-- | Tobías      | Quiroga       | Matemática  |    7 |
+-- | Tobías      | Quiroga       | Matemática  |    8 |
+-- | Camila      | Barrios       | Matemática  |    6 |
+-- | Camila      | Barrios       | Matemática  |    7 |
+-- | Jonás       | Correa        | Matemática  |    7 |
+-- | Jonás       | Correa        | Matemática  |    8 |
+-- | Mónica      | Ferrari       | Matemática  |    8 |
+-- | Mónica      | Ferrari       | Matemática  |    7 |
+-- | Mauricio    | Godoy         | Matemática  |    6 |
+-- | Mauricio    | Godoy         | Matemática  |    7 |
+-- | Bárbara     | Salvatierra   | Matemática  |    7 |
+-- | Bárbara     | Salvatierra   | Matemática  |    8 |
+-- | Pablo       | Sierra        | Matemática  |    8 |
+-- | Pablo       | Sierra        | Matemática  |    7 |
+-- | Tamara      | Bustos        | Matemática  |    6 |
+-- | Tamara      | Bustos        | Matemática  |    7 |
+-- | Federico    | Vallejos      | Matemática  |    7 |
+-- | Federico    | Vallejos      | Matemática  |    8 |
+-- | Mariela     | Santoro       | Matemática  |    8 |
+-- | Mariela     | Santoro       | Matemática  |    7 |
+-- | Iván        | Báez          | Matemática  |    6 |
+-- | Iván        | Báez          | Matemática  |    7 |
+-- | Antonella   | Coronel       | Matemática  |    7 |
+-- | Antonella   | Coronel       | Matemática  |    8 |
+-- | Rodrigo     | Aguilar       | Matemática  |    8 |
+-- | Rodrigo     | Aguilar       | Matemática  |    7 |
+-- | Carla       | Duré          | Matemática  |    6 |
+-- | Carla       | Duré          | Matemática  |    7 |
+-- | Enzo        | Recalde       | Matemática  |    8 |
+-- | Enzo        | Recalde       | Matemática  |    7 |
+-- | Gabriela    | Morales       | Matemática  |    7 |
+-- | Gabriela    | Morales       | Matemática  |    8 |
+-- | Luciano     | Pizarro       | Matemática  |    6 |
+-- | Luciano     | Pizarro       | Matemática  |    7 |
+-- | Mariela     | Tello         | Matemática  |    8 |
+-- | Mariela     | Tello         | Matemática  |    7 |
+-- | Facundo     | Herrera       | Matemática  |    7 |
+-- | Facundo     | Herrera       | Matemática  |    8 |
+-- | Romina      | Fariña        | Matemática  |    6 |
+-- | Romina      | Fariña        | Matemática  |    7 |
+-- | Gustavo     | Santana       | Matemática  |    8 |
+-- | Gustavo     | Santana       | Matemática  |    7 |
+-- | Daniela     | Morel         | Matemática  |    7 |
+-- | Daniela     | Morel         | Matemática  |    8 |
+-- | Kevin       | Aguirre       | Matemática  |    6 |
+-- | Kevin       | Aguirre       | Matemática  |    7 |
+-- | Magalí      | Navarro       | Matemática  |    8 |
+-- | Magalí      | Navarro       | Matemática  |    7 |
+-- | Nicolás     | Santibáñez    | Matemática  |    7 |
+-- | Nicolás     | Santibáñez    | Matemática  |    8 |
+-- | Lara        | Cabrera       | Matemática  |    6 |
+-- | Lara        | Cabrera       | Matemática  |    7 |
+-- | Tomás       | Serrano       | Matemática  |    7 |
+-- | Tomás       | Serrano       | Matemática  |    8 |
+-- | Fiorella    | Bustamante    | Matemática  |    8 |
+-- | Fiorella    | Bustamante    | Matemática  |    7 |
+-- | Mateo       | Cardozo       | Matemática  |    6 |
+-- | Mateo       | Cardozo       | Matemática  |    7 |
+-- | Camila      | Figueroa      | Matemática  |    7 |
+-- | Camila      | Figueroa      | Matemática  |    8 |
+-- | Benjamín    | Espinoza      | Matemática  |    8 |
+-- | Benjamín    | Espinoza      | Matemática  |    7 |
+-- | Marina      | Galarza       | Matemática  |    6 |
+-- | Marina      | Galarza       | Matemática  |    7 |
+-- | Franco      | Palacios      | Matemática  |    7 |
+-- | Franco      | Palacios      | Matemática  |    8 |
+-- | Agustina    | Ortigoza      | Matemática  |    8 |
+-- | Agustina    | Ortigoza      | Matemática  |    7 |
+-- | Lucas       | Quintana      | Matemática  |    6 |
+-- | Lucas       | Quintana      | Matemática  |    7 |
+-- | Florencia   | Sánchez       | Matemática  |    7 |
+-- | Florencia   | Sánchez       | Matemática  |    8 |
+-- | Alejandro   | Bravo         | Matemática  |    8 |
+-- | Alejandro   | Bravo         | Matemática  |    7 |
+-- | Tamara      | Caballero     | Matemática  |    6 |
+-- | Tamara      | Caballero     | Matemática  |    7 |
+-- | Damián      | Rosales       | Matemática  |    8 |
+-- | Damián      | Rosales       | Matemática  |    7 |
+-- | Gisela      | Ferraresi     | Matemática  |    7 |
+-- | Gisela      | Ferraresi     | Matemática  |    8 |
+-- | Marcos      | Cordero       | Matemática  |    6 |
+-- | Marcos      | Cordero       | Matemática  |    7 |
+-- | Rocío       | Acosta        | Matemática  |    8 |
+-- | Rocío       | Acosta        | Matemática  |    7 |
+-- | Santiago    | Bermúdez      | Matemática  |    7 |
+-- | Santiago    | Bermúdez      | Matemática  |    8 |
+-- | Miriam      | Garrido       | Matemática  |    6 |
+-- | Miriam      | Garrido       | Matemática  |    7 |
+-- | Adrián      | Villalba      | Matemática  |    8 |
+-- | Adrián      | Villalba      | Matemática  |    7 |
+-- | Sabrina     | Espinoza      | Matemática  |    7 |
+-- | Sabrina     | Espinoza      | Matemática  |    8 |
+-- | Kevin       | Mercado       | Matemática  |    6 |
+-- | Kevin       | Mercado       | Matemática  |    7 |
+-- | Natalia     | Bravo         | Matemática  |    8 |
+-- | Natalia     | Bravo         | Matemática  |    7 |
+-- | Ariel       | Paz           | Matemática  |    7 |
+-- | Ariel       | Paz           | Matemática  |    8 |
+-- | Mariela     | Sepúlveda     | Matemática  |    6 |
+-- | Mariela     | Sepúlveda     | Matemática  |    7 |
+-- | Julián      | Bustos        | Matemática  |    7 |
+-- | Julián      | Bustos        | Matemática  |    8 |
+-- | Daniela     | Rojas         | Matemática  |    8 |
+-- | Daniela     | Rojas         | Matemática  |    7 |
+-- | Maximiliano | Zárate        | Matemática  |    6 |
+-- | Maximiliano | Zárate        | Matemática  |    7 |
+-- | Ailén       | Domínguez     | Matemática  |    7 |
+-- | Ailén       | Domínguez     | Matemática  |    8 |
+-- | Hernán      | Moya          | Matemática  |    8 |
+-- | Hernán      | Moya          | Matemática  |    7 |
+-- | Verónica    | Pizarro       | Matemática  |    6 |
+-- | Verónica    | Pizarro       | Matemática  |    7 |
+-- | Rodrigo     | Cáceres       | Matemática  |    7 |
+-- | Rodrigo     | Cáceres       | Matemática  |    8 |
+-- | Patricia    | Vidal         | Matemática  |    8 |
+-- | Patricia    | Vidal         | Matemática  |    7 |
+-- | Sergio      | Coronel       | Matemática  |    6 |
+-- | Sergio      | Coronel       | Matemática  |    7 |
+-- | Vanesa      | Silva         | Matemática  |    7 |
+-- | Vanesa      | Silva         | Matemática  |    8 |
+-- | Martín      | Agüero        | Matemática  |    8 |
+-- | Martín      | Agüero        | Matemática  |    7 |
+-- | Florencia   | Lagos         | Matemática  |    6 |
+-- | Florencia   | Lagos         | Matemática  |    7 |
+-- | Franco      | Quinteros     | Matemática  |    8 |
+-- | Franco      | Quinteros     | Matemática  |    7 |
+-- | Carolina    | Paredes       | Matemática  |    7 |
+-- | Carolina    | Paredes       | Matemática  |    8 |
+-- | Leandro     | Salvatierra   | Matemática  |    6 |
+-- | Leandro     | Salvatierra   | Matemática  |    7 |
+-- | Noelia      | Montenegro    | Matemática  |    8 |
+-- | Noelia      | Montenegro    | Matemática  |    7 |
+-- | Mauricio    | Olivera       | Matemática  |    7 |
+-- | Mauricio    | Olivera       | Matemática  |    8 |
+-- | Romina      | Villarreal    | Matemática  |    6 |
+-- | Romina      | Villarreal    | Matemática  |    7 |
+-- | Federico    | Cruz          | Matemática  |    8 |
+-- | Federico    | Cruz          | Matemática  |    7 |
+-- | Julieta     | Ponce         | Matemática  |    7 |
+-- | Julieta     | Ponce         | Matemática  |    8 |
+-- | Iván        | Alcaraz       | Matemática  |    6 |
+-- | Iván        | Alcaraz       | Matemática  |    7 |
+-- | Gabriela    | Medina        | Matemática  |    8 |
+-- | Gabriela    | Medina        | Matemática  |    7 |
+-- | Pablo       | Serrano       | Matemática  |    7 |
+-- | Pablo       | Serrano       | Matemática  |    8 |
+-- | Daiana      | Torres        | Matemática  |    6 |
+-- | Daiana      | Torres        | Matemática  |    7 |
+-- | Felipe      | Lemus         | Matemática  |    7 |
+-- | Felipe      | Lemus         | Matemática  |    8 |
+-- | Micaela     | Godoy         | Matemática  |    8 |
+-- | Micaela     | Godoy         | Matemática  |    7 |
+-- | Sergio      | Moreno        | Matemática  |    6 |
+-- | Sergio      | Moreno        | Matemática  |    7 |
+-- | Bianca      | Acosta        | Matemática  |    7 |
+-- | Bianca      | Acosta        | Matemática  |    8 |
+-- | Cristian    | Delgado       | Matemática  |    8 |
+-- | Cristian    | Delgado       | Matemática  |    7 |
+-- | Valeria     | Aguirre       | Matemática  |    6 |
+-- | Valeria     | Aguirre       | Matemática  |    7 |
+-- | Ariel       | Gómez         | Matemática  |    7 |
+-- | Ariel       | Gómez         | Matemática  |    8 |
+-- | Lorena      | Paz           | Matemática  |    8 |
+-- | Lorena      | Paz           | Matemática  |    7 |
+-- | Gastón      | Caballero     | Matemática  |    6 |
+-- | Gastón      | Caballero     | Matemática  |    7 |
+-- | Mariela     | Funes         | Matemática  |    7 |
+-- | Mariela     | Funes         | Matemática  |    8 |
+-- | Jorge       | Ramos         | Matemática  |    8 |
+-- | Jorge       | Ramos         | Matemática  |    7 |
+-- | Alejandra   | Salas         | Matemática  |    6 |
+-- | Alejandra   | Salas         | Matemática  |    7 |
+-- | Fabián      | Rosendo       | Matemática  |    8 |
+-- | Fabián      | Rosendo       | Matemática  |    7 |
+-- | Eliana      | Prieto        | Matemática  |    7 |
+-- | Eliana      | Prieto        | Matemática  |    8 |
+-- | Mariano     | Ojeda         | Matemática  |    6 |
+-- | Mariano     | Ojeda         | Matemática  |    7 |
+-- | Natalia     | Sarmiento     | Matemática  |    8 |
+-- | Natalia     | Sarmiento     | Matemática  |    7 |
+-- | Iván        | Benítez       | Matemática  |    7 |
+-- | Iván        | Benítez       | Matemática  |    8 |
+-- | Patricia    | Guerrero      | Matemática  |    6 |
+-- | Patricia    | Guerrero      | Matemática  |    7 |
+-- | Alejandro   | Fleitas       | Matemática  |    8 |
+-- | Alejandro   | Fleitas       | Matemática  |    7 |
+-- | Vanina      | Ayala         | Matemática  |    7 |
+-- | Vanina      | Ayala         | Matemática  |    8 |
+-- | Javier      | Galarza       | Matemática  |    6 |
+-- | Javier      | Galarza       | Matemática  |    7 |
+-- | Sabrina     | Meza          | Matemática  |    8 |
+-- | Sabrina     | Meza          | Matemática  |    7 |
+-- | Nahuel      | Espínola      | Matemática  |    7 |
+-- | Nahuel      | Espínola      | Matemática  |    8 |
+-- | Florencia   | Barrios       | Matemática  |    6 |
+-- | Florencia   | Barrios       | Matemática  |    7 |
+-- | Cristian    | Cáceres       | Matemática  |    7 |
+-- | Cristian    | Cáceres       | Matemática  |    8 |
+-- | Laura       | Morales       | Matemática  |    8 |
+-- | Laura       | Morales       | Matemática  |    7 |
+-- | Agustín     | Zúñiga        | Matemática  |    6 |
+-- | Agustín     | Zúñiga        | Matemática  |    7 |
+-- | Sofía       | Aguilar       | Matemática  |    7 |
+-- | Sofía       | Aguilar       | Matemática  |    8 |
+-- | Brian       | Ledesma       | Matemática  |    8 |
+-- | Brian       | Ledesma       | Matemática  |    7 |
+-- | Luciana     | Funes         | Matemática  |    6 |
+-- | Luciana     | Funes         | Matemática  |    7 |
+-- | Héctor      | Márquez       | Matemática  |    7 |
+-- | Héctor      | Márquez       | Matemática  |    8 |
+-- | Rocío       | Montes        | Matemática  |    8 |
+-- | Rocío       | Montes        | Matemática  |    7 |
+-- | Emanuel     | Villanueva    | Matemática  |    6 |
+-- | Emanuel     | Villanueva    | Matemática  |    7 |
+-- | Brenda      | Arce          | Matemática  |    7 |
+-- | Brenda      | Arce          | Matemática  |    8 |
+-- | Fernando    | Ojeda         | Matemática  |    8 |
+-- | Fernando    | Ojeda         | Matemática  |    7 |
+-- | Jimena      | Britez        | Matemática  |    6 |
+-- | Jimena      | Britez        | Matemática  |    7 |
+-- | Ignacio     | Maldini       | Matemática  |    8 |
+-- | Ignacio     | Maldini       | Matemática  |    7 |
+-- | Valeria     | Ortega        | Matemática  |    7 |
+-- | Valeria     | Ortega        | Matemática  |    8 |
+-- | Mauricio    | Santoro       | Matemática  |    6 |
+-- | Mauricio    | Santoro       | Matemática  |    7 |
+-- | Pamela      | Téllez        | Matemática  |    8 |
+-- | Pamela      | Téllez        | Matemática  |    7 |
+-- | Leandro     | Fiorito       | Matemática  |    7 |
+-- | Leandro     | Fiorito       | Matemática  |    8 |
+-- | Romina      | Mancini       | Matemática  |    6 |
+-- | Romina      | Mancini       | Matemática  |    7 |
+-- | Facundo     | Alarcón       | Matemática  |    8 |
+-- | Facundo     | Alarcón       | Matemática  |    7 |
+-- | Tamara      | Quintana      | Matemática  |    7 |
+-- | Tamara      | Quintana      | Matemática  |    8 |
+-- | Esteban     | Toledo        | Matemática  |    6 |
+-- | Esteban     | Toledo        | Matemática  |    7 |
+-- | Laura       | Pellegrini    | Matemática  |    8 |
+-- | Laura       | Pellegrini    | Matemática  |    7 |
+-- | Pablo       | Centurión     | Matemática  |    7 |
+-- | Pablo       | Centurión     | Matemática  |    8 |
+-- | Silvina     | Marelli       | Matemática  |    6 |
+-- | Silvina     | Marelli       | Matemática  |    7 |
+-- | Franco      | Silvestre     | Matemática  |    7 |
+-- | Franco      | Silvestre     | Matemática  |    8 |
+-- | Micaela     | Durán         | Matemática  |    8 |
+-- | Micaela     | Durán         | Matemática  |    7 |
+-- | Jorge       | Pintos        | Matemática  |    6 |
+-- | Jorge       | Pintos        | Matemática  |    7 |
+-- | Patricia    | Almada        | Matemática  |    7 |
+-- | Patricia    | Almada        | Matemática  |    8 |
+-- | Oscar       | Figueroa      | Matemática  |    8 |
+-- | Oscar       | Figueroa      | Matemática  |    7 |
+-- | Adriana     | Salas         | Matemática  |    6 |
+-- | Adriana     | Salas         | Matemática  |    7 |
+-- | Damián      | Ferreyra      | Matemática  |    7 |
+-- | Damián      | Ferreyra      | Matemática  |    8 |
+-- | Florencia   | Palacios      | Matemática  |    8 |
+-- | Florencia   | Palacios      | Matemática  |    7 |
+-- | Emanuel     | Ojeda         | Matemática  |    6 |
+-- | Emanuel     | Ojeda         | Matemática  |    7 |
+-- | Karina      | Benítez       | Matemática  |    7 |
+-- | Karina      | Benítez       | Matemática  |    8 |
+-- | Luis        | Miranda       | Matemática  |    8 |
+-- | Luis        | Miranda       | Matemática  |    7 |
+-- | Gloria      | Chávez        | Matemática  |    6 |
+-- | Gloria      | Chávez        | Matemática  |    7 |
+-- | Hernán      | Villalba      | Matemática  |    8 |
+-- | Hernán      | Villalba      | Matemática  |    7 |
+-- | Carolina    | Marino        | Matemática  |    7 |
+-- | Carolina    | Marino        | Matemática  |    8 |
+-- | Rodrigo     | Arancibia     | Matemática  |    6 |
+-- | Rodrigo     | Arancibia     | Matemática  |    7 |
+-- | Sandra      | Escobar       | Matemática  |    8 |
+-- | Sandra      | Escobar       | Matemática  |    7 |
+-- | Iván        | Varela        | Matemática  |    7 |
+-- | Iván        | Varela        | Matemática  |    8 |
+-- | Rocío       | Toja          | Matemática  |    6 |
+-- | Rocío       | Toja          | Matemática  |    7 |
+-- | Gonzalo     | Lozano        | Matemática  |    8 |
+-- | Gonzalo     | Lozano        | Matemática  |    7 |
+-- | Julieta     | Páez          | Matemática  |    7 |
+-- | Julieta     | Páez          | Matemática  |    8 |
+-- | Ezequiel    | Vallejos      | Matemática  |    6 |
+-- | Ezequiel    | Vallejos      | Matemática  |    7 |
+-- | Marcela     | Pizarro       | Matemática  |    8 |
+-- | Marcela     | Pizarro       | Matemática  |    7 |
+-- | Sebastián   | Bravo         | Matemática  |    7 |
+-- | Sebastián   | Bravo         | Matemática  |    8 |
+-- | Adela       | Zapata        | Matemática  |    6 |
+-- | Adela       | Zapata        | Matemática  |    7 |
+-- | Alejandro   | Falcón        | Matemática  |    7 |
+-- | Alejandro   | Falcón        | Matemática  |    8 |
+-- | Mónica      | Corvalán      | Matemática  |    8 |
+-- | Mónica      | Corvalán      | Matemática  |    7 |
+-- | Cristian    | Santillán     | Matemática  |    6 |
+-- | Cristian    | Santillán     | Matemática  |    7 |
+-- | Viviana     | Pereira       | Matemática  |    7 |
+-- | Viviana     | Pereira       | Matemática  |    8 |
+-- | Pablo       | Cáceres       | Matemática  |    8 |
+-- | Pablo       | Cáceres       | Matemática  |    7 |
+-- | Gabriela    | Márquez       | Matemática  |    6 |
+-- | Gabriela    | Márquez       | Matemática  |    7 |
+-- | Hugo        | Bustos        | Matemática  |    7 |
+-- | Hugo        | Bustos        | Matemática  |    8 |
+-- | Teresa      | Roldán        | Matemática  |    8 |
+-- | Teresa      | Roldán        | Matemática  |    7 |
+-- | Martín      | Saavedra      | Matemática  |    6 |
+-- | Martín      | Saavedra      | Matemática  |    7 |
+-- | Graciela    | Valverde      | Matemática  |    7 |
+-- | Graciela    | Valverde      | Matemática  |    8 |
+-- | Claudio     | Ocampo        | Matemática  |    8 |
+-- | Claudio     | Ocampo        | Matemática  |    7 |
+-- | Nadia       | Ramírez       | Matemática  |    6 |
+-- | Nadia       | Ramírez       | Matemática  |    7 |
+-- | Ignacio     | Quiroga       | Matemática  |    8 |
+-- | Ignacio     | Quiroga       | Matemática  |    7 |
+-- | Mariela     | Téllez        | Matemática  |    7 |
+-- | Mariela     | Téllez        | Matemática  |    8 |
+-- | Oscar       | Carrizo       | Matemática  |    6 |
+-- | Oscar       | Carrizo       | Matemática  |    7 |
+-- | Patricia    | Valdez        | Matemática  |    8 |
+-- | Patricia    | Valdez        | Matemática  |    7 |
+-- | Adrián      | Serrano       | Matemática  |    7 |
+-- | Adrián      | Serrano       | Matemática  |    8 |
+-- | Rosa        | Meza          | Matemática  |    6 |
+-- | Rosa        | Meza          | Matemática  |    7 |
+-- | Federico    | Olivera       | Matemática  |    8 |
+-- | Federico    | Olivera       | Matemática  |    7 |
+-- | Cecilia     | Prieto        | Matemática  |    7 |
+-- | Cecilia     | Prieto        | Matemática  |    8 |
+-- | Matías      | Barrera       | Matemática  |    6 |
+-- | Matías      | Barrera       | Matemática  |    7 |
+-- | Daniela     | Lagos         | Matemática  |    8 |
+-- | Daniela     | Lagos         | Matemática  |    7 |
+-- | Tomás       | Zárate        | Matemática  |    7 |
+-- | Tomás       | Zárate        | Matemática  |    8 |
+-- | Elena       | Ojeda         | Matemática  |    6 |
+-- | Elena       | Ojeda         | Matemática  |    7 |
+-- | Héctor      | Vega          | Matemática  |    7 |
+-- | Héctor      | Vega          | Matemática  |    8 |
+-- | Luciana     | Peñaloza      | Matemática  |    8 |
+-- | Luciana     | Peñaloza      | Matemática  |    7 |
+-- | Nicolás     | Moyano        | Matemática  |    6 |
+-- | Nicolás     | Moyano        | Matemática  |    7 |
+-- | Beatriz     | Riquelme      | Matemática  |    7 |
+-- | Beatriz     | Riquelme      | Matemática  |    8 |
+-- | Andrés      | Barrios       | Matemática  |    8 |
+-- | Andrés      | Barrios       | Matemática  |    7 |
+-- | Liliana     | Giménez       | Matemática  |    6 |
+-- | Liliana     | Giménez       | Matemática  |    7 |
+-- | Esteban     | Toledo        | Matemática  |    7 |
+-- | Esteban     | Toledo        | Matemática  |    8 |
+-- | Ruth        | Calderón      | Matemática  |    8 |
+-- | Ruth        | Calderón      | Matemática  |    7 |
+-- | Germán      | Roldán        | Matemática  |    6 |
+-- | Germán      | Roldán        | Matemática  |    7 |
+-- | Adriana     | Silva         | Matemática  |    7 |
+-- | Adriana     | Silva         | Matemática  |    8 |
+-- | Cristian    | Montenegro    | Matemática  |    8 |
+-- | Cristian    | Montenegro    | Matemática  |    7 |
+-- | Griselda    | Aguirre       | Matemática  |    6 |
+-- | Griselda    | Aguirre       | Matemática  |    7 |
+-- +-------------+---------------+-------------+------+
+
+-- 7
+
+-- Alumnos que tienen promedio mayor a 7
+/*Esta consulta se utiliza para identificar a los alumnos cuyo promedio general de calificaciones es mayor a 7. 
+La subconsulta primero agrupa las calificaciones por alumno (DNI_A) y calcula su promedio con AVG(Nota), luego HAVING AVG(Nota) > 7 
+filtra solo a quienes superan ese umbral.
+La consulta principal utiliza WHERE DNI IN (...) para traer el nombre y apellido de esos alumnos destacados.
+Esto es útil para reconocer a los estudiantes con buen rendimiento, preparar reportes de seguimiento académico 
+o detectar posibles candidatos para actividades especiales o premios.*/
+
+SELECT Nombre, Apellido 
+FROM Alumnos
+WHERE DNI IN (
+    SELECT DNI_A 
+    FROM Calificaciones
+    GROUP BY DNI_A
+    HAVING AVG(Nota) > 7
+);
+
+-- +-------------+--------------+
+-- | Nombre      | Apellido     |
+-- +-------------+--------------+
+-- | Sofía       | García       |
+-- | Mateo       | Fernández    |
+-- | Valentina   | López        |
+-- | Benjamín    | Martínez     |
+-- | Emma        | Gómez        |
+-- | Thiago      | Díaz         |
+-- | Isabella    | Silva        |
+-- | Lucas       | Torres       |
+-- | Camila      | Rojas        |
+-- | Matías      | Morales      |
+-- | Luna        | Castro       |
+-- | Santiago    | Pérez        |
+-- | Emma        | Alvarez      |
+-- | Juan        | Vargas       |
+-- | Agustina    | Cabrera      |
+-- | Tomás       | Campos       |
+-- | Sofía       | Ibarra       |
+-- | Lucas       | Pineda       |
+-- | Valeria     | Fuentes      |
+-- | Diego       | Valdez       |
+-- | María       | Miranda      |
+-- | Bruno       | Luna         |
+-- | Isabel      | Mendoza      |
+-- | Martín      | Ramos        |
+-- | Catalina    | Moreno       |
+-- | Juan        | Bravo        |
+-- | Florencia   | Salinas      |
+-- | Santiago    | Mora         |
+-- | Agustina    | Santana      |
+-- | Lucas       | Ibáñez       |
+-- | María       | Camacho      |
+-- | Tomás       | Estrada      |
+-- | Isabella    | Valle        |
+-- | Matías      | Rey          |
+-- | Mía         | Crespo       |
+-- | Bruno       | Flores       |
+-- | Isabella    | Romero       |
+-- | Mateo       | Santos       |
+-- | Sofía       | Rojas        |
+-- | Benjamín    | Ortiz        |
+-- | Emma        | Castillo     |
+-- | Thiago      | Herrera      |
+-- | Camila      | Morales      |
+-- | Matías      | Molina       |
+-- | Luna        | Fuentes      |
+-- | Santiago    | Miranda      |
+-- | Mía         | Salazar      |
+-- | Agustín     | Reyes        |
+-- | Isabel      | Paz          |
+-- | Bruno       | Núñez        |
+-- | Lucía       | Salinas      |
+-- | Facundo     | Santana      |
+-- | Micaela     | Ibáñez       |
+-- | Julián      | Camacho      |
+-- | Emilia      | Estrada      |
+-- | Matías      | Valle        |
+-- | Lucía       | Rey          |
+-- | Gabriel     | Crespo       |
+-- | Catalina    | Flores       |
+-- | Martín      | Ortiz        |
+-- | Luna        | Ortiz        |
+-- | Santiago    | Castillo     |
+-- | Mía         | Herrera      |
+-- | Agustín     | Morales      |
+-- | Emma        | Molina       |
+-- | Martín      | Fuentes      |
+-- | Catalina    | Valdez       |
+-- | Diego       | Miranda      |
+-- | Julia       | Luna         |
+-- | Julián      | Mendoza      |
+-- | Emma        | Ramos        |
+-- | Lucas       | Paz          |
+-- | Ana         | Vargas       |
+-- | Martín      | Salinas      |
+-- | Carla       | Mendoza      |
+-- | Lucas       | Cabrera      |
+-- | Laura       | Campos       |
+-- | Sergio      | Fernández    |
+-- | Mariana     | Pineda       |
+-- | Diego       | Herrera      |
+-- | Verónica    | Reyes        |
+-- | Facundo     | Ortiz        |
+-- | Gabriela    | Castro       |
+-- | Pablo       | Paz          |
+-- | Agustina    | Pacheco      |
+-- | Martín      | Bravo        |
+-- | Julieta     | Vargas       |
+-- | Leandro     | Miranda      |
+-- | Valentina   | Luna         |
+-- | Santiago    | Campos       |
+-- | Camila      | Castillo     |
+-- | Bruno       | Romero       |
+-- | Florencia   | Mora         |
+-- | Lucas       | Salinas      |
+-- | Emilia      | Ibarra       |
+-- | Tomás       | Reyes        |
+-- | Carla       | Domínguez    |
+-- | Pablo       | Herrera      |
+-- | Lucía       | Morales      |
+-- | Matías      | Molina       |
+-- | Emilia      | Fuentes      |
+-- | Ramiro      | Valdez       |
+-- | Paula       | Miranda      |
+-- | Diego       | Luna         |
+-- | María       | Vega         |
+-- | Javier      | Salinas      |
+-- | Florencia   | Ramos        |
+-- | Sergio      | Ortiz        |
+-- | Gabriela    | Flores       |
+-- | Ramiro      | Ortiz        |
+-- | Natalia     | Sosa         |
+-- | Javier      | León         |
+-- | Lucía       | Rivas        |
+-- | Tomás       | Campos       |
+-- | María       | Navarro      |
+-- | Diego       | Romero       |
+-- | Paula       | Santos       |
+-- | Lucas       | Rojas        |
+-- | Emilio      | Ortiz        |
+-- | Florencia   | Castillo     |
+-- | Sergio      | Cabrera      |
+-- | Natalia     | Campos       |
+-- | Pablo       | Suárez       |
+-- | Camila      | Ramos        |
+-- | Bruno       | Ortiz        |
+-- | Isabel      | Castillo     |
+-- | Lucas       | Herrera      |
+-- | Emilia      | Morales      |
+-- | Martín      | Molina       |
+-- | Sofía       | Fuentes      |
+-- | Diego       | Valdez       |
+-- | Lucía       | Miranda      |
+-- | Matías      | Salazar      |
+-- | Florencia   | Ramos        |
+-- | Emilio      | Ortiz        |
+-- | Paula       | Castillo     |
+-- | Lucas       | Romero       |
+-- | Isabel      | Mora         |
+-- | Javier      | Salinas      |
+-- | Micaela     | Ibarra       |
+-- | Ramiro      | Reyes        |
+-- | Natalia     | Pacheco      |
+-- | Bruno       | Vargas       |
+-- | Sofía       | Salinas      |
+-- | Lautaro     | Benítez      |
+-- | Juana       | Perdomo      |
+-- | Franco      | Figueroa     |
+-- | Renata      | Chávez       |
+-- | Ignacio     | Galván       |
+-- | Valentina   | Arévalo      |
+-- | Dante       | Vivas        |
+-- | Milagros    | Sánchez      |
+-- | Emilio      | Carrizo      |
+-- | Paula       | Tejada       |
+-- | Simón       | Cabral       |
+-- | Camila      | Villafañe    |
+-- | Mauricio    | Riveros      |
+-- | Aitana      | Fonseca      |
+-- | Esteban     | Lagos        |
+-- | Martina     | Esquivel     |
+-- | Lucas       | Navarro      |
+-- | Lucía       | Morán        |
+-- | Martín      | Calvo        |
+-- | Isabel      | Ríos         |
+-- | Agustín     | Toha         |
+-- | Tamara      | Frías        |
+-- | Maximiliano | Saiz         |
+-- | Candela     | Lucero       |
+-- | Nicolás     | Patiño       |
+-- | Rocío       | Alonso       |
+-- | Fabián      | Vega         |
+-- | Mariela     | Bravo        |
+-- | Oscar       | Tello        |
+-- | Adriana     | Castillo     |
+-- | Benjamín    | Oliva        |
+-- | Daniela     | Campos       |
+-- | Mauricio    | Carranza     |
+-- | Zoe         | Peñaloza     |
+-- | Damián      | Valdés       |
+-- | Margarita   | Estévez      |
+-- | Ezequiel    | Corvalán     |
+-- | Pamela      | Ferreyra     |
+-- | Agustina    | Ojeda        |
+-- | Leandro     | Funes        |
+-- | Cintia      | Vázquez      |
+-- | Joaquín     | Domínguez    |
+-- | Nerea       | Camposano    |
+-- | Franco      | Yáñez        |
+-- | Bianca      | Ortega       |
+-- | Axel        | Ibarra       |
+-- | Tobías      | Quiroga      |
+-- | Camila      | Barrios      |
+-- | Jonás       | Correa       |
+-- | Bárbara     | Salvatierra  |
+-- | Federico    | Vallejos     |
+-- | Antonella   | Coronel      |
+-- | Enzo        | Recalde      |
+-- | Gabriela    | Morales      |
+-- | Luciano     | Pizarro      |
+-- | Mariela     | Tello        |
+-- | Facundo     | Herrera      |
+-- | Romina      | Fariña       |
+-- | Gustavo     | Santana      |
+-- | Daniela     | Morel        |
+-- | Kevin       | Aguirre      |
+-- | Magalí      | Navarro      |
+-- | Nicolás     | Santibáñez   |
+-- | Lara        | Cabrera      |
+-- | Tomás       | Serrano      |
+-- | Camila      | Figueroa     |
+-- | Franco      | Palacios     |
+-- | Florencia   | Sánchez      |
+-- | Damián      | Rosales      |
+-- | Gisela      | Ferraresi    |
+-- | Marcos      | Cordero      |
+-- | Rocío       | Acosta       |
+-- | Santiago    | Bermúdez     |
+-- | Miriam      | Garrido      |
+-- | Adrián      | Villalba     |
+-- | Sabrina     | Espinoza     |
+-- | Kevin       | Mercado      |
+-- | Natalia     | Bravo        |
+-- | Ariel       | Paz          |
+-- | Mariela     | Sepúlveda    |
+-- | Julián      | Bustos       |
+-- | Ailén       | Domínguez    |
+-- | Rodrigo     | Cáceres      |
+-- | Vanesa      | Silva        |
+-- | Franco      | Quinteros    |
+-- | Carolina    | Paredes      |
+-- | Leandro     | Salvatierra  |
+-- | Noelia      | Montenegro   |
+-- | Mauricio    | Olivera      |
+-- | Romina      | Villarreal   |
+-- | Federico    | Cruz         |
+-- | Julieta     | Ponce        |
+-- | Iván        | Alcaraz      |
+-- | Gabriela    | Medina       |
+-- | Pablo       | Serrano      |
+-- | Daiana      | Torres       |
+-- | Felipe      | Lemus        |
+-- | Bianca      | Acosta       |
+-- | Ariel       | Gómez        |
+-- | Mariela     | Funes        |
+-- | Fabián      | Rosendo      |
+-- | Eliana      | Prieto       |
+-- | Mariano     | Ojeda        |
+-- | Natalia     | Sarmiento    |
+-- | Iván        | Benítez      |
+-- | Patricia    | Guerrero     |
+-- | Alejandro   | Fleitas      |
+-- | Vanina      | Ayala        |
+-- | Javier      | Galarza      |
+-- | Sabrina     | Meza         |
+-- | Nahuel      | Espínola     |
+-- | Florencia   | Barrios      |
+-- | Cristian    | Cáceres      |
+-- | Laura       | Morales      |
+-- | Sofía       | Aguilar      |
+-- | Héctor      | Márquez      |
+-- | Brenda      | Arce         |
+-- | Ignacio     | Maldini      |
+-- | Valeria     | Ortega       |
+-- | Mauricio    | Santoro      |
+-- | Pamela      | Téllez       |
+-- | Leandro     | Fiorito      |
+-- | Romina      | Mancini      |
+-- | Facundo     | Alarcón      |
+-- | Tamara      | Quintana     |
+-- | Esteban     | Toledo       |
+-- | Laura       | Pellegrini   |
+-- | Pablo       | Centurión    |
+-- | Silvina     | Marelli      |
+-- | Franco      | Silvestre    |
+-- | Patricia    | Almada       |
+-- | Damián      | Ferreyra     |
+-- | Karina      | Benítez      |
+-- | Hernán      | Villalba     |
+-- | Carolina    | Marino       |
+-- | Rodrigo     | Arancibia    |
+-- | Sandra      | Escobar      |
+-- | Iván        | Varela       |
+-- | Rocío       | Toja         |
+-- | Gonzalo     | Lozano       |
+-- | Julieta     | Páez         |
+-- | Ezequiel    | Vallejos     |
+-- | Marcela     | Pizarro      |
+-- | Sebastián   | Bravo        |
+-- | Adela       | Zapata       |
+-- | Alejandro   | Falcón       |
+-- | Viviana     | Pereira      |
+-- | Hugo        | Bustos       |
+-- | Graciela    | Valverde     |
+-- | Ignacio     | Quiroga      |
+-- | Mariela     | Téllez       |
+-- | Oscar       | Carrizo      |
+-- | Patricia    | Valdez       |
+-- | Adrián      | Serrano      |
+-- | Rosa        | Meza         |
+-- | Federico    | Olivera      |
+-- | Cecilia     | Prieto       |
+-- | Matías      | Barrera      |
+-- | Daniela     | Lagos        |
+-- | Tomás       | Zárate       |
+-- | Elena       | Ojeda        |
+-- | Héctor      | Vega         |
+-- | Beatriz     | Riquelme     |
+-- | Esteban     | Toledo       |
+-- | Adriana     | Silva        |
+-- +-------------+--------------+
+
+
+-- Docentes que dictan más de 2 materias
+/*Esta consulta se utiliza para identificar a los docentes que dictan más de dos materias. 
+La subconsulta agrupa los registros de la tabla Asignacion_Docentes por docente (DNI_D) y utiliza COUNT(ID_Materia) 
+junto con HAVING > 2 para filtrar solo a aquellos que tienen asignadas más de dos materias.
+La consulta principal luego recupera el nombre y apellido de esos docentes usando WHERE DNI IN (...). 
+Esto es útil para detectar cargas horarias elevadas, analizar la distribución del trabajo docente 
+o planificar apoyos adicionales para quienes tienen mayor cantidad de asignaturas a su cargo.*/
+
+SELECT Nombre, Apellido 
+FROM Docentes
+WHERE DNI IN (
+    SELECT DNI_D 
+    FROM Asignacion_Docentes
+    GROUP BY DNI_D
+    HAVING COUNT(ID_Materia) > 2
+);
+
+-- +-----------+------------+
+-- | Nombre    | Apellido   |
+-- +-----------+------------+
+-- | Juan      | Martínez   |
+-- | Tomás     | Villalba   |
+-- | Laura     | Fernández  |
+-- | Florencia | Silva      |
+-- | Julieta   | Vega       |
+-- | Simón     | Peralta    |
+-- | Lorenzo   | Giménez    |
+-- | Martina   | López      |
+-- | Facundo   | Mendoza    |
+-- | Nicolás   | Aguirre    |
+-- | Bianca    | Navarro    |
+-- | Agustina  | Cabrera    |
+-- | Milagros  | Bustamante |
+-- | Lucía     | Moreno     |
+-- | Renata    | Salas      |
+-- | Sofía     | Quiroga    |
+-- | Mateo     | Sosa       |
+-- | Elías     | Ojeda      |
+-- | Benjamín  | Luna       |
+-- | Valentina | Rivas      |
+-- | Dante     | Ibarra     |
+-- | Julián    | Benítez    |
+-- | Catalina  | Paz        |
+-- | Camila    | Escobar    |
+-- | Lautaro   | Ruiz       |
+-- +-----------+------------+
